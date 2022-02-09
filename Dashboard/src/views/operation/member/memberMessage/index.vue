@@ -21,7 +21,7 @@
         <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
       </el-form-item>
     </el-form>
-    <el-table v-loading="dataLoading" :data="tableData" :border="true">
+    <el-table v-loading="dataLoading" :data="tableData" border>
       <el-table-column prop="Name" :label="$t('__member') + $t('__account')" />
       <el-table-column prop="NickName" :label="$t('__nickname')" />
       <el-table-column prop="Currency" :label="$t('__currency')" />

@@ -61,10 +61,4 @@ export default {
     justify-content: center;
   }
 }
-
-.has-gutter th {
-    background-color: #FF9800;
-    color: white;
-    border: none !important;
-}
 </style>
