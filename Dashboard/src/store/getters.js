@@ -10,6 +10,9 @@ const getters = {
   role: state => state.user.role,
   agentId: state => state.user.agentId,
   permissions: state => state.user.permissions,
-  permission_routes: state => state.permission.routes
+  permission_routes: state => state.permission.routes,
+  accountListData: state => state.backstage.accountListData,
+  accountCreateAgentRole: state => state.backstage.accountCreateAgentRole,
+  customerServiceListData: state => state.customerServiceManage.customerServiceListData
 }
 export default getters

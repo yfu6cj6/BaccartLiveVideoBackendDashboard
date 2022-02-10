@@ -9,7 +9,7 @@
       </el-form-item>
       <el-form-item :label="$t('__currency')">
         <el-select v-model="searchForm.currency">
-          <el-option v-for="item in currencyList" :key="item.code" :label="item.name" :value="item.code" />
+          <el-option v-for="item in currencyList" :key="item.Code" :label="item.Name" :value="item.Code" />
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('__accountType')">
@@ -53,6 +53,16 @@ export default {
   name: 'MemberMessage',
   mixins: [handlePageChange, shared, transTableDataByLang],
   data() {
+    const accountType = [
+      {
+        label: '試用帳號',
+        value: 1
+      },
+      {
+        label: '正式真錢帳號',
+        value: 2
+      }
+    ]
     return {
       currencyList: [],
       searchForm: {
@@ -63,7 +73,7 @@ export default {
         limit: 0,
         page: 1
       },
-      accountType: []
+      accountType: accountType
     }
   },
   computed: {
@@ -81,11 +91,12 @@ export default {
       this.selectLoading = true
       this.dataLoading = true
       return getSelectMenu(this.token).then((res) => {
-        this.currencyList.push({ code: 0, name: this.$t('__allCurrency') })
+        this.currencyList = []
+        this.currencyList.push({ Code: 0, Name: this.$t('__allCurrency') })
         this.currencyList = this.currencyList.concat(res.Data.Currencies)
 
-        this.searchForm.currency = this.currencyList[0].code
-        // this.searchForm.accountType = this.accountType[0].value
+        this.searchForm.currency = this.currencyList[0].Code
+        this.searchForm.accountType = this.accountType[0].value
         this.searchForm.limit = this.pageSize
       })
     },

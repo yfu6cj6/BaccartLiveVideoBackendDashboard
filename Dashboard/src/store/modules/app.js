@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie'
+import store from '@/store'
 
 const state = {
   sidebar: {
@@ -37,6 +38,10 @@ const actions = {
   },
   toggleDevice({ commit }, device) {
     commit('TOGGLE_DEVICE', device)
+  },
+  changeSelectLang({ commit }) {
+    store.dispatch('backstage/changeSelectLang')
+    store.dispatch('customerServiceManage/changeSelectLang')
   }
 }
 

@@ -27,7 +27,7 @@ export default {
   name: 'CustomerServiceList',
   mixins: [handlePageChange, shared],
   computed: {
-    ...mapGetters(['token'])
+    ...mapGetters(['token', 'customerServiceListData'])
   },
   created() {
     this.search()
@@ -40,7 +40,8 @@ export default {
     async onSubmit() {
       this.dataLoading = true
       customerServiceList(this.token).then((res) => {
-        this.allDataByClient = res.Data
+        this.$store.dispatch('customerServiceManage/setcustomerServiceListData', res.Data)
+        this.allDataByClient = this.customerServiceListData
         this.totalCount = res.Data.length
         this.handlePageChangeByClient(this.currentPage)
         this.dataLoading = false

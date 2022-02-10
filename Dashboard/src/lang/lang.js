@@ -28,12 +28,10 @@ const messages = {
 }
 
 const languageKey = 'language' // 定義寫入Cookies時使用的名稱
-const chooseLanguage = Cookies.get(languageKey) // 定義取得Cookies的常數
-
-Cookies.remove(languageKey)
 
 // 定義取得Cookies的函數並匯出
 export const getLanguage = () => {
+  const chooseLanguage = Cookies.get(languageKey) // 定義取得Cookies的常數
   if (chooseLanguage) { return chooseLanguage }
 
   // 如果沒有選擇任何一項語言

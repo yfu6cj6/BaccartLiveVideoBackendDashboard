@@ -72,5 +72,13 @@
     "__gamePlay": "遊戲玩法",
     "__betAmount": "下注額度",
     "__payout": "派彩",
-    "__validBetAmount": "有效投注額"
+    "__validBetAmount": "有效投注額",
+    "__admin": "管理員",
+    "__customerService": "客服",
+    "__agentAccount": "廠商帳號",
+    "__customerServiceAccount": "客服帳號",
+    "__business": "業務",
+    "__agentAccount_seamlessWallet": "廠商帳號-無縫錢包",
+    "__finance": "財務",
+    "__bdl_customerService": "BDL客服"
 }

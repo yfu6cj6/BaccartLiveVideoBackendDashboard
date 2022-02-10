@@ -44,6 +44,7 @@ export default {
   methods: {
     changeLocale: function(locale) {
       setLanguage(locale)
+      this.$store.dispatch('app/changeSelectLang')
     },
     getLang: function(lang) {
       switch (lang) {

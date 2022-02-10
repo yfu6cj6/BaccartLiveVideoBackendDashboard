@@ -109,7 +109,8 @@ export default {
   computed: {
     ...mapGetters([
       'token',
-      'visitedViews'
+      'visitedViews',
+      'accountCreateAgentRole'
     ]),
     formAgentId() {
       return this.form.agentId
@@ -119,8 +120,8 @@ export default {
     this.roleLoading = true
     this.infoLoading = true
     getAgentRole(this.token).then((res) => {
-      const { Data } = res
-      this.getRole = Data
+      this.$store.dispatch('backstage/setAccountCreateAgentRole', res.Data)
+      this.getRole = this.accountCreateAgentRole
       this.roleLoading = false
     })
     getAgentLevelInfo(this.token).then((res) => {

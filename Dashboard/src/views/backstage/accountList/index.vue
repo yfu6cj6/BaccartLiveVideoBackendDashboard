@@ -32,7 +32,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['token'])
+    ...mapGetters(['token', 'accountListData'])
   },
   created() {
     this.handleCurrentChange(1)
@@ -41,7 +41,8 @@ export default {
     async onSubmit() {
       this.dataLoading = true
       accountListPage(this.token).then((res) => {
-        this.allDataByClient = res.Data
+        this.$store.dispatch('backstage/setAccountListData', res.Data)
+        this.allDataByClient = this.accountListData
         this.totalCount = res.Data.length
         this.handlePageChangeByClient(this.currentPage)
         this.dataLoading = false
