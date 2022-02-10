@@ -39,3 +39,22 @@ export function apiBetRecordSearch(token, data) {
     data: data
   })
 }
+
+// - 額度記錄
+// - 代理列表、幣種、交易類型下拉選單值
+export function apiBalanceRecordSelect(token) {
+  return request({
+    url: '/member_balance_record/select_menu',
+    method: 'get',
+    headers: { 'Authorization': 'token ' + token }
+  })
+}
+
+export function apiBalanceRecordSearch(token, data) {
+  return request({
+    url: '/member_balance_record/search',
+    method: 'post',
+    headers: { 'Authorization': 'token ' + token },
+    data: data
+  })
+}
