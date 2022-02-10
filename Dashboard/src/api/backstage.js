@@ -1,12 +1,8 @@
 import request from '@/utils/request'
+import { getLanguage } from '@/lang/lang'
 
-export function accountListPage(token) {
-  return request({
-    url: '/user/account_list',
-    method: 'post',
-    headers: { 'Authorization': 'token ' + token }
-  })
-}
+const lang = getLanguage()
+
 export function getAgentRole(token) {
   return request({
     url: '/user/account_create',
@@ -14,6 +10,7 @@ export function getAgentRole(token) {
     headers: { 'Authorization': 'token ' + token }
   })
 }
+
 export function createUser(token, body) {
   return request({
     url: '/user/create_user',
@@ -22,6 +19,23 @@ export function createUser(token, body) {
     headers: { 'Authorization': 'token ' + token }
   })
 }
+
+export function getAgentLevelInfo(token) {
+  return request({
+    url: '/agent_day_report/agent_level_info',
+    method: 'get',
+    headers: { 'Authorization': 'token ' + token, 'Accept-Language': lang }
+  })
+}
+
+export function accountListPage(token) {
+  return request({
+    url: '/user/account_list',
+    method: 'post',
+    headers: { 'Authorization': 'token ' + token }
+  })
+}
+
 export function modifyPassword(token, body) {
   return request({
     url: '/user/modify_password',
@@ -30,22 +44,3 @@ export function modifyPassword(token, body) {
     headers: { 'Authorization': 'token ' + token }
   })
 }
-
-export function update(token, body) {
-  return request({
-    url: '/user/update',
-    method: 'post',
-    data: body,
-    headers: { 'Authorization': 'token ' + token }
-  })
-}
-
-export function del(token, body) {
-  return request({
-    url: '/user/delete',
-    method: 'post',
-    data: body,
-    headers: { 'Authorization': 'token ' + token }
-  })
-}
-

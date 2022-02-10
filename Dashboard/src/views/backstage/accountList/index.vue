@@ -1,6 +1,6 @@
 <template>
   <div class="accountList-container">
-    <el-table :data="tableData" border>
+    <el-table v-loading="dataLoading" :data="tableData" border>
       <el-table-column prop="Account" :label="$t('__account')" />
       <el-table-column prop="RoleName" :label="$t('__role')" />
       <el-table-column prop="AgentName" :label="$t('__agent')" />
@@ -26,20 +26,24 @@ import shared from '@/layout/mixin/shared'
 export default {
   name: 'AccountList',
   mixins: [handlePageChange, shared],
+  data() {
+    return {
+      dataLoading: false
+    }
+  },
   computed: {
     ...mapGetters(['token'])
   },
   created() {
-    this.selectLoading = true
     this.handleCurrentChange(1)
   },
   methods: {
     async onSubmit() {
+      this.dataLoading = true
       accountListPage(this.token).then((res) => {
         this.allDataByClient = res.Data
         this.totalCount = res.Data.length
         this.handlePageChangeByClient(this.currentPage)
-        this.selectLoading = false
         this.dataLoading = false
       })
     }

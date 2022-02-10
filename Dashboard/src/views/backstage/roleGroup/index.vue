@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="roleGroup-container">
     <el-form class="filterForm" style="max-width: 450px; margin: 0 auto" label-width="120px">
       <el-form-item :label="$t('__select') + $t('__roleGroup')" style="border-bottom: 1px solid #ebebeb">
         <el-select v-model="group">
@@ -22,3 +22,11 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.roleGroup {
+  &-container {
+    margin: 20px;
+  }
+}
+</style>

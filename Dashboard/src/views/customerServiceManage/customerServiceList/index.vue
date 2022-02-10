@@ -1,6 +1,6 @@
 <template>
   <div class="customerServiceList-container">
-    <el-table :data="tableData" border>
+    <el-table v-loading="dataLoading" :data="tableData" border>
       <el-table-column prop="Account" :label="$t('__account')" />
       <el-table-column prop="RoleName" :label="$t('__role')" />
       <el-table-column prop="AgentName" :label="$t('__agent')" />
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { customerServiceList } from '@/api/customerService'
+import { customerServiceList } from '@/api/customerServiceManage'
 import { mapGetters } from 'vuex'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
@@ -38,12 +38,11 @@ export default {
       this.onSubmit()
     },
     async onSubmit() {
-      this.selectLoading = true
+      this.dataLoading = true
       customerServiceList(this.token).then((res) => {
         this.allDataByClient = res.Data
         this.totalCount = res.Data.length
         this.handlePageChangeByClient(this.currentPage)
-        this.selectLoading = false
         this.dataLoading = false
       })
     }

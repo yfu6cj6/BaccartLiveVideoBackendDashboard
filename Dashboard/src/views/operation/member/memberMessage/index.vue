@@ -46,11 +46,11 @@ import { mapGetters } from 'vuex'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import transTableDataByLang from '@/layout/mixin/transTableDataByLang'
-import { apiMemberInfo } from '@/api/member'
-import { getSelectMenu } from '@/api/select_menu'
+import { apiMemberInfo, getSelectMenu } from '@/api/operation_member'
 import _ from 'lodash'
 
 export default {
+  name: 'MemberMessage',
   mixins: [handlePageChange, shared, transTableDataByLang],
   data() {
     return {
@@ -72,13 +72,14 @@ export default {
     ])
   },
   created() {
-    this.selectLoading = true
     this.initAllSelectMenu().then((res) => {
       this.handleCurrentChange(1)
     })
   },
   methods: {
     async initAllSelectMenu() {
+      this.selectLoading = true
+      this.dataLoading = true
       return getSelectMenu(this.token).then((res) => {
         this.currencyList.push({ code: 0, name: this.$t('__allCurrency') })
         this.currencyList = this.currencyList.concat(res.Data.Currencies)
@@ -86,12 +87,12 @@ export default {
         this.searchForm.currency = this.currencyList[0].code
         // this.searchForm.accountType = this.accountType[0].value
         this.searchForm.limit = this.pageSize
-        this.selectLoading = false
       })
     },
     async onSubmit() {
       this.searchForm.page = this.currentPage
       this.tableData = []
+      this.selectLoading = true
       this.dataLoading = true
       await apiMemberInfo(this.token, this.searchForm).then((res) => {
         this.allDataByClient = res.Data.MemberInfos
@@ -101,6 +102,7 @@ export default {
           item.RegisterTime = item.RegisterTime.replace('T', ' ')
           return this.transTableDataByLang(item)
         })
+        this.selectLoading = false
         this.dataLoading = false
       })
     }

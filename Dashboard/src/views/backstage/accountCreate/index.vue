@@ -1,7 +1,7 @@
 <template>
-  <div class="app-container">
+  <div class="accountCreate-container">
     <el-row>
-      <el-col :span="6">
+      <el-col v-loading="roleLoading" :span="6">
         <el-card shadow="never">
           <el-scrollbar>
             <el-tree
@@ -18,6 +18,7 @@
       <el-col :span="18">
         <el-form
           ref="form"
+          v-loading="infoLoading"
           class="filterForm"
           label-width="150px"
           style="max-width: 400px; margin: 0 auto;"
@@ -61,10 +62,9 @@
 
 <script>
 import { form } from './model.js'
-import { createUser, getAgentRole } from '@/api/backstage'
+import { getAgentRole, createUser, getAgentLevelInfo } from '@/api/backstage'
 import { validAccount } from '@/utils/validate'
 import { mapGetters } from 'vuex'
-import { getAgentLevelInfo } from '@/api/agent'
 
 export default {
   name: 'AccountCreate',
@@ -101,7 +101,9 @@ export default {
         children: 'SubAgentLevelInfos',
         label: 'AgentName'
       },
-      getRole: []
+      getRole: [],
+      roleLoading: false,
+      infoLoading: false
     }
   },
   computed: {
@@ -114,9 +116,12 @@ export default {
     }
   },
   created() {
+    this.roleLoading = true
+    this.infoLoading = true
     getAgentRole(this.token).then((res) => {
       const { Data } = res
       this.getRole = Data
+      this.roleLoading = false
     })
     getAgentLevelInfo(this.token).then((res) => {
       this.treeData.agentLevelInfo = [res.Data.AgentLevelInfo]
@@ -124,6 +129,7 @@ export default {
       this.form.role = this.getRole[0].Id
       this.defaultForm.agentId = res.Data.AgentLevelInfo.AgentId
       this.defaultForm.role = this.form.role
+      this.infoLoading = false
     })
   },
   methods: {
@@ -181,7 +187,12 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.accountCreate {
+  &-container {
+    margin: 20px;
+  }
+}
 .el-input {
   width: 150px;
 }

@@ -1,7 +1,8 @@
 <template>
-  <div class="app-container">
+  <div class="passwordReset-container">
     <el-form
       ref="form"
+      v-loading="submitLoading"
       class="filterForm"
       style="margin: 0 auto"
       label-width="110px"
@@ -61,6 +62,7 @@ export default {
     onSubmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
+          this.submitLoading = true
           modifyPassword(this.token, this.form).then((res) => {
             this.reset()
             this.$message({
@@ -68,12 +70,14 @@ export default {
               message: this.$t('__revise') + this.$t('__success'),
               type: 'success'
             })
+            this.submitLoading = false
           }).catch((error) => {
             this.$message({
               title: error.Error.Code,
               message: this.$t('__revise') + this.$t('__fail'),
               type: 'error'
             })
+            this.submitLoading = false
           })
         }
       })
@@ -87,5 +91,16 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.passwordReset {
+  &-container {
+    margin: 20px;
+    padding: 1em;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+  }
+}
 </style>
