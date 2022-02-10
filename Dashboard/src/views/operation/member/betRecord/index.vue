@@ -1,7 +1,7 @@
 <template>
   <div class="betRecord-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
-      <el-form-item :label="$t('__memberAccount')">
+      <el-form-item :label="$t('__member') + $t('__account')">
         <el-input v-model="searchForm.memberName" />
       </el-form-item>
       <el-form-item :label="$t('__roundID')">
@@ -55,7 +55,7 @@
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" :border="true">
-      <el-table-column prop="MemberName" :label="$t('__memberAccount')" />
+      <el-table-column prop="MemberName" :label="$t('__member') + $t('__account')" />
       <el-table-column prop="AgentName" :label="$t('__agent')" />
       <el-table-column prop="OrderNumber" :label="$t('__orderNumber')" />
       <el-table-column prop="RoundId" :label="$t('__roundID')" />
@@ -120,8 +120,7 @@ export default {
       gameTypeList: [],
       currencyList: [],
       agentList: [],
-      timeZoneList: [],
-      messageInstance: this.$message
+      timeZoneList: []
     }
   },
   computed: {
@@ -133,6 +132,7 @@ export default {
     ])
   },
   created() {
+    this.selectLoading = true
     // 取得並初始化下拉式選單
     apiBetRecordSelect(this.token).then((res) => {
       this.gameTableList = res.Data.GameTables
@@ -140,19 +140,20 @@ export default {
       this.agentList = res.Data.Agents
       this.currencyList = res.Data.Currencies
       this.timeZoneList = res.Data.TimeZones
-      // this.$store.dispatch('select_menu/changeSelectLang')
       this.searchForm.tableId = this.gameTableList[0].Id
       this.searchForm.gameType = this.gameTypeList[0].Id
       this.searchForm.agentId = this.agentList[0].Id
       this.searchForm.currency = this.currencyList[0].Code
       this.searchForm.timeZone = this.timeZoneList[0].Id
-      this.searchForm.orderBy = this.orderBy[0].value
-      this.searchForm.orderByCondition = this.orderByCondition_bet_record[0].value
+      // this.searchForm.orderBy = this.orderBy[0].value
+      // this.searchForm.orderByCondition = this.orderByCondition_bet_record[0].value
+      this.selectLoading = false
     })
   },
   methods: {
     async onSubmit() {
       this.tableData = []
+      this.selectLoading = true
       this.dataLoading = true
       const ZO = ' 00:00:00'
       this.searchForm.betTimeRangeStart = getFullDate(this.searchTimeRange[0]) + ZO
@@ -164,11 +165,10 @@ export default {
           return transTableDataByLang(item)
         })
         this.dataLoading = false
+        this.selectLoading = false
+      }).catch(() => {
+        this.selectLoading = false
       })
-        .catch(() => {
-          this.dataLoading = false
-          // requestFailded(this.messageInstance, err)
-        })
     }
   }
 }
