@@ -4,18 +4,18 @@
       ref="form"
       v-loading="submitLoading"
       class="filterForm"
-      style="margin: 0 auto"
+      style="margin: 0 auto;"
       label-width="110px"
       :model="form"
       :rules="rules"
     >
-      <el-form-item :label="$t('__oldPassword')" prop="oldPassword">
+      <el-form-item style="padding-right: 10px;" :label="$t('__oldPassword')" prop="oldPassword">
         <el-input v-model="form.oldPassword" />
       </el-form-item>
-      <el-form-item :label="$t('__newPassword')" prop="newPassword">
+      <el-form-item style="padding-right: 10px;" :label="$t('__newPassword')" prop="newPassword">
         <el-input v-model="form.newPassword" show-password />
       </el-form-item>
-      <el-form-item :label="$t('__confirmPassword')" prop="confirmPassword">
+      <el-form-item style="padding-right: 10px;" :label="$t('__confirmPassword')" prop="confirmPassword">
         <el-input v-model="confirmPassword" show-password />
       </el-form-item>
       <div clsss="row">

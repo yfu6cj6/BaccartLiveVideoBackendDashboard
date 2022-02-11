@@ -55,17 +55,17 @@
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" :border="true">
-      <el-table-column prop="MemberName" :label="$t('__member') + $t('__account')" />
+      <el-table-column style="width: 100px;" prop="MemberName" :label="$t('__member') + $t('__account')" />
       <el-table-column prop="AgentName" :label="$t('__agent')" />
       <el-table-column prop="OrderNumber" :label="$t('__orderNumber')" />
       <el-table-column prop="RoundId" :label="$t('__roundID')" />
       <el-table-column prop="TableId" :label="$t('__tableID')" />
-      <el-table-column prop="OrderStatus" :label="$t('__orderStatus')" />
-      <el-table-column prop="GamePlay" :label="$t('__gamePlay')" />
+      <el-table-column prop="OrderStatusLabel" :label="$t('__orderStatus')" />
+      <el-table-column prop="GamePlayLabel" :label="$t('__gamePlay')" />
       <el-table-column prop="BetAmount" :label="$t('__betAmount')" />
       <el-table-column prop="Payout" :label="$t('__payout')" />
       <el-table-column prop="ValidBetAmount" :label="$t('__validBetAmount')" />
-      <el-table-column prop="Currency" :label="$t('__currency')" />
+      <el-table-column prop="CurrencyLabel" :label="$t('__currency')" />
       <el-table-column prop="BetTime" :label="$t('__betTime')" />
     </el-table>
 
@@ -87,12 +87,10 @@ import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import { initDatePickerRange, getFullDate } from '@/utils/transDate'
 import { apiBetRecordSelect, apiBetRecordSearch } from '@/api/operation_member'
-import transTableDataByLang from '@/layout/mixin/transTableDataByLang'
-import _ from 'lodash'
 
 export default {
   name: 'BetRecord',
-  mixins: [handlePageChange, shared, transTableDataByLang],
+  mixins: [handlePageChange, shared],
   data() {
     return {
       searchForm: {
@@ -106,9 +104,9 @@ export default {
         memberName: '',
         fuzzyQuery: false,
         roundId: undefined,
-        orderNumber: 0,
-        payoutRangeMin: 0,
-        payoutRangeMax: 0,
+        orderNumber: undefined,
+        payoutRangeMin: undefined,
+        payoutRangeMax: undefined,
         orderByCondition: 0,
         orderBy: 0,
         device: 0,
@@ -124,14 +122,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'token',
-      'agentId',
-      'orderBy',
-      'orderByCondition_bet_record'
-    ])
+    ...mapGetters(['token', 'memberBetRecords', 'orderBy', 'orderByCondition_bet_record'])
   },
   created() {
+    this.$store.dispatch('operation_member/setSelectMenu')
     this.selectLoading = true
     // 取得並初始化下拉式選單
     apiBetRecordSelect(this.token).then((res) => {
@@ -145,9 +139,11 @@ export default {
       this.searchForm.agentId = this.agentList[0].Id
       this.searchForm.currency = this.currencyList[0].Code
       this.searchForm.timeZone = this.timeZoneList[0].Id
-      // this.searchForm.orderBy = this.orderBy[0].value
-      // this.searchForm.orderByCondition = this.orderByCondition_bet_record[0].value
+      this.searchForm.orderBy = this.orderBy[0].value
+      this.searchForm.orderByCondition = this.orderByCondition_bet_record[0].value
       this.selectLoading = false
+
+      this.handleCurrentChange(1)
     })
   },
   methods: {
@@ -159,11 +155,14 @@ export default {
       this.searchForm.betTimeRangeStart = getFullDate(this.searchTimeRange[0]) + ZO
       this.searchForm.betTimeRangeEnd = getFullDate(this.searchTimeRange[1]) + ZO
       await apiBetRecordSearch(this.token, this.searchForm).then((res) => {
-        this.totalCount = res.Data.TotalCount
-        this.tableData = res.Data.MemberBetRecords
-        this.allData = _.cloneDeep(this.tableData).map((item) => {
-          return transTableDataByLang(item)
+        this.$store.dispatch('operation_member/setMemberBetRecords', res.Data.MemberBetRecords)
+        this.allDataByClient = this.memberBetRecords
+        this.allDataByClient.forEach(element => {
+          const gameTable = this.gameTableList.find(table => table.Id === element.TableId)
+          element.TableId = gameTable ? gameTable.Name : element.TableId
         })
+        this.totalCount = res.Data.TotalCount
+        this.handlePageChangeByClient(this.currentPage)
         this.dataLoading = false
         this.selectLoading = false
       }).catch(() => {

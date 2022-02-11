@@ -70,11 +70,10 @@ import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import { apiBalanceRecordSelect, apiBalanceRecordSearch } from '@/api/operation_member'
 import { initDatePickerRange, getFullDate, transTimeModel } from '@/utils/transDate'
-import transTableDataByLang from '@/layout/mixin/transTableDataByLang'
 import _ from 'lodash'
 
 export default {
-  mixins: [handlePageChange, shared, transTableDataByLang],
+  mixins: [handlePageChange, shared],
   data() {
     return {
       limitList: this._limitList,
@@ -131,7 +130,7 @@ export default {
         this.oriAllData = res.data.memberBalanceRecords
         this.allData = _.cloneDeep(this.oriAllData).map((item) => {
           item.createTime = transTimeModel(item.createTime)
-          return transTableDataByLang(item)
+          return item
         })
         this.dataLoading = false
       })

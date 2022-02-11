@@ -24,8 +24,8 @@
     <el-table v-loading="dataLoading" :data="tableData" border>
       <el-table-column prop="Name" :label="$t('__member') + $t('__account')" />
       <el-table-column prop="NickName" :label="$t('__nickname')" />
-      <el-table-column prop="Currency" :label="$t('__currency')" />
-      <el-table-column prop="Status" :label="$t('__accountStatus')" />
+      <el-table-column prop="CurrencyLabel" :label="$t('__currency')" />
+      <el-table-column prop="StatusLabel" :label="$t('__accountStatus')" />
       <el-table-column prop="Balance" :label="$t('__balance')" />
       <el-table-column prop="RegisterTime" :label="$t('__registerTime')" />
     </el-table>
@@ -45,24 +45,12 @@
 import { mapGetters } from 'vuex'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
-import transTableDataByLang from '@/layout/mixin/transTableDataByLang'
 import { apiMemberInfo, getSelectMenu } from '@/api/operation_member'
-import _ from 'lodash'
 
 export default {
   name: 'MemberMessage',
-  mixins: [handlePageChange, shared, transTableDataByLang],
+  mixins: [handlePageChange, shared],
   data() {
-    const accountType = [
-      {
-        label: '試用帳號',
-        value: 1
-      },
-      {
-        label: '正式真錢帳號',
-        value: 2
-      }
-    ]
     return {
       currencyList: [],
       searchForm: {
@@ -72,16 +60,14 @@ export default {
         accountType: undefined,
         limit: 0,
         page: 1
-      },
-      accountType: accountType
+      }
     }
   },
   computed: {
-    ...mapGetters([
-      'token'
-    ])
+    ...mapGetters(['token', 'accountType', 'memberInfos'])
   },
   created() {
+    this.$store.dispatch('operation_member/setAccountType')
     this.initAllSelectMenu().then((res) => {
       this.handleCurrentChange(1)
     })
@@ -106,13 +92,10 @@ export default {
       this.selectLoading = true
       this.dataLoading = true
       await apiMemberInfo(this.token, this.searchForm).then((res) => {
-        this.allDataByClient = res.Data.MemberInfos
+        this.$store.dispatch('operation_member/setMemberInfos', res.Data.MemberInfos)
+        this.allDataByClient = this.memberInfos
         this.totalCount = res.Data.TotalCount
         this.handlePageChangeByClient(this.currentPage)
-        this.allData = _.cloneDeep(this.allDataByClient).map((item) => {
-          item.RegisterTime = item.RegisterTime.replace('T', ' ')
-          return this.transTableDataByLang(item)
-        })
         this.selectLoading = false
         this.dataLoading = false
       })
