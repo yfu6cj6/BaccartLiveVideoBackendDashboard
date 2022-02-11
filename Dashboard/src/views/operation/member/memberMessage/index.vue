@@ -67,16 +67,16 @@ export default {
     ...mapGetters(['token', 'accountType', 'memberInfos'])
   },
   created() {
-    this.$store.dispatch('operation_member/setAccountType')
-    this.initAllSelectMenu().then((res) => {
+    this.initAllSelectMenu().then(() => {
       this.handleCurrentChange(1)
     })
   },
   methods: {
     async initAllSelectMenu() {
+      this.$store.dispatch('operation_member/setAccountType')
       this.selectLoading = true
       this.dataLoading = true
-      return getSelectMenu(this.token).then((res) => {
+      getSelectMenu(this.token).then((res) => {
         this.currencyList = []
         this.currencyList.push({ Code: 0, Name: this.$t('__allCurrency') })
         this.currencyList = this.currencyList.concat(res.Data.Currencies)

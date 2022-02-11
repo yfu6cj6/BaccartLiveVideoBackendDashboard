@@ -73,6 +73,7 @@ import { initDatePickerRange, getFullDate, transTimeModel } from '@/utils/transD
 import _ from 'lodash'
 
 export default {
+  name: 'MemberTransactionRecord',
   mixins: [handlePageChange, shared],
   data() {
     return {

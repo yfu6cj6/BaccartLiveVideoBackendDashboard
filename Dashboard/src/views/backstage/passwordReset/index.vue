@@ -49,7 +49,8 @@ export default {
       rules: {
         newPassword: [{ required: true, validator: validatePassword, trigger: 'blur' }],
         confirmPassword: [{ required: true, validator: validateConfirmPassword, trigger: 'blur' }]
-      }
+      },
+      submitLoading: false
     }
   },
   computed: {

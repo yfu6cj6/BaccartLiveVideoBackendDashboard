@@ -43,7 +43,7 @@
           <el-form-item :label="$t('__roleGroup')" prop="role">
             <el-select v-model="form.role">
               <el-option
-                v-for="item in getRole"
+                v-for="item in accountCreateAgentRole"
                 :key="item.Id"
                 :label="item.Name"
                 :value="item.Id"
@@ -101,7 +101,6 @@ export default {
         children: 'SubAgentLevelInfos',
         label: 'AgentName'
       },
-      getRole: [],
       roleLoading: false,
       infoLoading: false
     }
@@ -117,23 +116,25 @@ export default {
     }
   },
   created() {
-    this.roleLoading = true
-    this.infoLoading = true
-    getAgentRole(this.token).then((res) => {
-      this.$store.dispatch('backstage/setAccountCreateAgentRole', res.Data)
-      this.getRole = this.accountCreateAgentRole
-      this.roleLoading = false
-    })
-    getAgentLevelInfo(this.token).then((res) => {
-      this.treeData.agentLevelInfo = [res.Data.AgentLevelInfo]
-      this.form.agentId = res.Data.AgentLevelInfo.AgentId
-      this.form.role = this.getRole[0].Id
-      this.defaultForm.agentId = res.Data.AgentLevelInfo.AgentId
-      this.defaultForm.role = this.form.role
-      this.infoLoading = false
-    })
+    this.initAllSelectMenu()
   },
   methods: {
+    async initAllSelectMenu() {
+      this.roleLoading = true
+      this.infoLoading = true
+      getAgentRole(this.token).then((res) => {
+        this.$store.dispatch('backstage/setAccountCreateAgentRole', res.Data)
+        this.roleLoading = false
+        getAgentLevelInfo(this.token).then((res) => {
+          this.treeData.agentLevelInfo = [res.Data.AgentLevelInfo]
+          this.form.agentId = res.Data.AgentLevelInfo.AgentId
+          this.form.role = this.accountCreateAgentRole[0].Id
+          this.defaultForm.agentId = res.Data.AgentLevelInfo.AgentId
+          this.defaultForm.role = this.form.role
+          this.infoLoading = false
+        })
+      })
+    },
     onSubmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {

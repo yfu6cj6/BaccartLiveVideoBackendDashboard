@@ -89,7 +89,7 @@ import { initDatePickerRange, getFullDate } from '@/utils/transDate'
 import { apiBetRecordSelect, apiBetRecordSearch } from '@/api/operation_member'
 
 export default {
-  name: 'BetRecord',
+  name: 'MemberBetRecord',
   mixins: [handlePageChange, shared],
   data() {
     return {
@@ -125,28 +125,31 @@ export default {
     ...mapGetters(['token', 'memberBetRecords', 'orderBy', 'orderByCondition_bet_record'])
   },
   created() {
-    this.$store.dispatch('operation_member/setSelectMenu')
-    this.selectLoading = true
-    // 取得並初始化下拉式選單
-    apiBetRecordSelect(this.token).then((res) => {
-      this.gameTableList = res.Data.GameTables
-      this.gameTypeList = res.Data.GameTypes
-      this.agentList = res.Data.Agents
-      this.currencyList = res.Data.Currencies
-      this.timeZoneList = res.Data.TimeZones
-      this.searchForm.tableId = this.gameTableList[0].Id
-      this.searchForm.gameType = this.gameTypeList[0].Id
-      this.searchForm.agentId = this.agentList[0].Id
-      this.searchForm.currency = this.currencyList[0].Code
-      this.searchForm.timeZone = this.timeZoneList[0].Id
-      this.searchForm.orderBy = this.orderBy[0].value
-      this.searchForm.orderByCondition = this.orderByCondition_bet_record[0].value
-      this.selectLoading = false
-
+    this.initAllSelectMenu().then(() => {
       this.handleCurrentChange(1)
     })
   },
   methods: {
+    async initAllSelectMenu() {
+      this.$store.dispatch('operation_member/setSelectMenu')
+      this.selectLoading = true
+      // 取得並初始化下拉式選單
+      apiBetRecordSelect(this.token).then((res) => {
+        this.gameTableList = res.Data.GameTables
+        this.gameTypeList = res.Data.GameTypes
+        this.agentList = res.Data.Agents
+        this.currencyList = res.Data.Currencies
+        this.timeZoneList = res.Data.TimeZones
+        this.searchForm.tableId = this.gameTableList[0].Id
+        this.searchForm.gameType = this.gameTypeList[0].Id
+        this.searchForm.agentId = this.agentList[0].Id
+        this.searchForm.currency = this.currencyList[0].Code
+        this.searchForm.timeZone = this.timeZoneList[0].Id
+        this.searchForm.orderBy = this.orderBy[0].value
+        this.searchForm.orderByCondition = this.orderByCondition_bet_record[0].value
+        this.selectLoading = false
+      })
+    },
     async onSubmit() {
       this.tableData = []
       this.selectLoading = true
