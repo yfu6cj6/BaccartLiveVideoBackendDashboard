@@ -71,14 +71,13 @@ import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import { getAgentReport } from '../Data'
 import { getFullDate } from '@/utils/transDate'
-import transTableDataByLang from '@/layout/mixin/transTableDataByLang'
 import { transTimeModel } from '@/utils/transTimeModel'
 import _ from 'lodash'
 import { parseTime } from '@/utils/index'
 
 export default {
   name: 'Home',
-  mixins: [transTableDataByLang, handlePageChange, shared],
+  mixins: [handlePageChange, shared],
   data() {
     return {
       userData: [],
@@ -135,7 +134,7 @@ export default {
         this.oriAllData = res.Data.AgentDayReports
         this.allData = _.cloneDeep(this.oriAllData).map((item) => {
           item.createTime = transTimeModel(item.createTime)
-          return this.transTableDataByLang(item)
+          return item
         })
         this.dataLoading = false
       })
@@ -212,6 +211,6 @@ export default {
   width: 150px;
 }
 .el-tree {
-  display:inline-block;
+  display: inline-block;
 }
 </style>

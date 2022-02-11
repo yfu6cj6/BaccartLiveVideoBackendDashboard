@@ -66,13 +66,12 @@ import { getAgentManageSelect, getAgentManageSearch, getAgentLevelInfo } from '@
 import { mapGetters } from 'vuex'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
-import transTableDataByLang from '@/layout/mixin/transTableDataByLang'
 import _ from 'lodash'
 import { parseTime } from '@/utils/index'
 
 export default {
   name: 'Home',
-  mixins: [handlePageChange, shared, transTableDataByLang],
+  mixins: [handlePageChange, shared],
   data() {
     return {
       tableData: [],
@@ -131,7 +130,7 @@ export default {
         this.total = res.Data.TotalCount
         this.oriAllData = res.Data.Agents
         this.allData = _.cloneDeep(this.oriAllData).map((item) => {
-          return transTableDataByLang(item)
+          return item
         })
         this.dataLoading = false
       })
