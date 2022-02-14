@@ -72,9 +72,9 @@
             <el-select v-model="searchForm.timeZone">
               <el-option
                 v-for="item in timeZoneList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
+                :key="item.value"
+                :label="$t(item.key)"
+                :value="item.value"
               />
             </el-select>
           </el-form-item>
@@ -147,9 +147,9 @@ export default {
       await getAgentCreateSelect(this.token).then((res) => {
         this.currencyList = res.Data.Currencies
         this.timeZoneList = res.Data.TimeZones
+        console.log(this.timeZoneList)
         this.searchForm.currency = this.currencyList[0].Code
-        // this.searchForm.timeZone = this.timeZoneList[0].Id
-        this.searchForm.timeZone = 0
+        this.searchForm.timeZone = this.timeZoneList[0].Id
         this.searchForm.oddType = this.oddType[0].value
         this.searchForm.walletType = this.walletType[0].value
       })

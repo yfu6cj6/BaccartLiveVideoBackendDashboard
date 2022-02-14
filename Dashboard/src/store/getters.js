@@ -18,6 +18,7 @@ const getters = {
   memberBetRecords: state => state.operation_member.memberBetRecords,
   orderBy: state => state.operation_member.orderBy,
   orderByCondition_bet_record: state => state.operation_member.orderByCondition_bet_record,
+  orderByCondition_transaction_record: state => state.operation_member.orderByCondition_transaction_record,
   orderByCondition_game_result: state => state.operation_member.game_result,
   gamePaymentStatus: state => state.operation_member.gamePaymentStatus,
   limitList: state => state.operation_member.limitList,

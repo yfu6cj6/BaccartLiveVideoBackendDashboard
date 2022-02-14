@@ -156,5 +156,14 @@
     "__gameRoundID": "游戏局号",
     "__limitPage_50": "50",
     "__limitPage_100": "100",
-    "__limitPage_200": "200"
+    "__limitPage_200": "200",
+    "__transactionIDForInternal": "交易单号",
+    "__transactionType": "交易类型",
+    "__currencyType": "货币类型",
+    "__transactionLimit": "交易额度",
+    "__preTradeBalance": "交易前额度",
+    "__balanceAfterTrade": "交易后额度",
+    "__memberAccount": "会员帐号",
+    "__transactionID": "交易单号",
+    "__income": "收入"
 }

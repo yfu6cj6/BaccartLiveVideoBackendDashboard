@@ -9,7 +9,8 @@ const state = {
   orderByCondition_bet_record: [],
   gamePaymentStatus: [],
   game_result: [],
-  limitList: []
+  limitList: [],
+  orderByCondition_transaction_record: []
 }
 
 const accountType = [
@@ -134,6 +135,45 @@ const limitList = [
   }
 ]
 
+// -> 額度紀錄
+const orderByCondition_transaction_record = [
+  {
+    label: '',
+    key: '__transactionIDForInternal',
+    value: 1
+  },
+  {
+    label: '',
+    key: '__transactionTime',
+    value: 2
+  },
+  {
+    label: '',
+    key: '__transactionType',
+    value: 3
+  },
+  {
+    label: '',
+    key: '__currencyType',
+    value: 4
+  },
+  {
+    label: '',
+    key: '__transactionLimit',
+    value: 5
+  },
+  {
+    label: '',
+    key: '__preTradeBalance',
+    value: 6
+  },
+  {
+    label: '',
+    key: '__balanceAfterTrade',
+    value: 7
+  }
+]
+
 const mutations = {
   SET_ACCOUNTTYPE(state) {
     state.accountType = accountType
@@ -156,6 +196,7 @@ const mutations = {
     state.gamePaymentStatus = gamePaymentStatus
     state.game_result = game_result
     state.limitList = limitList
+    state.orderByCondition_transaction_record = orderByCondition_transaction_record
   },
   CHANGE_SELECT_LANG(state) {
     state.accountType.forEach(element => {
@@ -181,6 +222,9 @@ const mutations = {
       element.label = i18n.messages[i18n.locale][element.key]
     })
     state.limitList.forEach(element => {
+      element.label = i18n.messages[i18n.locale][element.key]
+    })
+    state.orderByCondition_transaction_record.forEach(element => {
       element.label = i18n.messages[i18n.locale][element.key]
     })
   }

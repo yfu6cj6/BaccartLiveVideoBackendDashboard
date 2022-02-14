@@ -9,7 +9,7 @@
       </el-form-item>
       <el-form-item :label="$t('__transactionType')">
         <el-select v-model="searchForm.transactionType">
-          <el-option v-for="item in transactionTypeList" :key="item.id" :label="item.name" :value="item.id" />
+          <el-option v-for="item in transactionTypeList" :key="item.id" :label="item.Name" :value="item.Id" />
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('__transactionTime')">
@@ -110,6 +110,7 @@ export default {
     ])
   },
   created() {
+    this.$store.dispatch('operation_member/setSelectMenu')
     this.initAllSelectMenu()
   },
   methods: {
@@ -127,8 +128,8 @@ export default {
       this.searchForm.transactionTimeRangeEnd =
         getFullDate(this.searchForm.searchTimeRange[1]) + ZO
       apiBalanceRecordSearch(this.token, this.searchForm).then((res) => {
-        this.totalCount = res.data.totalCount
-        this.oriAllData = res.data.memberBalanceRecords
+        this.totalCount = res.Data.TotalCount
+        this.oriAllData = res.Data.MemberBalanceRecords
         this.allData = _.cloneDeep(this.oriAllData).map((item) => {
           item.createTime = transTimeModel(item.createTime)
           return item
@@ -138,14 +139,13 @@ export default {
     },
     async initAllSelectMenu() {
       await apiBalanceRecordSelect(this.token).then((res) => {
-        this.agentList = res.data.agents
-        this.currencyList = res.data.currencies
-        this.transactionTypeList = res.data.transactionTypes
-        this.transactionTypeList.unshift({ id: 0, name: '全部' })
-        this.$store.dispatch('select_menu/changeSelectLang')
+        this.agentList = res.Data.Agents
+        this.currencyList = res.Data.Currencies
+        this.transactionTypeList = res.Data.TransactionTypes
+        this.transactionTypeList.unshift({ Id: 0, Name: '全部' })
         this.searchForm.agentId = this.agentList[0].id
         this.searchForm.currency = this.currencyList[0].code
-        this.searchForm.transactionType = this.transactionTypeList[0].id
+        this.searchForm.transactionType = this.transactionTypeList[0].Id
         this.searchForm.orderBy = this.orderBy[0].value
         this.searchForm.orderByCondition = this.orderByCondition_transaction_record[0].value
       })
