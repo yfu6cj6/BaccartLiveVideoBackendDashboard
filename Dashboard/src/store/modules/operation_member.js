@@ -6,7 +6,10 @@ const state = {
   memberInfos: [],
   memberBetRecords: [],
   orderBy: [],
-  orderByCondition_bet_record: []
+  orderByCondition_bet_record: [],
+  gamePaymentStatus: [],
+  game_result: [],
+  limitList: []
 }
 
 const accountType = [
@@ -74,6 +77,63 @@ const orderByCondition_bet_record = [
   }
 ]
 
+// -> 遊戲結果狀態
+const gamePaymentStatus = [
+  {
+    label: '',
+    key: '__paidOuted',
+    value: 1
+  },
+  {
+    label: '',
+    key: '__paidNone',
+    value: 2
+  }
+]
+
+// -> 遊戲結果
+const game_result = [
+  {
+    label: '',
+    key: '__gameRoundID',
+    value: 1
+  },
+  {
+    label: '',
+    key: '__startTime',
+    value: 2
+  },
+  {
+    label: '',
+    key: '__endTime',
+    value: 3
+  },
+  {
+    label: '',
+    key: '__status',
+    value: 4
+  }
+]
+
+// -> 每頁顯示筆數
+const limitList = [
+  {
+    label: '',
+    key: '__limitPage_50',
+    value: 0
+  },
+  {
+    label: '',
+    key: '__limitPage_100',
+    value: 1
+  },
+  {
+    label: '',
+    key: '__limitPage_200',
+    value: 2
+  }
+]
+
 const mutations = {
   SET_ACCOUNTTYPE(state) {
     state.accountType = accountType
@@ -93,6 +153,9 @@ const mutations = {
   SET_SELECTMENU(state) {
     state.orderBy = orderBy
     state.orderByCondition_bet_record = orderByCondition_bet_record
+    state.gamePaymentStatus = gamePaymentStatus
+    state.game_result = game_result
+    state.limitList = limitList
   },
   CHANGE_SELECT_LANG(state) {
     state.accountType.forEach(element => {
@@ -109,6 +172,15 @@ const mutations = {
       element.label = i18n.messages[i18n.locale][element.key]
     })
     state.orderByCondition_bet_record.forEach(element => {
+      element.label = i18n.messages[i18n.locale][element.key]
+    })
+    state.gamePaymentStatus.forEach(element => {
+      element.label = i18n.messages[i18n.locale][element.key]
+    })
+    state.game_result.forEach(element => {
+      element.label = i18n.messages[i18n.locale][element.key]
+    })
+    state.limitList.forEach(element => {
       element.label = i18n.messages[i18n.locale][element.key]
     })
   }

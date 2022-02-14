@@ -58,3 +58,20 @@ export function apiBalanceRecordSearch(token, data) {
     data: data
   })
 }
+
+// - 遊戲結果
+export function apiGameResultSelect(token) {
+  return request({
+    url: 'game_result_record/select_menu',
+    method: 'get',
+    headers: { 'Authorization': 'token ' + token }
+  })
+}
+export function apiGameResultSearch(token, data) {
+  return request({
+    url: 'game_result_record/search',
+    method: 'post',
+    headers: { 'Authorization': 'token ' + token },
+    data: data
+  })
+}

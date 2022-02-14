@@ -109,17 +109,15 @@ export default {
       defaultProps: {
         children: 'SubAgentLevelInfos',
         label: 'AgentName'
-      },
-      oddType: 0,
-      walletType: 0
+      }
     }
   },
   computed: {
     ...mapGetters([
-      'token'
-      // 'oddType',
-      // 'walletType',
-      // 'getTimezoneList'
+      'token',
+      'oddType',
+      'walletType',
+      'getTimezoneList'
     ]),
     timeZoneList: {
       get() {
@@ -129,6 +127,7 @@ export default {
     }
   },
   created() {
+    this.$store.dispatch('operation_agent/setSelectMenu')
     this.initAllSelectMenu()
   },
   methods: {
@@ -148,14 +147,11 @@ export default {
       await getAgentCreateSelect(this.token).then((res) => {
         this.currencyList = res.Data.Currencies
         this.timeZoneList = res.Data.TimeZones
-        // this.$store.dispatch('select_menu/changeSelectLang')
         this.searchForm.currency = this.currencyList[0].Code
         // this.searchForm.timeZone = this.timeZoneList[0].Id
         this.searchForm.timeZone = 0
-        // this.searchForm.oddType = this.oddType[0].value
-        // this.searchForm.walletType = this.walletType[0].value
-        this.searchForm.oddType = 0
-        this.searchForm.walletType = 0
+        this.searchForm.oddType = this.oddType[0].value
+        this.searchForm.walletType = this.walletType[0].value
       })
       getAgentLevelInfo(this.token).then((res) => {
         this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]

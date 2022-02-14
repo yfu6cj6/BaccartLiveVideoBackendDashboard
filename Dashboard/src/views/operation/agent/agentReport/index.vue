@@ -27,7 +27,7 @@
           </el-form-item>
           <el-form-item class="inputTitle" :label="$t('__orderBy')">
             <el-select v-model="searchForm.orderBy">
-              <el-option v-for="item in orderBy" :key="item.value" :label="item.label" :value="item.value" />
+              <el-option v-for="item in agentOrderBy" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
           <el-form-item class="inputTitle" :label="$t('__orderByCondition')">
@@ -46,13 +46,14 @@
           <el-table-column prop="betMemberCount" :label="$t('__betCount')" />
           <el-table-column prop="betOrderCount" :label="$t('__betOrderCount')" />
           <el-table-column prop="totalBetAmount" :label="$t('__totalBetAmount')" />
-          <el-table-column prop="totalValidBetAmount" :label="$t('__totalValidBetAmount')" />
-          <el-table-column prop="totalPayout" :label="$t('__memberPayout')" />
+          <el-table-column prop="totalValidBetAmount" :label="$t('__validBetAmount')" />
+          <el-table-column prop="totalPayout" :label="$t('__memberPaidOut')" />
           <el-table-column prop="reportTime" :label="$t('__date')" />
         </el-table>
 
         <el-pagination
-          layout="prev, pager, next"
+          class="agentList-pagination"
+          layout="prev, pager, next, jumper"
           :total="totalCount"
           background
           :page-size="pageSize"
@@ -99,11 +100,12 @@ export default {
   computed: {
     ...mapGetters([
       'token',
-      'orderBy',
+      'agentOrderBy',
       'orderByCondition_agent_report'
     ])
   },
   created() {
+    this.$store.dispatch('operation_agent/setSelectMenu')
     this.initAllSelectMenu()
   },
   methods: {
@@ -111,11 +113,9 @@ export default {
       this.selectLoading = true
       await getAgentReportSelect(this.token).then((res) => {
         this.currencyList = res.Data.Currencies
-        // this.$store.dispatch('select_menu/changeSelectLang')
         this.searchForm.currency = this.currencyList[0].code
-        // this.searchForm.orderBy = this.orderBy[0].value
-        // this.searchForm.orderByCondition = this.orderByCondition_agent_report[0].value
-        this.searchForm.orderBy = 0
+        this.searchForm.orderBy = this.agentOrderBy[0].value
+        this.searchForm.orderByCondition = this.orderByCondition_agent_report[0].value
         this.searchForm.orderByCondition = 0
         this.selectLoading = false
       })
@@ -212,5 +212,18 @@ export default {
 }
 .el-tree {
   display: inline-block;
+}
+.agentList {
+  &-container {
+    margin: 20px;
+  }
+  &-pagination {
+    padding: 1em;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+  }
 }
 </style>

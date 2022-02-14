@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="agentList-container">
     <el-row :gutter="20">
       <el-col :span="6">
         <el-card shadow="never">
@@ -29,7 +29,7 @@
           </el-form-item>
           <el-form-item class="inputTitle" :label="$t('__orderBy')">
             <el-select v-model="searchForm.orderBy">
-              <el-option v-for="item in orderBy" :key="item.value" :label="item.label" :value="item.value" />
+              <el-option v-for="item in agentOrderBy" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
           <el-form-item class="inputTitle" :label="$t('__orderByCondition')">
@@ -49,7 +49,8 @@
         </el-table>
 
         <el-pagination
-          layout="prev, pager, next"
+          class="agentList-pagination"
+          layout="prev, pager, next, jumper"
           :total="totalCount"
           background
           :page-size="pageSize"
@@ -98,24 +99,24 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['token', 'orderBy', 'orderByCondition_agent_management', 'userStatus'])
+    ...mapGetters(['token', 'agentOrderBy', 'orderByCondition_agent_management', 'userStatus'])
   },
   created() {
     this.initAllSelectMenu()
   },
   methods: {
     async initAllSelectMenu() {
+      this.$store.dispatch('operation_agent/setSelectMenu')
       this.selectLoading = false
-      this.orderByList = this.orderBy
+      this.orderByList = this.agentOrderBy
       this.orderByConditionList = this.orderByCondition_agent_management
       await getAgentManageSelect(this.token).then((res) => {
         this.currencyList = res.Data.Currencies
-        // this.$store.dispatch('select_menu/changeSelectLang')
         this.userStatusList = this.userStatus
         this.searchForm.currency = this.currencyList[0].code
-        // this.searchForm.orderBy = this.orderBy[0].value
-        // this.searchForm.orderByCondition = this.orderByCondition_agent_management[0].value
-        // this.searchForm.userStatus = this.userStatusList[0].value
+        this.searchForm.orderBy = this.agentOrderBy[0].value
+        this.searchForm.orderByCondition = this.orderByCondition_agent_management[0].value
+        this.searchForm.userStatus = this.userStatusList[0].value
         this.selectLoading = false
       })
       getAgentLevelInfo(this.token).then((res) => {
@@ -180,11 +181,24 @@ export default {
 }
 </script>
 
-<style scoped>
-  .inputTitle{
+<style lang="scss" scoped>
+.inputTitle{
     padding: 0px 12px 0 12px;
   }
-  .el-tree {
+.el-tree {
   display:inline-block;
   }
+.agentList {
+  &-container {
+    margin: 20px;
+  }
+  &-pagination {
+    padding: 1em;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+  }
+}
 </style>

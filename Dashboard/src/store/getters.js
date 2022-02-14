@@ -17,6 +17,16 @@ const getters = {
   memberInfos: state => state.operation_member.memberInfos,
   memberBetRecords: state => state.operation_member.memberBetRecords,
   orderBy: state => state.operation_member.orderBy,
-  orderByCondition_bet_record: state => state.operation_member.orderByCondition_bet_record
+  orderByCondition_bet_record: state => state.operation_member.orderByCondition_bet_record,
+  orderByCondition_game_result: state => state.operation_member.game_result,
+  gamePaymentStatus: state => state.operation_member.gamePaymentStatus,
+  limitList: state => state.operation_member.limitList,
+  agentOrderBy: state => state.operation_agent.agentOrderBy,
+  orderByCondition_agent_report: state => state.operation_agent.orderByCondition_agent_report,
+  userStatus: state => state.operation_agent.userStatus,
+  orderByCondition_agent_management: state => state.operation_agent.orderByCondition_agent_management,
+  oddType: state => state.operation_agent.oddType,
+  walletType: state => state.operation_agent.walletType,
+  getTimezoneList: state => state.operation_agent.timezoneList
 }
 export default getters

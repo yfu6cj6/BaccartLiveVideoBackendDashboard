@@ -47,6 +47,7 @@ export default {
       this.$store.dispatch('backstage/changeSelectLang')
       this.$store.dispatch('customerServiceManage/changeSelectLang')
       this.$store.dispatch('operation_member/changeSelectLang')
+      this.$store.dispatch('operation_agent/changeSelectLang')
     },
     getLang: function(lang) {
       switch (lang) {
