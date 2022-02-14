@@ -112,7 +112,7 @@ export const asyncRoutes = [
       {
         path: 'customerServiceList',
         name: 'CustomerServiceList',
-        showingChildren: true,
+        showThisChildren: true,
         component: () => import('@/views/customerServiceManage/customerServiceList/index'),
         meta: { title: '__customerServiceList', icon: 'el-icon-user-solid' }
       }
@@ -189,6 +189,7 @@ export const asyncRoutes = [
 
   {
     path: '/logout',
+    name: 'Logout',
     component: () => import('@/views/logout/index'),
     meta: { title: '__logout', icon: 'link' }
   },

@@ -1,6 +1,6 @@
 <template>
   <div v-if="!item.hidden">
-    <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
+    <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||!onlyOneChild.showChildren&&!item.alwaysShow)">
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
           <item :icon="onlyOneChild.meta.icon||(item.meta&&item.meta.icon)" :title="$t(onlyOneChild.meta.title)" />
@@ -70,15 +70,15 @@ export default {
 
       // When there is only one child router, the child router is displayed by default
       if (showingChildren.length === 1) {
-        if (showingChildren[0].showingChildren) {
-          this.onlyOneChild = { ... parent, path: '', noShowingChildren: false }
+        if (showingChildren[0].showThisChildren) {
+          this.onlyOneChild = { ... parent, path: '', showChildren: true }
         }
         return true
       }
 
       // Show parent if there are no child router to display
       if (showingChildren.length === 0) {
-        this.onlyOneChild = { ... parent, path: '', noShowingChildren: true }
+        this.onlyOneChild = { ... parent, path: '', showChildren: false }
         return true
       }
 
