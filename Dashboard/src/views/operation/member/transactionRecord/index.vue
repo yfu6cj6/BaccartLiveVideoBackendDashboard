@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="transactionRecord-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item :label="$t('__memberAccount')">
         <el-input v-model="searchForm.memberName" />
@@ -13,7 +13,7 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('__transactionTime')">
-        <el-date-picker v-model="searchForm.searchTimeRange" type="datetimerange" range-separator="至" start-placeholder="開始日期" end-placeholder="結束日期" />
+        <el-date-picker v-model="searchTimeRange" type="datetimerange" range-separator="至" start-placeholder="開始日期" end-placeholder="結束日期" />
       </el-form-item>
       <el-form-item :label="$t('__orderBy')">
         <el-select v-model="searchForm.orderBy">
@@ -27,16 +27,16 @@
       </el-form-item>
       <el-form-item :label="$t('__currency')">
         <el-select v-model="searchForm.currency">
-          <el-option v-for="item in currencyList" :key="item.code" :label="item.name" :value="item.code" />
+          <el-option v-for="item in currencyList" :key="item.Code" :label="item.Name" :value="item.Code" />
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('__agent')">
         <el-select v-model="searchForm.agentId">
-          <el-option v-for="item in agentList" :key="item.id" :label="item.name" :value="item.id" />
+          <el-option v-for="item in agentList" :key="item.Id" :label="item.Name" :value="item.Id" />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="search">{{ $t("__search") }}</el-button>
+        <el-button type="primary" @click="onSubmit">{{ $t("__search") }}</el-button>
       </el-form-item>
     </el-form>
 
@@ -55,6 +55,7 @@
 
     <el-pagination
       layout="prev, pager, next, jumper"
+      class="transactionRecord-pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
@@ -69,35 +70,30 @@ import { mapGetters } from 'vuex'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import { apiBalanceRecordSelect, apiBalanceRecordSearch } from '@/api/operation_member'
-import { initDatePickerRange, getFullDate, transTimeModel } from '@/utils/transDate'
-import _ from 'lodash'
+import { initDatePickerRange, getFullDate } from '@/utils/transDate'
 
 export default {
   name: 'MemberTransactionRecord',
   mixins: [handlePageChange, shared],
   data() {
     return {
-      limitList: this._limitList,
       searchForm: {
         memberName: '',
-        transactionId: 0,
+        transactionId: undefined,
         transactionType: 0,
-        searchTimeRange: initDatePickerRange(),
         transactionTimeRangeStart: null,
         transactionTimeRangeEnd: null,
-        orderByCondition: null,
-        orderBy: null,
-        currency: null,
-        agentId: this.agentId,
+        orderByCondition: 1,
+        orderBy: 0,
+        currency: 0,
+        agentId: 0,
         limit: 0,
         page: 1
       },
-      tableData: [],
-      oriAllData: [],
+      searchTimeRange: initDatePickerRange(),
       agentList: [],
       currencyList: [],
-      transactionTypeList: [],
-      messageInstance: this.$message
+      transactionTypeList: []
     }
   },
   computed: {
@@ -105,55 +101,62 @@ export default {
       'token',
       'orderBy',
       'orderByCondition_transaction_record',
-      '_limitList',
-      'agentId'
+      'memberBalanceRecords'
     ])
   },
   created() {
-    this.$store.dispatch('operation_member/setSelectMenu')
-    this.initAllSelectMenu()
+    this.initAllSelectMenu().then(() => {
+      this.handleCurrentChange(1)
+    })
   },
   methods: {
-    search() {
-      this.currentPage = 1
-      this.onSubmit()
-    },
-    onSubmit() {
-      this.dataLoading = true
-      const ZO = ' 00:00:00'
-      this.searchForm.limit = this.pageSize
-      this.searchForm.page = this.currentPage
-      this.searchForm.transactionTimeRangeStart =
-        getFullDate(this.searchForm.searchTimeRange[0]) + ZO
-      this.searchForm.transactionTimeRangeEnd =
-        getFullDate(this.searchForm.searchTimeRange[1]) + ZO
-      apiBalanceRecordSearch(this.token, this.searchForm).then((res) => {
-        this.totalCount = res.Data.TotalCount
-        this.oriAllData = res.Data.MemberBalanceRecords
-        this.allData = _.cloneDeep(this.oriAllData).map((item) => {
-          item.createTime = transTimeModel(item.createTime)
-          return item
-        })
-        this.dataLoading = false
-      })
-    },
     async initAllSelectMenu() {
+      this.$store.dispatch('operation_member/setSelectMenu')
+      this.selectLoading = true
+      this.dataLoading = true
       await apiBalanceRecordSelect(this.token).then((res) => {
         this.agentList = res.Data.Agents
         this.currencyList = res.Data.Currencies
         this.transactionTypeList = res.Data.TransactionTypes
         this.transactionTypeList.unshift({ Id: 0, Name: '全部' })
-        this.searchForm.agentId = this.agentList[0].id
-        this.searchForm.currency = this.currencyList[0].code
+        this.searchForm.agentId = this.agentList[0].Id
+        this.searchForm.currency = this.currencyList[0].Code
         this.searchForm.transactionType = this.transactionTypeList[0].Id
         this.searchForm.orderBy = this.orderBy[0].value
         this.searchForm.orderByCondition = this.orderByCondition_transaction_record[0].value
       })
-      this.selectLoading = false
+    },
+    async onSubmit() {
+      this.tableData = []
+      this.selectLoading = true
+      this.dataLoading = true
+      const ZO = ' 00:00:00'
+      this.searchForm.limit = this.pageSize
+      this.searchForm.page = this.currentPage
+      this.searchForm.transactionTimeRangeStart = getFullDate(this.searchTimeRange[0]) + ZO
+      this.searchForm.transactionTimeRangeEnd = getFullDate(this.searchTimeRange[1]) + ZO
+      await apiBalanceRecordSearch(this.token, this.searchForm).then((res) => {
+        this.$store.dispatch('operation_member/setMemberTransactionRecords', res.Data.MemberBalanceRecords)
+        this.allDataByClient = this.memberBalanceRecords
+        this.totalCount = res.Data.TotalCount
+        this.handlePageChangeByClient(this.currentPage)
+        this.selectLoading = false
+        this.dataLoading = false
+      })
     }
   }
 }
 </script>
 
-<style scoped>
+<style  lang="scss" scoped>
+.transactionRecord {
+  &-pagination {
+    padding: 1em;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+  }
+}
 </style>

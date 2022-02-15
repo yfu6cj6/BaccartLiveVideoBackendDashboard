@@ -5,11 +5,12 @@ const state = {
   accountType: [],
   memberInfos: [],
   memberBetRecords: [],
+  memberTransactionRecords: [],
+  memberGameResultRecords: [],
   orderBy: [],
   orderByCondition_bet_record: [],
   gamePaymentStatus: [],
   game_result: [],
-  limitList: [],
   orderByCondition_transaction_record: []
 }
 
@@ -82,12 +83,17 @@ const orderByCondition_bet_record = [
 const gamePaymentStatus = [
   {
     label: '',
-    key: '__paidOuted',
+    key: '__all',
+    value: 0
+  },
+  {
+    label: '',
+    key: '__paid',
     value: 1
   },
   {
     label: '',
-    key: '__paidNone',
+    key: '__noPayout',
     value: 2
   }
 ]
@@ -113,25 +119,6 @@ const game_result = [
     label: '',
     key: '__status',
     value: 4
-  }
-]
-
-// -> 每頁顯示筆數
-const limitList = [
-  {
-    label: '',
-    key: '__limitPage_50',
-    value: 0
-  },
-  {
-    label: '',
-    key: '__limitPage_100',
-    value: 1
-  },
-  {
-    label: '',
-    key: '__limitPage_200',
-    value: 2
   }
 ]
 
@@ -190,12 +177,23 @@ const mutations = {
     })
     state.memberBetRecords = data
   },
+  SET_MEMBER_TRANSACTIONRECORDS(state, data) {
+    data.forEach(element => {
+      element = transTableDataByLang(element)
+    })
+    state.memberTransactionRecords = data
+  },
+  SET_MEMBER_GAMERESULTRECORDS(state, data) {
+    data.forEach(element => {
+      element = transTableDataByLang(element)
+    })
+    state.memberGameResultRecords = data
+  },
   SET_SELECTMENU(state) {
     state.orderBy = orderBy
     state.orderByCondition_bet_record = orderByCondition_bet_record
     state.gamePaymentStatus = gamePaymentStatus
     state.game_result = game_result
-    state.limitList = limitList
     state.orderByCondition_transaction_record = orderByCondition_transaction_record
   },
   CHANGE_SELECT_LANG(state) {
@@ -221,9 +219,6 @@ const mutations = {
     state.game_result.forEach(element => {
       element.label = i18n.messages[i18n.locale][element.key]
     })
-    state.limitList.forEach(element => {
-      element.label = i18n.messages[i18n.locale][element.key]
-    })
     state.orderByCondition_transaction_record.forEach(element => {
       element.label = i18n.messages[i18n.locale][element.key]
     })
@@ -240,6 +235,14 @@ const actions = {
   },
   setMemberBetRecords({ commit }, data) {
     commit('SET_MEMBER_BETRECORDS', data)
+    commit('CHANGE_SELECT_LANG')
+  },
+  setMemberTransactionRecords({ commit }, data) {
+    commit('SET_MEMBER_TRANSACTIONRECORDS', data)
+    commit('CHANGE_SELECT_LANG')
+  },
+  setMemberGameResultRecords({ commit }, data) {
+    commit('SET_MEMBER_GAMERESULTRECORDS', data)
     commit('CHANGE_SELECT_LANG')
   },
   setSelectMenu({ commit }) {

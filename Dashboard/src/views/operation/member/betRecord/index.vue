@@ -107,7 +107,7 @@ export default {
         orderNumber: undefined,
         payoutRangeMin: undefined,
         payoutRangeMax: undefined,
-        orderByCondition: 0,
+        orderByCondition: 1,
         orderBy: 0,
         device: 0,
         limit: 50,
@@ -133,8 +133,9 @@ export default {
     async initAllSelectMenu() {
       this.$store.dispatch('operation_member/setSelectMenu')
       this.selectLoading = true
+      this.dataLoading = true
       // 取得並初始化下拉式選單
-      apiBetRecordSelect(this.token).then((res) => {
+      await apiBetRecordSelect(this.token).then((res) => {
         this.gameTableList = res.Data.GameTables
         this.gameTypeList = res.Data.GameTypes
         this.agentList = res.Data.Agents
@@ -147,7 +148,6 @@ export default {
         this.searchForm.timeZone = this.timeZoneList[0].Id
         this.searchForm.orderBy = this.orderBy[0].value
         this.searchForm.orderByCondition = this.orderByCondition_bet_record[0].value
-        this.selectLoading = false
       })
     },
     async onSubmit() {
@@ -166,10 +166,8 @@ export default {
         })
         this.totalCount = res.Data.TotalCount
         this.handlePageChangeByClient(this.currentPage)
+        this.selectLoading = false
         this.dataLoading = false
-        this.selectLoading = false
-      }).catch(() => {
-        this.selectLoading = false
       })
     }
   }

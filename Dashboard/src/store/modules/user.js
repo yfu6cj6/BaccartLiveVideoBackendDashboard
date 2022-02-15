@@ -4,9 +4,7 @@ import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
-    id: 0,
     token: getToken(),
-    agentId: 0,
     role: -1,
     permissions: []
   }
@@ -25,9 +23,7 @@ const mutations = {
     state.account = account
   },
   SET_USER: (state, data) => {
-    state.id = data.Id
     state.account = data.Account
-    state.agentId = data.AgentId
     state.role = data.Role
     state.permissions = data.Permissions
   }

@@ -76,7 +76,7 @@ export default {
       this.$store.dispatch('operation_member/setAccountType')
       this.selectLoading = true
       this.dataLoading = true
-      getSelectMenu(this.token).then((res) => {
+      await getSelectMenu(this.token).then((res) => {
         this.currencyList = []
         this.currencyList.push({ Code: 0, Name: this.$t('__allCurrency') })
         this.currencyList = this.currencyList.concat(res.Data.Currencies)

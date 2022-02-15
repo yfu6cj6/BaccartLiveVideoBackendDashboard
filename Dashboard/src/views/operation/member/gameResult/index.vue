@@ -6,12 +6,12 @@
       </el-form-item>
       <el-form-item :label="$t('__tableID')">
         <el-select v-model="searchForm.tableId">
-          <el-option v-for="item in gameTableList" :key="item.id" :label="item.name" :value="item.id" />
+          <el-option v-for="item in gameTableList" :key="item.Id" :label="item.Name" :value="item.Id" />
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('__gameType')">
         <el-select v-model="searchForm.gameType">
-          <el-option v-for="item in gameTypeList" :key="item.id" :label="item.name" :value="item.id" />
+          <el-option v-for="item in gameTypeList" :key="item.Id" :label="item.Name" :value="item.Id" />
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('__status')">
@@ -20,7 +20,7 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('__transactionTime')">
-        <el-date-picker v-model="searchForm.searchTimeRange" type="datetimerange" range-separator="至" start-placeholder="開始日期" end-placeholder="結束日期" />
+        <el-date-picker v-model="searchTimeRange" type="datetimerange" range-separator="至" start-placeholder="開始日期" end-placeholder="結束日期" />
       </el-form-item>
       <el-form-item :label="$t('__orderBy')">
         <el-select v-model="searchForm.orderBy">
@@ -80,78 +80,82 @@ import { mapGetters } from 'vuex'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import { apiGameResultSelect, apiGameResultSearch } from '@/api/operation_member'
-import { getFullDate } from '@/utils/transDate'
-import { initDatePickerRange } from '@/utils/transDate'
+import { initDatePickerRange, getFullDate } from '@/utils/transDate'
 import ResultDetailDialog from './resultDetailDialog.vue'
 
 export default {
-  name: 'GameResult',
+  name: 'MemberGameResult',
   components: { ResultDetailDialog },
   mixins: [handlePageChange, shared],
   data() {
     return {
-      gameTypeList: [],
-      gameTableList: [],
       searchForm: {
-        roundId: 0,
+        roundId: undefined,
         tableId: 0,
-        searchTimeRange: initDatePickerRange(),
         gameStartTime: null,
         gameEndTime: null,
         gameType: 0,
-        gamePaymentStatus: 0,
+        gamePaymentStatus: 1,
         orderByCondition: null,
         orderBy: null,
         limit: 50,
         page: 1
       },
-      tableData: [],
+      searchTimeRange: initDatePickerRange(),
+      gameTableList: [],
+      gameTypeList: [],
       resultDetailDialogVisible: false,
       rowData: {
         roundId: 0,
-        gameTypeName: null,
         playerCard: [],
         bankerCard: []
-      },
-      messageInstance: this.$message
+      }
     }
   },
   computed: {
     ...mapGetters([
       'token',
-      'orderBy',
-      'orderByCondition_game_result',
       'gamePaymentStatus',
-      'limitList'
+      'memberGameResultRecords',
+      'orderBy',
+      'orderByCondition_game_result'
     ])
   },
   created() {
-    this.$store.dispatch('operation_member/setSelectMenu')
-    this.initAllSelectMenu()
+    this.initAllSelectMenu().then(() => {
+      this.handleCurrentChange(1)
+    })
   },
   methods: {
     async initAllSelectMenu() {
+      this.$store.dispatch('operation_member/setSelectMenu')
+      this.selectLoading = true
+      this.dataLoading = true
       await apiGameResultSelect(this.token).then((res) => {
         this.gameTableList = res.Data.GameTables
         this.gameTypeList = res.Data.GameTypes
-        this.searchForm.limit = this.limitList[0].value
-        this.searchForm.tableId = this.gameTableList[0].id
-        this.searchForm.gameType = this.gameTypeList[0].id
+        this.searchForm.tableId = this.gameTableList[0].Id
+        this.searchForm.gameType = this.gameTypeList[0].Id
         this.searchForm.gamePaymentStatus = this.gamePaymentStatus[0].value
         this.searchForm.orderBy = this.orderBy[0].value
         this.searchForm.orderByCondition = this.orderByCondition_game_result[0].value
       })
-      this.selectLoading = false
     },
-    onSubmit() {
-      this.tableData = undefined
+    async onSubmit() {
+      this.tableData = []
+      this.selectLoading = true
       this.dataLoading = true
       const ZO = ' 00:00:00'
-      this.searchForm.gameStartTime = getFullDate(this.searchForm.searchTimeRange[0]) + ZO
-      this.searchForm.gameEndTime = getFullDate(this.searchForm.searchTimeRange[1]) + ZO
-      apiGameResultSearch(this.token, this.searchForm).then((res) => {
-        this.tableData = res.Data
-        this.allData = res.Data.gameResultRecords
+      this.searchForm.limit = this.pageSize
+      this.searchForm.page = this.currentPage
+      this.searchForm.gameStartTime = getFullDate(this.searchTimeRange[0]) + ZO
+      this.searchForm.gameEndTime = getFullDate(this.searchTimeRange[1]) + ZO
+      await apiGameResultSearch(this.token, this.searchForm).then((res) => {
+        this.$store.dispatch('operation_member/setMemberGameResultRecords', res.Data.GameResultRecords)
+        this.allDataByClient = this.memberGameResultRecords
+        this.totalCount = res.Data.TotalCount
+        this.handlePageChangeByClient(this.currentPage)
+        this.selectLoading = false
         this.dataLoading = false
       })
     },
@@ -163,6 +167,7 @@ export default {
     },
     closeResultDetail() {
       this.resultDetailDialogVisible = false
+      this.rowData = []
     }
   }
 }

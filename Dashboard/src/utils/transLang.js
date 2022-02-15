@@ -25,10 +25,10 @@ export function transTableDataByLang(data) {
   // 訂單狀態
   if (data.OrderStatus) {
     if (data.OrderStatus === 1) {
-      data.OrderStatusKey = '__paidOuted'
+      data.OrderStatusKey = '__paid'
     }
     if (data.OrderStatus === 2) {
-      data.OrderStatusKey = '__paidNone'
+      data.OrderStatusKey = '__noPayout'
     }
   }
 
