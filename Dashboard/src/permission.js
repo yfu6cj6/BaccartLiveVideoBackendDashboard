@@ -61,8 +61,23 @@ router.beforeEach(async(to, from, next) => {
   }
 })
 
-router.afterEach(() => {
+router.afterEach((to, from) => {
   // finish progress bar
+  handleKeepAlive(to)
   NProgress.done()
 })
 
+const handleKeepAlive = function(to) {
+  if (to.matched && to.matched.length > 2) {
+    for (let i = 0, max = to.matched.length - 1; i < max; i++) {
+      const element = to.matched[i]
+      // 因为import()异步懒加载,第一次获取不到element.components.default.name , 所以不能再beforeEach做,不然第一次访问的界面不缓存第二次才会缓存
+      // afterEach就不一样了,这时候可以获取到element.components.default.name了
+      if (element.components.default.name === 'Layout') {
+        continue
+      }
+      to.matched.splice(i, 1)
+      handleKeepAlive(to)
+    }
+  }
+}

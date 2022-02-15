@@ -147,7 +147,6 @@ export default {
       await getAgentCreateSelect(this.token).then((res) => {
         this.currencyList = res.Data.Currencies
         this.timeZoneList = res.Data.TimeZones
-        console.log(this.timeZoneList)
         this.searchForm.currency = this.currencyList[0].Code
         this.searchForm.timeZone = this.timeZoneList[0].Id
         this.searchForm.oddType = this.oddType[0].value

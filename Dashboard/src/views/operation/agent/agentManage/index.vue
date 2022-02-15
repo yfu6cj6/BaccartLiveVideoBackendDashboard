@@ -127,7 +127,6 @@ export default {
     onSubmit() {
       this.tableData = undefined
       getAgentManageSearch(this.token, this.searchForm).then((res) => {
-        console.log(res)
         this.total = res.Data.TotalCount
         this.oriAllData = res.Data.Agents
         this.allData = _.cloneDeep(this.oriAllData).map((item) => {
