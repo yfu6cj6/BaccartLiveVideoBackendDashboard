@@ -130,11 +130,10 @@ export default {
       this.tableData = []
       this.selectLoading = true
       this.dataLoading = true
-      const ZO = ' 00:00:00'
       this.searchForm.limit = this.pageSize
       this.searchForm.page = this.currentPage
-      this.searchForm.transactionTimeRangeStart = getFullDate(this.searchTimeRange[0]) + ZO
-      this.searchForm.transactionTimeRangeEnd = getFullDate(this.searchTimeRange[1]) + ZO
+      this.searchForm.transactionTimeRangeStart = getFullDate(this.searchTimeRange[0])
+      this.searchForm.transactionTimeRangeEnd = getFullDate(this.searchTimeRange[1])
       await apiBalanceRecordSearch(this.token, this.searchForm).then((res) => {
         this.$store.dispatch('operation_member/setMemberTransactionRecords', res.Data.MemberBalanceRecords)
         this.allDataByClient = this.memberBalanceRecords

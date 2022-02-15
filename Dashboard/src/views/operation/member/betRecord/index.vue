@@ -154,9 +154,8 @@ export default {
       this.tableData = []
       this.selectLoading = true
       this.dataLoading = true
-      const ZO = ' 00:00:00'
-      this.searchForm.betTimeRangeStart = getFullDate(this.searchTimeRange[0]) + ZO
-      this.searchForm.betTimeRangeEnd = getFullDate(this.searchTimeRange[1]) + ZO
+      this.searchForm.betTimeRangeStart = getFullDate(this.searchTimeRange[0])
+      this.searchForm.betTimeRangeEnd = getFullDate(this.searchTimeRange[1])
       await apiBetRecordSearch(this.token, this.searchForm).then((res) => {
         this.$store.dispatch('operation_member/setMemberBetRecords', res.Data.MemberBetRecords)
         this.allDataByClient = this.memberBetRecords

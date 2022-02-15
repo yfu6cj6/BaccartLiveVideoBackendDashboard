@@ -145,11 +145,10 @@ export default {
       this.tableData = []
       this.selectLoading = true
       this.dataLoading = true
-      const ZO = ' 00:00:00'
       this.searchForm.limit = this.pageSize
       this.searchForm.page = this.currentPage
-      this.searchForm.gameStartTime = getFullDate(this.searchTimeRange[0]) + ZO
-      this.searchForm.gameEndTime = getFullDate(this.searchTimeRange[1]) + ZO
+      this.searchForm.gameStartTime = getFullDate(this.searchTimeRange[0])
+      this.searchForm.gameEndTime = getFullDate(this.searchTimeRange[1])
       await apiGameResultSearch(this.token, this.searchForm).then((res) => {
         this.$store.dispatch('operation_member/setMemberGameResultRecords', res.Data.GameResultRecords)
         this.allDataByClient = this.memberGameResultRecords
