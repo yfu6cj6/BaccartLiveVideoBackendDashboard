@@ -33,9 +33,9 @@ export default {
     this.handleCurrentChange(1)
   },
   methods: {
-    async onSubmit() {
+    onSubmit() {
       this.dataLoading = true
-      await customerServiceList(this.token).then((res) => {
+      customerServiceList(this.token).then((res) => {
         this.$store.dispatch('customerServiceManage/setcustomerServiceListData', res.Data)
         this.allDataByClient = this.customerServiceListData
         this.totalCount = res.Data.length

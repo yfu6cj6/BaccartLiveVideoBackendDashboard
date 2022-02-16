@@ -86,12 +86,12 @@ export default {
         this.searchForm.limit = this.pageSize
       })
     },
-    async onSubmit() {
+    onSubmit() {
       this.searchForm.page = this.currentPage
       this.tableData = []
       this.selectLoading = true
       this.dataLoading = true
-      await apiMemberInfo(this.token, this.searchForm).then((res) => {
+      apiMemberInfo(this.token, this.searchForm).then((res) => {
         this.$store.dispatch('operation_member/setMemberInfos', res.Data.MemberInfos)
         this.allDataByClient = this.memberInfos
         this.totalCount = res.Data.TotalCount

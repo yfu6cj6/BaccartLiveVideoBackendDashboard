@@ -126,7 +126,7 @@ export default {
         this.searchForm.orderByCondition = this.orderByCondition_transaction_record[0].value
       })
     },
-    async onSubmit() {
+    onSubmit() {
       this.tableData = []
       this.selectLoading = true
       this.dataLoading = true
@@ -134,7 +134,7 @@ export default {
       this.searchForm.page = this.currentPage
       this.searchForm.transactionTimeRangeStart = getFullDate(this.searchTimeRange[0])
       this.searchForm.transactionTimeRangeEnd = getFullDate(this.searchTimeRange[1])
-      await apiBalanceRecordSearch(this.token, this.searchForm).then((res) => {
+      apiBalanceRecordSearch(this.token, this.searchForm).then((res) => {
         this.$store.dispatch('operation_member/setMemberTransactionRecords', res.Data.MemberBalanceRecords)
         this.allDataByClient = this.memberBalanceRecords
         this.totalCount = res.Data.TotalCount

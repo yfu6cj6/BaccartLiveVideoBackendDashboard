@@ -150,13 +150,13 @@ export default {
         this.searchForm.orderByCondition = this.orderByCondition_bet_record[0].value
       })
     },
-    async onSubmit() {
+    onSubmit() {
       this.tableData = []
       this.selectLoading = true
       this.dataLoading = true
       this.searchForm.betTimeRangeStart = getFullDate(this.searchTimeRange[0])
       this.searchForm.betTimeRangeEnd = getFullDate(this.searchTimeRange[1])
-      await apiBetRecordSearch(this.token, this.searchForm).then((res) => {
+      apiBetRecordSearch(this.token, this.searchForm).then((res) => {
         this.$store.dispatch('operation_member/setMemberBetRecords', res.Data.MemberBetRecords)
         this.allDataByClient = this.memberBetRecords
         this.allDataByClient.forEach(element => {

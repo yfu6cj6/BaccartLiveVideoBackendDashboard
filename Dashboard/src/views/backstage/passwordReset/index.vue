@@ -61,10 +61,10 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.$refs.form.validate(async(valid) => {
+      this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true
-          await modifyPassword(this.token, this.form).then((res) => {
+          modifyPassword(this.token, this.form).then((res) => {
             this.reset()
             this.$message({
               title: res.Error.Code,

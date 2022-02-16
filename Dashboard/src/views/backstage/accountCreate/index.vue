@@ -119,20 +119,22 @@ export default {
     this.initAllSelectMenu()
   },
   methods: {
-    async initAllSelectMenu() {
+    initAllSelectMenu() {
       this.roleLoading = true
       this.infoLoading = true
-      await getAgentRole(this.token).then((res) => {
+      getAgentRole(this.token).then((res) => {
         this.$store.dispatch('backstage/setAccountCreateAgentRole', res.Data)
         this.roleLoading = false
-      }).then(getAgentLevelInfo(this.token).then((res) => {
-        this.treeData.agentLevelInfo = [res.Data.AgentLevelInfo]
-        this.form.agentId = res.Data.AgentLevelInfo.AgentId
-        this.form.role = this.accountCreateAgentRole[0].Id
-        this.defaultForm.agentId = res.Data.AgentLevelInfo.AgentId
-        this.defaultForm.role = this.form.role
-        this.infoLoading = false
-      }))
+      }).then(() => {
+        getAgentLevelInfo(this.token).then((res) => {
+          this.treeData.agentLevelInfo = [res.Data.AgentLevelInfo]
+          this.form.agentId = res.Data.AgentLevelInfo.AgentId
+          this.form.role = this.accountCreateAgentRole[0].Id
+          this.defaultForm.agentId = res.Data.AgentLevelInfo.AgentId
+          this.defaultForm.role = this.form.role
+          this.infoLoading = false
+        })
+      })
     },
     onSubmit() {
       this.$refs.form.validate((valid) => {

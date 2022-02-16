@@ -38,9 +38,9 @@ export default {
     this.handleCurrentChange(1)
   },
   methods: {
-    async onSubmit() {
+    onSubmit() {
       this.dataLoading = true
-      await accountListPage(this.token).then((res) => {
+      accountListPage(this.token).then((res) => {
         this.$store.dispatch('backstage/setAccountListData', res.Data)
         this.allDataByClient = this.accountListData
         this.totalCount = res.Data.length

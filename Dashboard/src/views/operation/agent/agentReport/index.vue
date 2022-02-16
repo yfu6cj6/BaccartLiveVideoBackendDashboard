@@ -126,19 +126,21 @@ export default {
         this.searchForm.currency = this.currencyList[0].Code
         this.searchForm.orderBy = this.agentOrderBy[0].value
         this.searchForm.orderByCondition = this.orderByCondition_agent_report[0].value
-      }).then(getAgentLevelInfo(this.token).then((res) => {
-        this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
-        this.searchForm.agentId = res.Data.AgentLevelInfo.AgentId
-        this.infoLoading = false
-      }))
+      }).then(() => {
+        getAgentLevelInfo(this.token).then((res) => {
+          this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
+          this.searchForm.agentId = res.Data.AgentLevelInfo.AgentId
+          this.infoLoading = false
+        })
+      })
     },
-    async onSubmit() {
+    onSubmit() {
       this.tableData = []
       this.selectLoading = true
       this.dataLoading = true
       this.searchForm.betTimeRangeStart = getFullDate(this.searchTimeRange[0])
       this.searchForm.betTimeRangeEnd = getFullDate(this.searchTimeRange[1])
-      await getAgentDayReportSearch(this.token, this.searchForm).then((res) => {
+      getAgentDayReportSearch(this.token, this.searchForm).then((res) => {
         this.$store.dispatch('operation_agent/setAgentReport', res.Data.AgentDayReports)
         this.allDataByClient = this.agentDayReports
         this.totalCount = res.Data.TotalCount

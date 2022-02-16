@@ -121,11 +121,13 @@ export default {
         this.searchForm.orderBy = this.agentOrderBy[0].value
         this.searchForm.orderByCondition = this.orderByCondition_agent_management[0].value
         this.searchForm.userStatus = this.userStatus[0].value
-      }).then(getAgentLevelInfo(this.token).then((res) => {
-        this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
-        this.searchForm.agentId = res.Data.AgentLevelInfo.AgentId
-        this.infoLoading = false
-      }))
+      }).then(() => {
+        getAgentLevelInfo(this.token).then((res) => {
+          this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
+          this.searchForm.agentId = res.Data.AgentLevelInfo.AgentId
+          this.infoLoading = false
+        })
+      })
     },
     async onSubmit() {
       this.tableData = []

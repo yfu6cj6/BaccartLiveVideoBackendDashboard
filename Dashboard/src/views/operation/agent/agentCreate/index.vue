@@ -140,11 +140,13 @@ export default {
         this.form.oddType = this.oddType[0].value
         this.form.walletType = this.walletType[0].value
         this.roleLoading = false
-      }).then(getAgentLevelInfo(this.token).then((res) => {
-        this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
-        this.form.parentAgentId = res.Data.AgentLevelInfo.AgentId
-        this.infoLoading = false
-      }))
+      }).then(() => {
+        getAgentLevelInfo(this.token).then((res) => {
+          this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
+          this.form.parentAgentId = res.Data.AgentLevelInfo.AgentId
+          this.infoLoading = false
+        })
+      })
     },
     onSubmit() {
       createAgent(this.token, this.form).then(getAgentLevelInfo(this.token).then((res) => {

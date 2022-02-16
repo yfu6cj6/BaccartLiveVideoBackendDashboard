@@ -141,7 +141,7 @@ export default {
         this.searchForm.orderByCondition = this.orderByCondition_game_result[0].value
       })
     },
-    async onSubmit() {
+    onSubmit() {
       this.tableData = []
       this.selectLoading = true
       this.dataLoading = true
@@ -149,7 +149,7 @@ export default {
       this.searchForm.page = this.currentPage
       this.searchForm.gameStartTime = getFullDate(this.searchTimeRange[0])
       this.searchForm.gameEndTime = getFullDate(this.searchTimeRange[1])
-      await apiGameResultSearch(this.token, this.searchForm).then((res) => {
+      apiGameResultSearch(this.token, this.searchForm).then((res) => {
         this.$store.dispatch('operation_member/setMemberGameResultRecords', res.Data.GameResultRecords)
         this.allDataByClient = this.memberGameResultRecords
         this.totalCount = res.Data.TotalCount
