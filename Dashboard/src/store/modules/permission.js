@@ -7,7 +7,7 @@ import { asyncRoutes, constantRoutes } from '@/router'
  */
 function hasPermission(permissions, route) {
   if (route.meta && route.meta.permission) {
-    return permissions.some(permission => ((permission === 999) || (route.meta.permission === permission.code)))
+    return permissions.some(permission => ((permission.Code === 999) || (route.meta.permission === permission.Code)))
   } else {
     return true
   }

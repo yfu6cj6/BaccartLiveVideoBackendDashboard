@@ -91,13 +91,13 @@ export const asyncRoutes = [
         path: 'roleGroup',
         name: 'RoleGroup',
         component: () => import('@/views/backstage/roleGroup/index'),
-        meta: { title: '__roleGroup', icon: 'el-icon-user-solid', permission: 1001 }
+        meta: { title: '__roleGroup', icon: 'el-icon-user-solid', permission: 1003 }
       },
       {
         path: 'passwordReset',
         name: 'PasswordReset',
         component: () => import('@/views/backstage/passwordReset/index'),
-        meta: { title: '__passwordReset', icon: 'el-icon-user-solid', permission: 1002 }
+        meta: { title: '__passwordReset', icon: 'el-icon-user-solid', permission: 1004 }
       }
     ]
   },
@@ -107,14 +107,14 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/',
     name: 'customerServiceManage',
-    meta: { title: '__customerServiceManage', icon: 'el-icon-s-custom' },
+    meta: { title: '__customerServiceManage', icon: 'el-icon-s-custom', permission: 1100 },
     children: [
       {
         path: 'customerServiceList',
         name: 'CustomerServiceList',
         showThisChildren: true,
         component: () => import('@/views/customerServiceManage/customerServiceList/index'),
-        meta: { title: '__customerServiceList', icon: 'el-icon-user-solid' }
+        meta: { title: '__customerServiceList', icon: 'el-icon-user-solid', permission: 1101 }
       }
     ]
   },
