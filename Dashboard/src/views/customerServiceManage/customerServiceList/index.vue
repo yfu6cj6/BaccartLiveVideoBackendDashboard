@@ -30,16 +30,12 @@ export default {
     ...mapGetters(['token', 'customerServiceListData'])
   },
   created() {
-    this.search()
+    this.handleCurrentChange(1)
   },
   methods: {
-    search() {
-      this.currentPage = 1
-      this.onSubmit()
-    },
     async onSubmit() {
       this.dataLoading = true
-      customerServiceList(this.token).then((res) => {
+      await customerServiceList(this.token).then((res) => {
         this.$store.dispatch('customerServiceManage/setcustomerServiceListData', res.Data)
         this.allDataByClient = this.customerServiceListData
         this.totalCount = res.Data.length

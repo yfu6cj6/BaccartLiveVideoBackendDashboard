@@ -18,11 +18,11 @@
       <el-col :span="18">
         <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
           <el-form-item class="inputTitle" :label="$t('__searchTime')">
-            <el-date-picker v-model="searchForm.searchTimeRange" format="yyyy-MM-dd" value-format="yyyy-MM-dd" type="daterange" range-separator="至" start-placeholder="開始日期" end-placeholder="結束日期" />
+            <el-date-picker v-model="searchTimeRange" format="yyyy-MM-dd" value-format="yyyy-MM-dd" type="daterange" range-separator="至" start-placeholder="開始日期" end-placeholder="結束日期" />
           </el-form-item>
           <el-form-item class="inputTitle" :label="$t('__currency')">
             <el-select v-model="searchForm.currency">
-              <el-option v-for="item in currencyList" :key="item.code" :label="item.name" :value="item.code" />
+              <el-option v-for="item in currencyList" :key="item.Code" :label="item.Name" :value="item.Code" />
             </el-select>
           </el-form-item>
           <el-form-item class="inputTitle" :label="$t('__orderBy')">
@@ -70,23 +70,26 @@ import { mapGetters } from 'vuex'
 import { getAgentReportSelect, getAgentDayReportSearch, getAgentLevelInfo } from '@/api/operation_agent'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
-import { getAgentReport } from '../Data'
-import { getFullDate } from '@/utils/transDate'
-import { transTimeModel } from '@/utils/transTimeModel'
-import _ from 'lodash'
+import { initDatePickerRange, getFullDate } from '@/utils/transDate'
 import { parseTime } from '@/utils/index'
 
 export default {
-  name: 'Home',
+  name: 'AgentReport',
   mixins: [handlePageChange, shared],
   data() {
     return {
       userData: [],
-      tableData: [],
       currencyList: [],
-      searchForm: getAgentReport(),
-      oriAllData: [],
       excel: true,
+      searchForm: {
+        betTimeRangeStart: '',
+        betTimeRangeEnd: '',
+        currency: undefined,
+        orderByCondition: undefined,
+        orderBy: undefined,
+        agentId: undefined
+      },
+      searchTimeRange: initDatePickerRange(),
       treeData: {
         subAgentLevelInfos: []
       },
@@ -94,48 +97,53 @@ export default {
         children: 'SubAgentLevelInfos',
         label: 'AgentName'
       },
-      messageInstance: this.$message
+      infoLoading: false
     }
   },
   computed: {
     ...mapGetters([
       'token',
       'agentOrderBy',
-      'orderByCondition_agent_report'
+      'orderByCondition_agent_report',
+      'agentDayReports'
     ])
   },
   created() {
-    this.$store.dispatch('operation_agent/setSelectMenu')
-    this.initAllSelectMenu()
+    this.initAllSelectMenu().then(() => {
+      this.handleCurrentChange(1)
+    })
   },
   methods: {
     async initAllSelectMenu() {
+      this.$store.dispatch('operation_agent/setSelectMenu')
       this.selectLoading = true
+      this.dataLoading = true
+      this.infoLoading = true
       await getAgentReportSelect(this.token).then((res) => {
-        this.currencyList = res.Data.Currencies
-        this.searchForm.currency = this.currencyList[0].code
+        this.currencyList = []
+        this.currencyList.push({ Code: 0, Name: this.$t('__allCurrency') })
+        this.currencyList = this.currencyList.concat(res.Data.Currencies)
+        this.searchForm.currency = this.currencyList[0].Code
         this.searchForm.orderBy = this.agentOrderBy[0].value
         this.searchForm.orderByCondition = this.orderByCondition_agent_report[0].value
-        this.searchForm.orderByCondition = 0
-        this.selectLoading = false
-      })
-      getAgentLevelInfo(this.token).then((res) => {
-        this.treeData.subAgentLevelInfos.push(res.Data.AgentLevelInfo)
+      }).then(getAgentLevelInfo(this.token).then((res) => {
+        this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
         this.searchForm.agentId = res.Data.AgentLevelInfo.AgentId
-      })
+        this.infoLoading = false
+      }))
     },
-    onSubmit() {
-      this.tableData = undefined
-      const ZO = ' 00:00:00'
-      this.searchForm.betTimeRangeStart = getFullDate(this.searchForm.searchTimeRange[0]) + ZO
-      this.searchForm.betTimeRangeEnd = getFullDate(this.searchForm.searchTimeRange[1]) + ZO
-      getAgentDayReportSearch(this.token, this.searchForm).then((res) => {
+    async onSubmit() {
+      this.tableData = []
+      this.selectLoading = true
+      this.dataLoading = true
+      this.searchForm.betTimeRangeStart = getFullDate(this.searchTimeRange[0])
+      this.searchForm.betTimeRangeEnd = getFullDate(this.searchTimeRange[1])
+      await getAgentDayReportSearch(this.token, this.searchForm).then((res) => {
+        this.$store.dispatch('operation_agent/setAgentReport', res.Data.AgentDayReports)
+        this.allDataByClient = this.agentDayReports
         this.totalCount = res.Data.TotalCount
-        this.oriAllData = res.Data.AgentDayReports
-        this.allData = _.cloneDeep(this.oriAllData).map((item) => {
-          item.createTime = transTimeModel(item.createTime)
-          return item
-        })
+        this.handlePageChangeByClient(this.currentPage)
+        this.selectLoading = false
         this.dataLoading = false
       })
     },

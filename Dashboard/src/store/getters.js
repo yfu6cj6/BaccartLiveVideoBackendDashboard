@@ -26,6 +26,8 @@ const getters = {
   orderByCondition_agent_management: state => state.operation_agent.orderByCondition_agent_management,
   oddType: state => state.operation_agent.oddType,
   walletType: state => state.operation_agent.walletType,
-  getTimezoneList: state => state.operation_agent.timezoneList
+  timezoneList: state => state.operation_agent.timezoneList,
+  agentDayReports: state => state.operation_agent.agentDayReports,
+  agentManageData: state => state.operation_agent.agentManageData
 }
 export default getters

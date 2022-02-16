@@ -1,7 +1,7 @@
 <template>
   <div class="agentCreate-container">
     <el-row>
-      <el-col :span="6">
+      <el-col v-loading="roleLoading" :span="6">
         <el-card shadow="never">
           <el-scrollbar>
             <el-tree
@@ -18,22 +18,23 @@
       <el-col :span="18">
         <el-form
           ref="form"
+          v-loading="infoLoading"
           class="filterForm"
           label-width="170px"
           style="max-width: 450px; margin: 0 auto"
-          :model="searchForm"
+          :model="form"
         >
           <el-form-item :label="$t('__toAddAgentID')">
             <el-input
-              v-model="searchForm.parentAgentId"
+              v-model="form.parentAgentId"
               :disabled="true"
             />
           </el-form-item>
           <el-form-item :label="$t('__name')">
-            <el-input v-model="searchForm.name" />
+            <el-input v-model="form.name" />
           </el-form-item>
           <el-form-item :label="$t('__betRange')">
-            <el-select v-model="searchForm.oddType">
+            <el-select v-model="form.oddType">
               <el-option
                 v-for="item in oddType"
                 :key="item.value"
@@ -43,20 +44,20 @@
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('__gameClientUrl')">
-            <el-input v-model="searchForm.gameClientUrl" />
+            <el-input v-model="form.gameClientUrl" />
           </el-form-item>
           <el-form-item :label="$t('__currency')">
-            <el-select v-model="searchForm.currency">
+            <el-select v-model="form.currency">
               <el-option
                 v-for="item in currencyList"
-                :key="item.code"
-                :label="item.name"
-                :value="item.code"
+                :key="item.Code"
+                :label="item.Name"
+                :value="item.Code"
               />
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('__walletType')">
-            <el-select v-model="searchForm.walletType">
+            <el-select v-model="form.walletType">
               <el-option
                 v-for="item in walletType"
                 :key="item.value"
@@ -66,20 +67,20 @@
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('__domain')">
-            <el-input v-model="searchForm.domain" />
+            <el-input v-model="form.domain" />
           </el-form-item>
           <el-form-item :label="$t('__timezone')">
-            <el-select v-model="searchForm.timeZone">
+            <el-select v-model="form.timeZone">
               <el-option
-                v-for="item in timeZoneList"
+                v-for="item in timezoneList"
                 :key="item.value"
-                :label="$t(item.key)"
+                :label="item.label"
                 :value="item.value"
               />
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('__commissionRate')">
-            <el-input v-model="searchForm.commissionRate" />
+            <el-input v-model="form.commissionRate" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onSubmit">{{
@@ -93,15 +94,16 @@
 </template>
 
 <script>
-import { getAgentCreate } from '../Data'
 import { mapGetters } from 'vuex'
 import { getAgentCreateSelect, createAgent, getAgentLevelInfo } from '@/api/operation_agent'
+import { form } from './model.js'
 
 export default {
   name: 'AgentCreate',
   data() {
     return {
-      searchForm: getAgentCreate(),
+      form: JSON.parse(JSON.stringify(form)),
+      defaultForm: JSON.parse(JSON.stringify(form)),
       currencyList: [],
       treeData: {
         subAgentLevelInfos: []
@@ -109,56 +111,54 @@ export default {
       defaultProps: {
         children: 'SubAgentLevelInfos',
         label: 'AgentName'
-      }
+      },
+      roleLoading: false,
+      infoLoading: false
     }
   },
   computed: {
     ...mapGetters([
       'token',
+      'timezoneList',
       'oddType',
-      'walletType',
-      'getTimezoneList'
-    ]),
-    timeZoneList: {
-      get() {
-        return this.getTimezoneList
-      },
-      set() {}
-    }
+      'walletType'
+    ])
   },
   created() {
-    this.$store.dispatch('operation_agent/setSelectMenu')
     this.initAllSelectMenu()
   },
   methods: {
-    onSubmit() {
-      createAgent(this.token, this.searchForm).then((res) => {
-        this.treeData = { subAgentLevelInfos: [] }
-        getAgentLevelInfo(this.token).then((res) => {
-          this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
-          this.searchForm.agentId = res.Data.AgentLevelInfo.AgentId
-        }).catch((e) => {
-
-        })
-      })
-    },
     async initAllSelectMenu() {
+      this.$store.dispatch('operation_agent/setSelectMenu')
+      this.roleLoading = true
+      this.infoLoading = true
       // 初始化下拉選單的值
       await getAgentCreateSelect(this.token).then((res) => {
         this.currencyList = res.Data.Currencies
-        this.timeZoneList = res.Data.TimeZones
-        this.searchForm.currency = this.currencyList[0].Code
-        this.searchForm.timeZone = this.timeZoneList[0].Id
-        this.searchForm.oddType = this.oddType[0].value
-        this.searchForm.walletType = this.walletType[0].value
-      })
-      getAgentLevelInfo(this.token).then((res) => {
+        this.form.currency = this.currencyList[0].Code
+        this.form.timeZone = this.timezoneList[0].value
+        this.form.oddType = this.oddType[0].value
+        this.form.walletType = this.walletType[0].value
+        this.roleLoading = false
+      }).then(getAgentLevelInfo(this.token).then((res) => {
         this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
-        this.searchForm.agentId = res.Data.AgentLevelInfo.AgentId
-      })
+        this.form.parentAgentId = res.Data.AgentLevelInfo.AgentId
+        this.infoLoading = false
+      }))
+    },
+    onSubmit() {
+      createAgent(this.token, this.form).then(getAgentLevelInfo(this.token).then((res) => {
+        this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
+        this.form.parentAgentId = res.Data.AgentLevelInfo.AgentId
+        this.reset()
+        this.infoLoading = false
+      }))
+    },
+    reset() {
+      this.form = JSON.parse(JSON.stringify(this.defaultForm))
     },
     handleNodeClick(data) {
-      this.searchForm.parentAgentId = data.AgentId
+      this.form.parentAgentId = data.AgentId
     },
     renderContent(h, { node, data, store }) {
       return (

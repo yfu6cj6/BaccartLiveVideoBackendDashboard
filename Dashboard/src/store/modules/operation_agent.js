@@ -7,7 +7,9 @@ const state = {
   orderByCondition_agent_management: [],
   oddType: [],
   walletType: [],
-  timezoneList: []
+  timezoneList: [],
+  agentDayReports: [],
+  agentManageData: []
 }
 
 // -> 排序方式
@@ -114,48 +116,39 @@ const orderByCondition_agent_management = [
 // -> 盤口，玩家可下注範圍
 const oddType = [
   {
-    label: '',
-    key: '__oddRange_1',
+    label: 'A_20_50000',
     value: 0
   },
   {
-    label: '',
-    key: '__oddRange_2',
+    label: 'B_50_5000',
     value: 1
   },
   {
-    label: '',
-    key: '__oddRange_3',
+    label: 'C_20_10000',
     value: 2
   },
   {
-    label: '',
-    key: '__oddRange_4',
+    label: 'D_200_20000',
     value: 3
   },
   {
-    label: '',
-    key: '__oddRange_5',
+    label: 'E_300_30000',
     value: 4
   },
   {
-    label: '',
-    key: '__oddRange_6',
+    label: 'F_400_40000',
     value: 5
   },
   {
-    label: '',
-    key: '__oddRange_7',
+    label: 'G_500_50000',
     value: 6
   },
   {
-    label: '',
-    key: '__oddRange_8',
+    label: 'H_1000_100000',
     value: 7
   },
   {
-    label: '',
-    key: '__oddRange_9',
+    label: 'I_2000_200000',
     value: 8
   }
 ]
@@ -176,88 +169,71 @@ const walletType = [
 
 const timezoneList = [
   {
-    label: '',
-    key: '__utf_plus8',
+    label: 'UTC +8',
     value: 0
   },
   {
-    label: '',
-    key: '__utf_plus7',
+    label: 'UTC +7',
     value: 1
   },
   {
-    label: '',
-    key: '__utf_plus6',
+    label: 'UTC +6',
     value: 2
   },
   {
-    label: '',
-    key: '__utf_plus5',
+    label: 'UTC +5',
     value: 3
   },
   {
-    label: '',
-    key: '__utf_plus4',
+    label: 'UTC +4',
     value: 4
   },
   {
-    label: '',
-    key: '__utf_plus3',
+    label: 'UTC +3',
     value: 5
   },
   {
-    label: '',
-    key: '__utf_plus2',
+    label: 'UTC +2',
     value: 6
   },
   {
-    label: '',
-    key: '__utf_plus1',
+    label: 'UTC +1',
     value: 7
   },
   {
-    label: '',
-    key: '__utf_plus0',
+    label: 'UTC +0',
     value: 8
   },
   {
-    label: '',
-    key: '__utf_minus1',
+    label: 'UTC -1',
     value: 9
   },
   {
-    label: '',
-    key: '__utf_minus2',
+    label: 'UTC -2',
     value: 10
   },
   {
-    label: '',
-    key: '__utf_minus3',
+    label: 'UTC -3',
     value: 11
   },
   {
-    label: '',
-    key: '__utf_minus4',
+    label: 'UTC -4',
     value: 12
   },
   {
-    label: '',
-    key: '__utf_minus5',
+    label: 'UTC -5',
     value: 13
   },
   {
-    label: '',
-    key: '__utf_minus6',
+    label: 'UTC -6',
     value: 14
   },
   {
-    label: '',
-    key: '__utf_minus7',
+    label: 'UTC -7',
     value: 15
   },
   {
-    label: '',
-    key: '__utf_minus8',
+    label: 'UTC -8',
     value: 16
   }
 ]
@@ -272,6 +248,12 @@ const mutations = {
     state.walletType = walletType
     state.timezoneList = timezoneList
   },
+  SET_AGENTREPORT(state, data) {
+    state.agentDayReports = data
+  },
+  SET_AGENTMANAGEDATA(state, data) {
+    state.agentManageData = data
+  },
   CHANGE_SELECT_LANG(state) {
     state.agentOrderBy.forEach(element => {
       element.label = i18n.messages[i18n.locale][element.key]
@@ -285,13 +267,7 @@ const mutations = {
     state.orderByCondition_agent_management.forEach(element => {
       element.label = i18n.messages[i18n.locale][element.key]
     })
-    state.oddType.forEach(element => {
-      element.label = i18n.messages[i18n.locale][element.key]
-    })
     state.walletType.forEach(element => {
-      element.label = i18n.messages[i18n.locale][element.key]
-    })
-    state.timezoneList.forEach(element => {
       element.label = i18n.messages[i18n.locale][element.key]
     })
   }
@@ -299,6 +275,14 @@ const mutations = {
 const actions = {
   setSelectMenu({ commit }) {
     commit('SET_SELECTMENU')
+    commit('CHANGE_SELECT_LANG')
+  },
+  setAgentReport({ commit }, data) {
+    commit('SET_AGENTREPORT', data)
+    commit('CHANGE_SELECT_LANG')
+  },
+  setAgentManageData({ commit }, data) {
+    commit('SET_AGENTMANAGEDATA', data)
     commit('CHANGE_SELECT_LANG')
   },
   changeSelectLang({ commit }) {

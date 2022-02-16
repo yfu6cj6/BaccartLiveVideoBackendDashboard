@@ -19,12 +19,12 @@
         <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
           <el-form-item class="inputTitle" :label="$t('__accountStatus')">
             <el-select v-model="searchForm.userStatus">
-              <el-option v-for="item in userStatusList" :key="item.value" :label="item.label" :value="item.value" />
+              <el-option v-for="item in userStatus" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
           <el-form-item class="inputTitle" :label="$t('__currency')">
             <el-select v-model="searchForm.currency">
-              <el-option v-for="item in currencyList" :key="item.code" :label="item.name" :value="item.code" />
+              <el-option v-for="item in currencyList" :key="item.Code" :label="item.Name" :value="item.Code" />
             </el-select>
           </el-form-item>
           <el-form-item class="inputTitle" :label="$t('__orderBy')">
@@ -63,29 +63,24 @@
 </template>
 
 <script>
-import { getAgentManageSelect, getAgentManageSearch, getAgentLevelInfo } from '@/api/operation_agent'
 import { mapGetters } from 'vuex'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
-import _ from 'lodash'
+import { getAgentManageSelect, getAgentManageSearch, getAgentLevelInfo } from '@/api/operation_agent'
 import { parseTime } from '@/utils/index'
 
 export default {
-  name: 'Home',
+  name: 'AgentManage',
   mixins: [handlePageChange, shared],
   data() {
     return {
-      tableData: [],
-      oriAllData: [],
-      userStatusList: [],
       currencyList: [],
       searchForm: {
-        language: '',
         userStatus: undefined,
-        currency: null,
-        orderByCondition: null,
-        orderBy: null,
-        agentId: ''
+        currency: undefined,
+        orderByCondition: undefined,
+        orderBy: undefined,
+        agentId: undefined
       },
       excel: true,
       treeData: {
@@ -95,43 +90,53 @@ export default {
         children: 'SubAgentLevelInfos',
         label: 'AgentName'
       },
-      messageInstance: this.$message
+      infoLoading: false
     }
   },
   computed: {
-    ...mapGetters(['token', 'agentOrderBy', 'orderByCondition_agent_management', 'userStatus'])
+    ...mapGetters([
+      'token',
+      'agentOrderBy',
+      'orderByCondition_agent_management',
+      'userStatus',
+      'agentManageData'
+    ])
   },
   created() {
-    this.initAllSelectMenu()
+    this.initAllSelectMenu().then(() => {
+      this.handleCurrentChange(1)
+    })
   },
   methods: {
     async initAllSelectMenu() {
       this.$store.dispatch('operation_agent/setSelectMenu')
-      this.selectLoading = false
-      this.orderByList = this.agentOrderBy
-      this.orderByConditionList = this.orderByCondition_agent_management
+      this.selectLoading = true
+      this.dataLoading = true
+      this.infoLoading = true
       await getAgentManageSelect(this.token).then((res) => {
-        this.currencyList = res.Data.Currencies
-        this.userStatusList = this.userStatus
-        this.searchForm.currency = this.currencyList[0].code
+        this.currencyList = []
+        this.currencyList.push({ Code: 0, Name: this.$t('__allCurrency') })
+        this.currencyList = this.currencyList.concat(res.Data.Currencies)
+        this.searchForm.currency = this.currencyList[0].Code
         this.searchForm.orderBy = this.agentOrderBy[0].value
         this.searchForm.orderByCondition = this.orderByCondition_agent_management[0].value
-        this.searchForm.userStatus = this.userStatusList[0].value
-        this.selectLoading = false
-      })
-      getAgentLevelInfo(this.token).then((res) => {
-        this.treeData.subAgentLevelInfos.push(res.Data.AgentLevelInfo)
+        this.searchForm.userStatus = this.userStatus[0].value
+      }).then(getAgentLevelInfo(this.token).then((res) => {
+        this.treeData.subAgentLevelInfos = [res.Data.AgentLevelInfo]
         this.searchForm.agentId = res.Data.AgentLevelInfo.AgentId
-      })
+        this.infoLoading = false
+      }))
     },
-    onSubmit() {
-      this.tableData = undefined
-      getAgentManageSearch(this.token, this.searchForm).then((res) => {
-        this.total = res.Data.TotalCount
-        this.oriAllData = res.Data.Agents
-        this.allData = _.cloneDeep(this.oriAllData).map((item) => {
-          return item
-        })
+    async onSubmit() {
+      this.tableData = []
+      this.selectLoading = true
+      this.dataLoading = true
+      await getAgentManageSearch(this.token, this.searchForm).then((res) => {
+        this.$store.dispatch('operation_agent/setAgentManageData', res.Data.Agents)
+        this.allDataByClient = this.agentManageData
+        this.totalCount = res.Data.TotalCount
+        this.handlePageChangeByClient(this.currentPage)
+        this.selectLoading = false
         this.dataLoading = false
       })
     },
