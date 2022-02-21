@@ -8,19 +8,16 @@ export function login(data) {
   })
 }
 
-export function getInfo(token) {
+export function getInfo() {
   return request({
     url: '/user/info',
-    method: 'post',
-    headers: { 'Authorization': 'token ' + token }
+    method: 'get'
   })
 }
 
-export function logout(token) {
+export function logout() {
   return request({
     url: '/user/logout',
-    method: 'post',
-    data: { 'token': token },
-    headers: { 'Authorization': 'token ' + token }
+    method: 'post'
   })
 }
