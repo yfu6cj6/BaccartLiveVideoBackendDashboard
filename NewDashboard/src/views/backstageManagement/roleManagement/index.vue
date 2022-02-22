@@ -24,13 +24,14 @@
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" :border="true">
-      <el-table-column prop="id" label="ID" />
+    <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
+      <el-table-column prop="id" width="80" label="ID" />
       <el-table-column prop="name" :label="$t('__name')" />
       <el-table-column prop="nickname" :label="$t('__nickname')" />
       <el-table-column prop="type" :label="$t('__type')" />
       <el-table-column :label="$t('__operate')">
         <template slot-scope="scope">
+          <el-button type="primary" size="mini" icon="el-icon-coordinate" @click="onEditBtnClick(scope.row)">{{ $t("__permission") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
         </template>
@@ -73,6 +74,7 @@
 import { roleSearch, roleCreate, roleEdit, roleDelete } from '@/api/backstageManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
+import handleViewResize from '@/layout/mixin/handleViewResize'
 import RoleManagementDialog from './roleManagementDialog'
 
 const defaultForm = {
@@ -82,7 +84,7 @@ const defaultForm = {
 export default {
   name: 'RoleManagement',
   components: { RoleManagementDialog },
-  mixins: [handlePageChange, shared],
+  mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
       searchForm: JSON.parse(JSON.stringify(defaultForm)),
@@ -96,6 +98,7 @@ export default {
   computed: {
   },
   created() {
+    this.setHeight()
     this.handleCurrentChange(1)
   },
   methods: {
@@ -229,5 +232,9 @@ export default {
 
 .el-input {
   width: 150px;
+}
+
+.el-select {
+  width: 120px;
 }
 </style>

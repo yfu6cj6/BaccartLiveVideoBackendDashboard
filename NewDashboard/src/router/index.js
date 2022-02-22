@@ -94,7 +94,7 @@ export const asyncRoutes = [
         path: 'permissionManagement',
         name: 'PermissionManagement',
         component: () => import('@/views/backstageManagement/permissionManagement/index'),
-        meta: { title: '__authorityManagement', icon: 'el-icon-user-solid', permission: 1001 }
+        meta: { title: '__permissionManagement', icon: 'el-icon-user-solid', permission: 1001 }
       },
       {
         // 時區管理

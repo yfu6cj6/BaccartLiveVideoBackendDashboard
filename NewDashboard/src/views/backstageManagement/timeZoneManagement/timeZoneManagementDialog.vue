@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="20%" :before-close="onClose" :close-on-press-escape="false">
+  <el-dialog :title="title" :visible.sync="visible" width="20%" :before-close="onClose">
     <el-row>
       <el-col :span="24">
         <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
@@ -62,8 +62,8 @@ export default {
     }
     return {
       rules: {
-        time_zone: [{ required: true, trigger: 'change', validator: validate }],
-        city_name: [{ required: true, trigger: 'change', validator: validate }]
+        time_zone: [{ required: true, trigger: 'blur', validator: validate }],
+        city_name: [{ required: true, trigger: 'blur', validator: validate }]
       },
       editForm: {}
     }
@@ -72,8 +72,9 @@ export default {
   },
   watch: {
     visible() {
-      this.editForm = JSON.parse(JSON.stringify(this.form))
-      if (!this.visible) {
+      if (this.visible) {
+        this.editForm = JSON.parse(JSON.stringify(this.form))
+      } else {
         this.$refs.editForm.clearValidate()
       }
     }

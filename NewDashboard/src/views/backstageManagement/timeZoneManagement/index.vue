@@ -19,8 +19,8 @@
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" :border="true">
-      <el-table-column prop="id" label="ID" />
+    <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
+      <el-table-column prop="id" width="80" label="ID" />
       <el-table-column prop="time_zone" :label="$t('__timeZone')" />
       <el-table-column prop="city_name" :label="$t('__cityName')" />
       <el-table-column :label="$t('__operate')">
@@ -65,12 +65,13 @@
 import { timezoneSearch, timezoneCreate, timezoneEdit, timezoneDelete } from '@/api/backstageManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
+import handleViewResize from '@/layout/mixin/handleViewResize'
 import TimeZoneManagementDialog from './timeZoneManagementDialog'
 
 export default {
   name: 'TimeZoneManagement',
   components: { TimeZoneManagementDialog },
-  mixins: [handlePageChange, shared],
+  mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
       searchForm: {},
@@ -82,6 +83,7 @@ export default {
   computed: {
   },
   created() {
+    this.setHeight()
     this.handleCurrentChange(1)
   },
   methods: {

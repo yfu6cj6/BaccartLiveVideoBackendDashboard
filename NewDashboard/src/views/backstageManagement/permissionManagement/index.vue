@@ -1,116 +1,223 @@
 <template>
-  <div class="accountList-container">
-    <el-form v-loading="selectLoading" class="filterForm" :inline="true">
-      <el-form-item :label="$t('__account')">
-        <el-input v-model="searchForm.account" />
+  <div class="permissionManagement-container">
+    <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+      <el-form-item class="inputTitle" label="ID">
+        <el-input v-model="searchForm.id" />
       </el-form-item>
-      <el-form-item :label="$t('__role')">
-        <el-select v-model="searchForm.role">
-          <el-option v-for="item in accountCreateAgentRole" :key="item.Id" :label="item.Name" :value="item.Id" />
-        </el-select>
+      <el-form-item class="inputTitle" :label="$t('__name')">
+        <el-input v-model="searchForm.name" />
       </el-form-item>
-      <el-form-item :label="$t('__agent')">
-        <el-select v-model="searchForm.agent">
-          <el-option v-for="item in currencyList" :key="item.Code" :label="item.Name" :value="item.Code" />
+      <el-form-item class="inputTitle" :label="$t('__nickname')">
+        <el-input v-model="searchForm.nickname" />
+      </el-form-item>
+      <el-form-item class="inputTitle" label="Uri">
+        <el-input v-model="searchForm.uri" />
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__method')">
+        <el-select v-model="searchForm.methodType">
+          <el-option v-for="item in searchMethodType" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+        <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="onSubmit">{{ $t("__search") }}</el-button>
+        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick">{{ $t("__showAll") }}</el-button>
+        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick">{{ $t("__create") }}</el-button>
       </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleCreateView">{{ $t("__accountCreate") }}</el-button>
-      </el-form-item>
+
     </el-form>
-    <el-table v-loading="dataLoading" :data="tableData" border>
-      <el-table-column prop="Account" :label="$t('__account')" />
-      <el-table-column prop="RoleName" :label="$t('__role')" />
-      <el-table-column prop="AgentName" :label="$t('__agent')" />
+
+    <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
+      <el-table-column prop="id" width="80" label="ID" />
+      <el-table-column prop="name" width="400" :label="$t('__name')" />
+      <el-table-column prop="nickname" width="100" :label="$t('__nickname')" />
+      <el-table-column prop="uri" label="Uri" />
+      <el-table-column prop="method" width="100" :label="$t('__method')" />
+      <el-table-column width="400" :label="$t('__operate')">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
+        </template>
+      </el-table-column>
     </el-table>
+
     <el-pagination
-      class="accountList-pagination"
-      background
       layout="prev, pager, next, jumper"
+      class="permissionManagement-pagination"
       :total="totalCount"
+      background
+      :page-size="pageSize"
       :current-page.sync="currentPage"
-      @size-change="handleSizeChange"
-      @current-change="handlePageChangeByClient"
+      @current-change="handleCurrentChange"
     />
 
-    <AccountCreateView
-      v-if="createViewVisible"
-      :visible="createViewVisible"
-      @close="closeResultDetail"
-      @init="test"
+    <PermissionManagementDialog
+      :title="$t('__edit')"
+      :visible="editDialogVisible"
+      :confirm="$t('__revise')"
+      :form="selectForm"
+      :method-type="methodType"
+      @close="closeDialogEven"
+      @confirm="editDialogConfirmEven"
+    />
+
+    <PermissionManagementDialog
+      :title="$t('__create')"
+      :visible="createDialogVisible"
+      :confirm="$t('__confirm')"
+      :form="selectForm"
+      :method-type="methodType"
+      @close="closeDialogEven"
+      @confirm="createDialogConfirmEven"
     />
   </div>
 </template>
 
 <script>
-import { accountListPage } from '@/api/backstageManagement'
-import { mapGetters } from 'vuex'
+import { permissionSearch, permissionCreate, permissionEdit, permissionDelete } from '@/api/backstageManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
-import AccountCreateView from './accountCreateView'
+import handleViewResize from '@/layout/mixin/handleViewResize'
+import PermissionManagementDialog from './permissionManagementDialog'
+
+const defaultForm = {
+  methodType: 'All'
+}
 
 export default {
-  name: 'AuthorityManagement',
-  components: { AccountCreateView },
-  mixins: [handlePageChange, shared],
+  name: 'PermissionManagement',
+  components: { PermissionManagementDialog },
+  mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
-      searchForm: {
-        account: undefined,
-        role: undefined,
-        agent: undefined
-      },
-      currencyList: [],
-      createViewVisible: true
+      searchForm: JSON.parse(JSON.stringify(defaultForm)),
+      selectForm: {},
+      searchMethodType: [],
+      methodType: [],
+      editDialogVisible: false,
+      createDialogVisible: false
     }
   },
   computed: {
-    ...mapGetters([
-      'accountListData',
-      'accountCreateAgentRole'
-    ])
   },
   created() {
-    this.selectLoading = true
-    this.dataLoading = true
+    this.setHeight()
+    this.handleCurrentChange(1)
   },
   methods: {
+    onReset() {
+      this.searchForm = JSON.parse(JSON.stringify(defaultForm))
+    },
     onSubmit() {
+      this.tableData = []
+      this.onShowAllBtnClick(this.searchForm)
+    },
+    onShowAllBtnClick(data) {
       this.selectLoading = true
       this.dataLoading = true
-      accountListPage().then((res) => {
-        this.$store.dispatch('backstageManagement/setAccountListData', res.Data)
-        this.allDataByClient = this.accountListData
-        this.totalCount = res.Data.length
+      data = JSON.parse(JSON.stringify(data))
+      if (data.methodType === 'All') {
+        data.methodType = undefined
+      }
+      permissionSearch(data).then((res) => {
+        this.allDataByClient = res.rows
+        this.totalCount = res.rows.length
+        this.searchMethodType = []
+        this.searchMethodType.push('All')
+        this.searchMethodType = this.searchMethodType.concat(res.methodType)
+        this.methodType = []
+        this.methodType.push('None')
+        this.methodType = this.methodType.concat(res.methodType)
         this.handlePageChangeByClient(this.currentPage)
         this.selectLoading = false
         this.dataLoading = false
       })
     },
-    handleCreateView() {
-      this.createViewVisible = true
+    onCreateBtnClick() {
+      this.selectForm = {}
+      this.selectForm.method = this.methodType[0]
+      this.createDialogVisible = true
+      this.editDialogVisible = false
     },
-    closeResultDetail() {
-      this.createViewVisible = false
+    createDialogConfirmEven(data) {
+      this.createDialogVisible = false
+      this.dataLoading = true
+      if (data.method !== 'None') {
+        data.methodType = data.method
+      }
+      permissionCreate(data).then((res) => {
+        this.allDataByClient = res.rows
+        this.totalCount = res.rows.length
+        this.handlePageChangeByClient(this.currentPage)
+        this.dataLoading = false
+      }).catch((err) => {
+        if (err.data.code !== 401) {
+          this.dataLoading = false
+          const { city_name, time_zone } = err.data.message
+          const log = () => {
+            if (time_zone !== undefined) {
+              return time_zone[0]
+            } else if (city_name !== undefined) {
+              return city_name[0]
+            } else {
+              return 'Create failed'
+            }
+          }
+          this.$message({
+            message: log(),
+            type: 'error'
+          })
+        }
+      })
     },
-    test(agentRole, agentId) {
-      this.searchForm.role = agentRole[0].Id
-      this.searchForm.agent = agentId
-      this.handleCurrentChange(1)
-      this.selectLoading = false
-      this.dataLoading = false
+    onEditBtnClick(item) {
+      this.selectForm = JSON.parse(JSON.stringify(item))
+      if (!this.selectForm.method) {
+        this.selectForm.method = this.methodType[0]
+      }
+      this.createDialogVisible = false
+      this.editDialogVisible = true
+    },
+    editDialogConfirmEven(data) {
+      this.$confirm(this.$t('__confirmChanges')).then(_ => {
+        this.editDialogVisible = false
+        this.dataLoading = true
+        if (data.method !== 'None') {
+          data.methodType = data.method
+        }
+        permissionEdit(data).then((res) => {
+          this.allDataByClient = res.rows
+          this.totalCount = res.rows.length
+          this.handlePageChangeByClient(this.currentPage)
+          this.dataLoading = false
+        }).catch(() => {
+          this.dataLoading = false
+        })
+      }).catch(_ => {})
+    },
+    onDeleteBtnClick(item) {
+      this.$confirm(this.$t('__confirmDeletion')).then(_ => {
+        this.dataLoading = true
+        permissionDelete(item.id).then((res) => {
+          this.allDataByClient = res.rows
+          this.totalCount = res.rows.length
+          this.handlePageChangeByClient(this.currentPage)
+          this.dataLoading = false
+        })
+      }).catch(_ => {})
+    },
+    closeDialogEven() {
+      this.createDialogVisible = false
+      this.editDialogVisible = false
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.accountList {
+.permissionManagement {
   &-container {
-    margin: 20px;
+    margin: 5px;
   }
   &-pagination {
     padding: 1em;
@@ -120,5 +227,26 @@ export default {
     -webkit-box-pack: center;
     justify-content: center;
   }
+}
+
+.filterForm {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.el-form-item {
+    margin-bottom: 0px;
+}
+
+.inputTitle {
+  padding: 0px 0px 0px 5px;
+}
+
+.el-input {
+  width: 140px;
+}
+
+.el-select {
+  width: 110px;
 }
 </style>

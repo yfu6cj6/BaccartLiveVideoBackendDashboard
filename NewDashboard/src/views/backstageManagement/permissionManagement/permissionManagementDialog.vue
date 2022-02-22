@@ -12,9 +12,12 @@
           <el-form-item :label="$t('__nickname')" prop="nickname">
             <el-input v-model="editForm.nickname" />
           </el-form-item>
-          <el-form-item :label="$t('__type')" prop="type">
-            <el-select v-model="editForm.type">
-              <el-option v-for="item in types" :key="item.key" :label="item.nickname" :value="item.key" />
+          <el-form-item label="Uri" prop="uri">
+            <el-input v-model="editForm.uri" />
+          </el-form-item>
+          <el-form-item :label="$t('__method')" prop="method">
+            <el-select v-model="editForm.method">
+              <el-option v-for="item in methodType" :key="item" :label="item" :value="item" />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -29,7 +32,7 @@
 
 <script>
 export default {
-  name: 'RoleManagementDialog',
+  name: 'PermissionManagementDialog',
   props: {
     'title': {
       type: String,
@@ -56,7 +59,7 @@ export default {
         return {}
       }
     },
-    'types': {
+    'methodType': {
       type: Array,
       require: true,
       default() {
@@ -75,8 +78,7 @@ export default {
     return {
       rules: {
         name: [{ required: true, trigger: 'blur', validator: validate }],
-        nickname: [{ required: true, trigger: 'blur', validator: validate }],
-        type: [{ required: true, trigger: 'blur', validator: validate }]
+        nickname: [{ required: true, trigger: 'blur', validator: validate }]
       },
       editForm: {}
     }
