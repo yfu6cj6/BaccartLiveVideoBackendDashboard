@@ -1,4 +1,5 @@
 import router from './router'
+import { resetRouter } from './router'
 import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
@@ -32,6 +33,7 @@ router.beforeEach(async(to, from, next) => {
         next()
       } else {
         try {
+          resetRouter()
           // get user info
           const { permissions } = await store.dispatch('user/getInfo')
           const accessRoutes = await store.dispatch('permission/generateRoutes', permissions)

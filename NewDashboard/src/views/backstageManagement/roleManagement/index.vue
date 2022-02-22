@@ -1,14 +1,19 @@
 <template>
-  <div class="timeZoneManagement-container">
+  <div class="roleManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item class="inputTitle" label="ID">
         <el-input v-model="searchForm.id" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__timeZone')">
-        <el-input v-model="searchForm.time_zone" />
+      <el-form-item class="inputTitle" :label="$t('__name')">
+        <el-input v-model="searchForm.name" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__cityName')">
-        <el-input v-model="searchForm.city_name" />
+      <el-form-item class="inputTitle" :label="$t('__nickname')">
+        <el-input v-model="searchForm.nickname" />
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__type')">
+        <el-select v-model="searchForm.type">
+          <el-option v-for="item in searchTypes" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
@@ -21,8 +26,9 @@
 
     <el-table v-loading="dataLoading" :data="tableData" :border="true">
       <el-table-column prop="id" label="ID" />
-      <el-table-column prop="time_zone" :label="$t('__timeZone')" />
-      <el-table-column prop="city_name" :label="$t('__cityName')" />
+      <el-table-column prop="name" :label="$t('__name')" />
+      <el-table-column prop="nickname" :label="$t('__nickname')" />
+      <el-table-column prop="type" :label="$t('__type')" />
       <el-table-column :label="$t('__operate')">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
@@ -33,7 +39,7 @@
 
     <el-pagination
       layout="prev, pager, next, jumper"
-      class="timeZoneManagement-pagination"
+      class="roleManagement-pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
@@ -41,20 +47,22 @@
       @current-change="handleCurrentChange"
     />
 
-    <TimeZoneManagementDialog
+    <RoleManagementDialog
       :title="$t('__edit')"
       :visible="editDialogVisible"
       :confirm="$t('__revise')"
       :form="selectForm"
+      :types="types"
       @close="closeDialogEven"
       @confirm="editDialogConfirmEven"
     />
 
-    <TimeZoneManagementDialog
+    <RoleManagementDialog
       :title="$t('__create')"
       :visible="createDialogVisible"
       :confirm="$t('__confirm')"
       :form="selectForm"
+      :types="types"
       @close="closeDialogEven"
       @confirm="createDialogConfirmEven"
     />
@@ -62,19 +70,25 @@
 </template>
 
 <script>
-import { timezoneSearch, timezoneCreate, timezoneEdit, timezoneDelete } from '@/api/backstageManagement'
+import { roleSearch, roleCreate, roleEdit, roleDelete } from '@/api/backstageManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
-import TimeZoneManagementDialog from './timeZoneManagementDialog'
+import RoleManagementDialog from './roleManagementDialog'
+
+const defaultForm = {
+  type: 'All'
+}
 
 export default {
-  name: 'TimeZoneManagement',
-  components: { TimeZoneManagementDialog },
+  name: 'RoleManagement',
+  components: { RoleManagementDialog },
   mixins: [handlePageChange, shared],
   data() {
     return {
-      searchForm: {},
+      searchForm: JSON.parse(JSON.stringify(defaultForm)),
       selectForm: {},
+      searchTypes: [],
+      types: [],
       editDialogVisible: false,
       createDialogVisible: false
     }
@@ -86,7 +100,7 @@ export default {
   },
   methods: {
     onReset() {
-      this.searchForm = {}
+      this.searchForm = JSON.parse(JSON.stringify(defaultForm))
     },
     onSubmit() {
       this.tableData = []
@@ -95,9 +109,17 @@ export default {
     onShowAllBtnClick(data) {
       this.selectLoading = true
       this.dataLoading = true
-      timezoneSearch(data).then((res) => {
-        this.allDataByClient = res
-        this.totalCount = res.length
+      data = JSON.parse(JSON.stringify(data))
+      if (data.type === 'All') {
+        data.type = undefined
+      }
+      roleSearch(data).then((res) => {
+        this.allDataByClient = res.rows
+        this.totalCount = res.rows.length
+        this.searchTypes = []
+        this.searchTypes.push({ 'key': 'All', 'nickname': 'All' })
+        this.searchTypes = this.searchTypes.concat(res.types)
+        this.types = res.types
         this.handlePageChangeByClient(this.currentPage)
         this.selectLoading = false
         this.dataLoading = false
@@ -105,26 +127,29 @@ export default {
     },
     onCreateBtnClick() {
       this.selectForm = {}
+      this.selectForm.type = this.types[0].key
       this.createDialogVisible = true
       this.editDialogVisible = false
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
       this.dataLoading = true
-      timezoneCreate(data).then((res) => {
-        this.allDataByClient = res
-        this.totalCount = res.length
+      roleCreate(data).then((res) => {
+        this.allDataByClient = res.rows
+        this.totalCount = res.rows.length
         this.handlePageChangeByClient(this.currentPage)
         this.dataLoading = false
       }).catch((err) => {
         if (err.data.code !== 401) {
           this.dataLoading = false
-          const { city_name, time_zone } = err.data.message
+          const { name, nickname, type } = err.data.message
           const log = () => {
-            if (time_zone !== undefined) {
-              return time_zone[0]
-            } else if (city_name !== undefined) {
-              return city_name[0]
+            if (name !== undefined) {
+              return name[0]
+            } else if (nickname !== undefined) {
+              return nickname[0]
+            } else if (type !== undefined) {
+              return type[0]
             } else {
               return 'Create failed'
             }
@@ -145,9 +170,9 @@ export default {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
         this.dataLoading = true
-        timezoneEdit(data).then((res) => {
-          this.allDataByClient = res
-          this.totalCount = res.length
+        roleEdit(data).then((res) => {
+          this.allDataByClient = res.rows
+          this.totalCount = res.rows.length
           this.handlePageChangeByClient(this.currentPage)
           this.dataLoading = false
         }).catch(() => {
@@ -158,9 +183,9 @@ export default {
     onDeleteBtnClick(item) {
       this.$confirm(this.$t('__confirmDeletion')).then(_ => {
         this.dataLoading = true
-        timezoneDelete(item.id).then((res) => {
-          this.allDataByClient = res
-          this.totalCount = res.length
+        roleDelete(item.id).then((res) => {
+          this.allDataByClient = res.rows
+          this.totalCount = res.rows.length
           this.handlePageChangeByClient(this.currentPage)
           this.dataLoading = false
         })
@@ -175,7 +200,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.timeZoneManagement {
+.roleManagement {
   &-container {
     margin: 5px;
   }

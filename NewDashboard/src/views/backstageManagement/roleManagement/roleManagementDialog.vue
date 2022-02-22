@@ -6,11 +6,16 @@
           <el-form-item label="ID" prop="id">
             <el-input v-model="editForm.id" :disabled="true" />
           </el-form-item>
-          <el-form-item :label="$t('__timeZone')" prop="time_zone">
-            <el-input v-model="editForm.time_zone" />
+          <el-form-item :label="$t('__name')" prop="name">
+            <el-input v-model="editForm.name" />
           </el-form-item>
-          <el-form-item :label="$t('__cityName')" prop="city_name">
-            <el-input v-model="editForm.city_name" />
+          <el-form-item :label="$t('__nickname')" prop="nickname">
+            <el-input v-model="editForm.nickname" />
+          </el-form-item>
+          <el-form-item :label="$t('__type')" prop="type">
+            <el-select v-model="editForm.type">
+              <el-option v-for="item in types" :key="item.key" :label="item.nickname" :value="item.key" />
+            </el-select>
           </el-form-item>
           <el-form-item>
             <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
@@ -24,7 +29,7 @@
 
 <script>
 export default {
-  name: 'TimeZoneManagementDialog',
+  name: 'RoleManagementDialog',
   props: {
     'title': {
       type: String,
@@ -50,6 +55,13 @@ export default {
       default() {
         return {}
       }
+    },
+    'types': {
+      type: Array,
+      require: true,
+      default() {
+        return []
+      }
     }
   },
   data: function() {
@@ -62,8 +74,9 @@ export default {
     }
     return {
       rules: {
-        time_zone: [{ required: true, trigger: 'change', validator: validate }],
-        city_name: [{ required: true, trigger: 'change', validator: validate }]
+        name: [{ required: true, trigger: 'change', validator: validate }],
+        nickname: [{ required: true, trigger: 'change', validator: validate }],
+        type: [{ required: true, trigger: 'change', validator: validate }]
       },
       editForm: {}
     }

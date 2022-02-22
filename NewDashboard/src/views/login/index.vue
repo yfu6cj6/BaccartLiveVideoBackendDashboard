@@ -101,11 +101,10 @@ export default {
       })
     },
     handleLogin() {
-      this.$refs.loginForm.validate(async valid => {
+      this.loading = true
+      this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
-          await this.$store.dispatch('user/login', this.loginForm).then((response) => {
-            this.loading = false
+          this.$store.dispatch('user/login', this.loginForm).then((response) => {
             // status = '0' 已被停權
             if (response.user.status === '0') {
               this.$message({
@@ -120,13 +119,14 @@ export default {
               this.$router.push({ path: '/home' })
             }
           }).catch(() => {
-            this.loading = false
             this.$message({
               message: 'Login failed, please confirm your account or password',
               type: 'error'
             })
+            this.loading = false
           })
         } else {
+          this.loading = false
           return false
         }
       })

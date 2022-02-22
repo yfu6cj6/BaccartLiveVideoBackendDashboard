@@ -76,42 +76,56 @@ export const asyncRoutes = [
     meta: { title: '__backstageManagement', icon: 'el-icon-document', permission: 1000 },
     children: [
       {
-        path: 'authorityManagement',
-        name: 'AuthorityManagement',
-        component: () => import('@/views/backstageManagement/authorityManagement/index'),
-        meta: { title: '__authorityManagement', icon: 'el-icon-user-solid', permission: 1001 }
-      },
-      {
-        path: 'timeZoneManagement',
-        name: 'TimeZoneManagement',
-        component: () => import('@/views/backstageManagement/timeZoneManagement/index'),
-        meta: { title: '__timeZoneManagement', icon: 'el-icon-user-solid', permission: 1001 }
-      },
-      {
+        // 帳號管理
         path: 'accountManagement',
         name: 'AccountManagement',
         component: () => import('@/views/backstageManagement/accountManagement/index'),
         meta: { title: '__accountManagement', icon: 'el-icon-user-solid', permission: 1001 }
       },
       {
+        // 角色管理
+        path: 'roleManagement',
+        name: 'RoleManagement',
+        component: () => import('@/views/backstageManagement/roleManagement/index'),
+        meta: { title: '__roleManagement', icon: 'el-icon-user-solid', permission: 1001 }
+      },
+      {
+        // 權限管理
+        path: 'permissionManagement',
+        name: 'PermissionManagement',
+        component: () => import('@/views/backstageManagement/permissionManagement/index'),
+        meta: { title: '__authorityManagement', icon: 'el-icon-user-solid', permission: 1001 }
+      },
+      {
+        // 時區管理
+        path: 'timeZoneManagement',
+        name: 'TimeZoneManagement',
+        component: () => import('@/views/backstageManagement/timeZoneManagement/index'),
+        meta: { title: '__timeZoneManagement', icon: 'el-icon-user-solid', permission: 1001 }
+      },
+      {
+        // 公告管理
         path: 'announcementManagement',
         name: 'AnnouncementManagement',
         component: () => import('@/views/backstageManagement/announcementManagement/index'),
         meta: { title: '__announcementManagement', icon: 'el-icon-user-solid', permission: 1001 }
       },
       {
+        // 系統管理
         path: 'systemManagement',
         name: 'SystemManagement',
         component: () => import('@/views/backstageManagement/systemManagement/index'),
         meta: { title: '__systemManagement', icon: 'el-icon-user-solid', permission: 1001 }
       },
       {
+        // 修改密碼
         path: 'passwordReset',
         name: 'PasswordReset',
         component: () => import('@/views/backstageManagement/passwordReset/index'),
         meta: { title: '__passwordReset', icon: 'el-icon-user-solid', permission: 1004 }
       },
       {
+        // 商戶API
         path: 'userAPI',
         name: 'UserAPI',
         component: () => import('@/views/backstageManagement/userAPI/index'),

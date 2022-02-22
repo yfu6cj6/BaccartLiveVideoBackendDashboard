@@ -7,7 +7,7 @@ import { asyncRoutes, constantRoutes } from '@/router'
  */
 function hasPermission(permissions, route) {
   if (route.meta && route.meta.permission) {
-    return permissions.some(permission => ((permission === 999) || (route.meta.permission === permission)))
+    return permissions.some(permission => ((permission === 'Administer') || (route.meta.permission === permission)))
   } else {
     return true
   }
@@ -48,7 +48,7 @@ const actions = {
   generateRoutes({ commit }, permissions) {
     return new Promise(resolve => {
       let accessedRoutes
-      if (permissions[0] === 999) {
+      if (permissions[0] === 'Administer') {
         accessedRoutes = asyncRoutes || []
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, permissions)

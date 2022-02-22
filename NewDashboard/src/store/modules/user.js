@@ -1,6 +1,5 @@
 import { login, logout, getInfo } from '@/api/user'
 import { removeToken, removeTokenType } from '@/utils/auth'
-import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
@@ -59,7 +58,6 @@ const actions = {
       logout().then(() => {
         removeToken() // must remove  token  first
         removeTokenType()
-        resetRouter()
         commit('RESET_STATE')
         resolve()
       }).catch(error => {

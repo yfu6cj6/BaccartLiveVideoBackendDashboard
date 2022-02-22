@@ -1,5 +1,6 @@
 <template>
   <div class="navbar">
+    <hamburger :is-active="!isCollapse" class="hamburger" @toggleClick="toggleSideBar" />
     <div class="bulletin">
       <i class="el-icon-mic" />
       <marquee direction="left">
@@ -10,13 +11,13 @@
       {{ $t('__agent') }}: {{ agentName }}
     </div>
     <div>
-      <el-col :span="12">
+      <el-col class="language-container" :span="12">
+        <span class="language-title">
+          {{ $t(getLang($i18n.locale)) }}
+        </span>
         <el-dropdown trigger="click">
-          <span class="el-dropdown-link">
-            {{ $t(getLang($i18n.locale)) }}
-            <span class="el-dropdown-link">
-              {{ $t('__laguage') }}<i class="el-icon-arrow-down el-icon--right" />
-            </span>
+          <span class="language-dropdown">
+            {{ $t('__laguage') }}<i class="el-icon-arrow-down el-icon--right" />
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="changeLocale('zh_cht')">{{ $t(getLang('zh_cht')) }}</el-dropdown-item>
@@ -29,13 +30,26 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import Hamburger from '@/components/Hamburger'
 import { getLanguage, setLanguage } from '@/lang/lang'
 
 export default {
+  components: {
+    Hamburger
+  },
   data: function() {
     return {
       agentName: this.$store.getters.agentName,
       bulletinMsg: '12345678910'
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'sidebar'
+    ]),
+    isCollapse() {
+      return !this.sidebar.opened
     }
   },
   methods: {
@@ -55,6 +69,9 @@ export default {
         default:
           return this.getLang(getLanguage())
       }
+    },
+    toggleSideBar() {
+      this.$store.dispatch('app/toggleSideBar')
     }
   }
 }
@@ -90,13 +107,24 @@ export default {
   left: 0.5em;
   top: 0.25em;
 }
-.el-dropdown-link {
-  cursor: pointer;
-  color: #ffffff;
-  display: flex;
-  height: 50px;
-  padding-left: 15px;
-  align-items: center;
+.language {
+  &-container {
+    height: 50px;
+    line-height: 50px;
+  }
+  &-title {
+    color: #ffffff;
+    display: inline-block;
+    height: 50px;
+    padding-left: 15px;
+  }
+  &-dropdown {
+    cursor: pointer;
+    color: #ffffff;
+    display: inline-block;
+    height: 50px;
+    padding-left: 15px;
+  }
 }
 .el-icon-arrow-down {
   font-size: 12px;

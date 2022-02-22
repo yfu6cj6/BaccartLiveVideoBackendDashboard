@@ -1,5 +1,9 @@
 import axios from 'axios'
 import { getToken, setToken, getTokenType, setTokenType } from '@/utils/auth'
+import store from '@/store/index'
+import router from '@/router/index'
+import { Message } from 'element-ui'
+import { i18n } from '@/lang/lang'
 
 // create an axios instance
 const service = axios.create({
@@ -42,11 +46,18 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-    if (res.code !== 200) {
+    if (res.code === 401) {
+      store.dispatch('user/resetToken').then(() => {
+        router.push({ path: '/logout' })
+        Message.error(i18n.messages[i18n.locale]['__operationField'] || 'Has Error')
+      })
       return Promise.reject(response)
     }
     setToken(res.access_token)
     setTokenType(res.token_type)
+    if (res.code !== 200) {
+      return Promise.reject(response)
+    }
     return res.data
   },
   error => {
