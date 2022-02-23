@@ -11,19 +11,19 @@
         <el-input v-model="searchForm.city_name" />
       </el-form-item>
       <el-form-item>
-        <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="onSubmit">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick">{{ $t("__create") }}</el-button>
+        <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="onSubmit()">{{ $t("__search") }}</el-button>
+        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
       </el-form-item>
 
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
-      <el-table-column prop="id" width="80" label="ID" />
-      <el-table-column prop="time_zone" :label="$t('__timeZone')" />
-      <el-table-column prop="city_name" :label="$t('__cityName')" />
-      <el-table-column :label="$t('__operate')">
+      <el-table-column prop="id" width="80" label="ID" align="center" />
+      <el-table-column prop="time_zone" :label="$t('__timeZone')" align="center" />
+      <el-table-column prop="city_name" :label="$t('__cityName')" align="center" />
+      <el-table-column :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>

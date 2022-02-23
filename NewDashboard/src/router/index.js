@@ -119,78 +119,10 @@ export const asyncRoutes = [
       },
       {
         // 公告管理
-        path: 'accountManagement',
-        name: 'AccountManagement',
-        component: () => import('@/views/backstageManagement/accountManagement/index'),
+        path: 'announcementManagement',
+        name: 'AnnouncementManagement',
+        component: () => import('@/views/backstageManagement/announcementManagement/index'),
         meta: { title: '__announcementManagement', icon: 'el-icon-user-solid', permission: 1001 }
-      }
-    ]
-  },
-
-  {
-    path: '/operation',
-    component: Layout,
-    redirect: '/',
-    name: 'Operation',
-    meta: { title: '__operationManage', icon: 'el-icon-bangzhu', permission: 1200 },
-    children: [
-      {
-        path: 'member',
-        name: 'Member',
-        component: () => import('@/views/operation/member/index'), // Parent router-view
-        meta: { title: '__member', icon: 'el-icon-s-custom', permission: 1210 },
-        children: [
-          {
-            path: 'memberMessage',
-            name: 'MemberMessage',
-            component: () => import('@/views/operation/member/memberMessage/index'),
-            meta: { title: '__memberMessage', icon: 'el-icon-user-solid', permission: 1211 }
-          },
-          {
-            path: 'memberBetRecord',
-            name: 'MemberBetRecord',
-            component: () => import('@/views/operation/member/betRecord/index'),
-            meta: { title: '__betRecord', icon: 'el-icon-user-solid', permission: 1212 }
-          },
-          {
-            path: 'memberTransactionRecord',
-            name: 'MemberTransactionRecord',
-            component: () => import('@/views/operation/member/transactionRecord/index'),
-            meta: { title: '__transactionRecord', icon: 'el-icon-user-solid', permission: 1213 }
-          },
-          {
-            path: 'memberGameResult',
-            name: 'MemberGameResult',
-            component: () => import('@/views/operation/member/gameResult/index'),
-            meta: { title: '__gameResult', icon: 'el-icon-user-solid', permission: 1214 }
-          }
-        ]
-      },
-      {
-        path: 'agent',
-        name: 'Agent',
-        component: () => import('@/views/operation/agent/index'), // Parent router-view
-        meta: { title: '__agent', icon: 'el-icon-office-building', permission: 1220 },
-        children: [
-          {
-            path: 'agentCreate',
-            name: 'AgentCreate',
-            component: () => import('@/views/operation/agent/agentCreate/index'),
-            meta: { title: '__agentCreate', icon: 'el-icon-user-solid', permission: 1221 }
-          },
-          {
-            path: 'agentReport',
-            name: 'AgentReport',
-            component: () => import('@/views/operation/agent/agentReport/index'),
-            meta: { title: '__agentReport', icon: 'el-icon-user-solid', permission: 1222 }
-          },
-          {
-            path: 'agentManage',
-            name: 'AgentManage',
-            component: () => import('@/views/operation/agent/agentManage/index'),
-            meta: { title: '__agentManage', icon: 'el-icon-user-solid', permission: 1223 }
-          }
-        ]
       }
     ]
   },

@@ -3,9 +3,9 @@
     <el-row>
       <el-col :span="24">
         <el-table ref="multipleTable" v-loading="dataLoading" :data="serverData.allPermissions" tooltip-effect="dark" height="300" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="55" />
-          <el-table-column prop="name" :label="$t('__name')" />
-          <el-table-column prop="nickname" :label="$t('__nickname')" width="100" show-overflow-tooltip />
+          <el-table-column type="selection" width="55" align="center" />
+          <el-table-column prop="name" :label="$t('__name')" align="center" :show-overflow-tooltip="true" />
+          <el-table-column prop="nickname" :label="$t('__nickname')" width="150" align="center" :show-overflow-tooltip="true" />
         </el-table>
         <div style="margin-top: 20px">
           <el-button icon="el-icon-minus" @click="cancelSelection">{{ $t('__cancelSelect') }}</el-button>
@@ -76,7 +76,7 @@ export default {
       this.$nextTick(() => {
         this.serverData.allPermissions.forEach(allPermission => {
           if (this.serverData.existPermissions.some(existPermission => existPermission && existPermission.name === allPermission.name)) {
-            this.$refs.multipleTable.toggleRowSelection(allPermission)
+            this.$refs.multipleTable.toggleRowSelection(allPermission, true)
           }
         })
       })

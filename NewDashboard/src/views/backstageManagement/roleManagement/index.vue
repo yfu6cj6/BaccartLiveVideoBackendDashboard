@@ -16,20 +16,20 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="onSubmit">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick">{{ $t("__create") }}</el-button>
+        <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="onSubmit()">{{ $t("__search") }}</el-button>
+        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
       </el-form-item>
 
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
-      <el-table-column prop="id" width="80" label="ID" />
-      <el-table-column prop="name" :label="$t('__name')" />
-      <el-table-column prop="nickname" :label="$t('__nickname')" />
-      <el-table-column prop="type" :label="$t('__type')" />
-      <el-table-column :label="$t('__operate')">
+      <el-table-column prop="id" width="80" label="ID" align="center" />
+      <el-table-column prop="name" :label="$t('__name')" align="center" />
+      <el-table-column prop="nickname" :label="$t('__nickname')" align="center" />
+      <el-table-column prop="type" :label="$t('__type')" align="center" />
+      <el-table-column :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-coordinate" @click="onPermissionBtnClick(scope.row)">{{ $t("__permission") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
