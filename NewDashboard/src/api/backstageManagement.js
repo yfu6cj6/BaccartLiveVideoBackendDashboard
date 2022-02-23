@@ -65,6 +65,22 @@ export function roleDelete(id) {
   })
 }
 
+export function getPermissions(data) {
+  return request({
+    url: '/role/getPermissions',
+    method: 'post',
+    data: data
+  })
+}
+
+export function setPermissions(data) {
+  return request({
+    url: '/role/setPermissions',
+    method: 'post',
+    data: data
+  })
+}
+
 export function permissionSearch(data) {
   return request({
     url: '/permission/search',

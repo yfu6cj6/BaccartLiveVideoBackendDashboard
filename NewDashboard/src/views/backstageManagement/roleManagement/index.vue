@@ -31,7 +31,7 @@
       <el-table-column prop="type" :label="$t('__type')" />
       <el-table-column :label="$t('__operate')">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-coordinate" @click="onEditBtnClick(scope.row)">{{ $t("__permission") }}</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-coordinate" @click="onPermissionBtnClick(scope.row)">{{ $t("__permission") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
         </template>
@@ -67,15 +67,26 @@
       @close="closeDialogEven"
       @confirm="createDialogConfirmEven"
     />
+
+    <RolePermissionDialog
+      ref="rolePermissionDialog"
+      :title="$t('__setPermission')"
+      :visible="permissionDialogVisible"
+      :confirm="$t('__confirm')"
+      :data-loading="permissionDataLoading"
+      @close="closeDialogEven"
+      @confirm="permissionDialogConfirmEven"
+    />
   </div>
 </template>
 
 <script>
-import { roleSearch, roleCreate, roleEdit, roleDelete } from '@/api/backstageManagement'
+import { roleSearch, roleCreate, roleEdit, roleDelete, getPermissions, setPermissions } from '@/api/backstageManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import RoleManagementDialog from './roleManagementDialog'
+import RolePermissionDialog from './rolePermissionDialog'
 
 const defaultForm = {
   type: 'All'
@@ -83,7 +94,7 @@ const defaultForm = {
 
 export default {
   name: 'RoleManagement',
-  components: { RoleManagementDialog },
+  components: { RoleManagementDialog, RolePermissionDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
@@ -92,7 +103,9 @@ export default {
       searchTypes: [],
       types: [],
       editDialogVisible: false,
-      createDialogVisible: false
+      createDialogVisible: false,
+      permissionDialogVisible: false,
+      permissionDataLoading: false
     }
   },
   computed: {
@@ -132,7 +145,6 @@ export default {
       this.selectForm = {}
       this.selectForm.type = this.types[0].key
       this.createDialogVisible = true
-      this.editDialogVisible = false
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
@@ -164,9 +176,30 @@ export default {
         }
       })
     },
+    onPermissionBtnClick(item) {
+      this.selectForm = JSON.parse(JSON.stringify(item))
+      this.permissionDialogVisible = true
+      this.permissionDataLoading = true
+      getPermissions(item).then((res) => {
+        this.$refs.rolePermissionDialog.setData(res)
+        this.permissionDataLoading = false
+      })
+    },
+    permissionDialogConfirmEven(selection) {
+      this.permissionDialogVisible = false
+      this.dataLoading = true
+      const requestData = { id: this.selectForm.id, permissions: selection.map(element => { return element.name }) }
+      setPermissions(requestData).then((res) => {
+        this.allDataByClient = res.rows
+        this.totalCount = res.rows.length
+        this.handlePageChangeByClient(this.currentPage)
+        this.dataLoading = false
+      }).catch(() => {
+        this.dataLoading = false
+      })
+    },
     onEditBtnClick(item) {
       this.selectForm = JSON.parse(JSON.stringify(item))
-      this.createDialogVisible = false
       this.editDialogVisible = true
     },
     editDialogConfirmEven(data) {
@@ -197,6 +230,7 @@ export default {
     closeDialogEven() {
       this.createDialogVisible = false
       this.editDialogVisible = false
+      this.permissionDialogVisible = false
     }
   }
 }

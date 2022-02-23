@@ -32,6 +32,8 @@
     "__type": "類別",
     "__method": "方法",
     "__permission": "權限",
+    "__setPermission": "設定權限",
+    "__cancelSelect": "取消選擇",
     "__customerServiceManage": "客服管理",
     "__customerServiceList": "客服列表",
     "__operationManage": "營運管理",
