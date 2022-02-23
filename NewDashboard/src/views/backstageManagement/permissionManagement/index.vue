@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { permissionSearch, permissionCreate, permissionEdit, permissionDelete } from '@/api/backstageManagement'
+import { permissionSearch, permissionCreate, permissionEdit, permissionDelete } from '@/api/backstageManagement/permissionManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'

@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import { roleSearch, roleCreate, roleEdit, roleDelete, getPermissions, setPermissions } from '@/api/backstageManagement'
+import { roleSearch, roleCreate, roleEdit, roleDelete, getPermissions, setPermissions } from '@/api/backstageManagement/roleManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'

@@ -1,14 +1,17 @@
 <template>
-  <div class="timeZoneManagement-container">
+  <div class="permissionManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item class="inputTitle" label="ID">
         <el-input v-model="searchForm.id" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__timeZone')">
-        <el-input v-model="searchForm.time_zone" />
+      <el-form-item class="inputTitle" :label="$t('__name')">
+        <el-input v-model="searchForm.name" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__cityName')">
-        <el-input v-model="searchForm.city_name" />
+      <el-form-item class="inputTitle" :label="$t('__code')">
+        <el-input v-model="searchForm.code" />
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__symbol')">
+        <el-input v-model="searchForm.symbol" />
       </el-form-item>
       <el-form-item>
         <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
@@ -21,8 +24,9 @@
 
     <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
       <el-table-column prop="id" width="80" label="ID" />
-      <el-table-column prop="time_zone" :label="$t('__timeZone')" />
-      <el-table-column prop="city_name" :label="$t('__cityName')" />
+      <el-table-column prop="name" :label="$t('__name')" />
+      <el-table-column prop="code" :label="$t('__code')" />
+      <el-table-column prop="symbol" :label="$t('__symbol')" />
       <el-table-column :label="$t('__operate')">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
@@ -33,7 +37,7 @@
 
     <el-pagination
       layout="prev, pager, next, jumper"
-      class="timeZoneManagement-pagination"
+      class="permissionManagement-pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
@@ -41,7 +45,7 @@
       @current-change="handleCurrentChange"
     />
 
-    <TimeZoneManagementDialog
+    <CurrencyManagementDialog
       :title="$t('__edit')"
       :visible="editDialogVisible"
       :confirm="$t('__revise')"
@@ -50,7 +54,7 @@
       @confirm="editDialogConfirmEven"
     />
 
-    <TimeZoneManagementDialog
+    <CurrencyManagementDialog
       :title="$t('__create')"
       :visible="createDialogVisible"
       :confirm="$t('__confirm')"
@@ -62,15 +66,15 @@
 </template>
 
 <script>
-import { timezoneSearch, timezoneCreate, timezoneEdit, timezoneDelete } from '@/api/backstageManagement/timeZoneManagement'
+import { currencySearch, currencyCreate, currencyEdit, currencyDelete } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
-import TimeZoneManagementDialog from './timeZoneManagementDialog'
+import CurrencyManagementDialog from './currencyManagementDialog'
 
 export default {
-  name: 'TimeZoneManagement',
-  components: { TimeZoneManagementDialog },
+  name: 'CurrencyManagement',
+  components: { CurrencyManagementDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
@@ -97,7 +101,7 @@ export default {
     onShowAllBtnClick(data) {
       this.selectLoading = true
       this.dataLoading = true
-      timezoneSearch(data).then((res) => {
+      currencySearch(data).then((res) => {
         this.allDataByClient = res
         this.totalCount = res.length
         this.handlePageChangeByClient(this.currentPage)
@@ -113,7 +117,7 @@ export default {
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
       this.dataLoading = true
-      timezoneCreate(data).then((res) => {
+      currencyCreate(data).then((res) => {
         this.allDataByClient = res
         this.totalCount = res.length
         this.handlePageChangeByClient(this.currentPage)
@@ -121,12 +125,14 @@ export default {
       }).catch((err) => {
         if (err.data.code !== 401) {
           this.dataLoading = false
-          const { city_name, time_zone } = err.data.message
+          const { name, code, symbol } = err.data.message
           const log = () => {
-            if (time_zone !== undefined) {
-              return time_zone[0]
-            } else if (city_name !== undefined) {
-              return city_name[0]
+            if (name !== undefined) {
+              return name[0]
+            } else if (code !== undefined) {
+              return code[0]
+            } else if (symbol !== undefined) {
+              return symbol[0]
             } else {
               return 'Create failed'
             }
@@ -147,7 +153,7 @@ export default {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
         this.dataLoading = true
-        timezoneEdit(data).then((res) => {
+        currencyEdit(data).then((res) => {
           this.allDataByClient = res
           this.totalCount = res.length
           this.handlePageChangeByClient(this.currentPage)
@@ -160,7 +166,7 @@ export default {
     onDeleteBtnClick(item) {
       this.$confirm(this.$t('__confirmDeletion')).then(_ => {
         this.dataLoading = true
-        timezoneDelete(item.id).then((res) => {
+        currencyDelete(item.id).then((res) => {
           this.allDataByClient = res
           this.totalCount = res.length
           this.handlePageChangeByClient(this.currentPage)
@@ -177,7 +183,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.timeZoneManagement {
+.permissionManagement {
   &-container {
     margin: 5px;
   }
@@ -205,6 +211,10 @@ export default {
 }
 
 .el-input {
-  width: 150px;
+  width: 140px;
+}
+
+.el-select {
+  width: 110px;
 }
 </style>

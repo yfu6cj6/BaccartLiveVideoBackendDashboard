@@ -104,32 +104,25 @@ export const asyncRoutes = [
         meta: { title: '__timeZoneManagement', icon: 'el-icon-user-solid', permission: 1001 }
       },
       {
+        // 幣別管理
+        path: 'currencyManagement',
+        name: 'CurrencyManagement',
+        component: () => import('@/views/backstageManagement/currencyManagement/index'),
+        meta: { title: '__currencyManagement', icon: 'el-icon-user-solid', permission: 1001 }
+      },
+      {
+        // 日誌管理
+        path: 'operationLogManagement',
+        name: 'OperationLogManagement',
+        component: () => import('@/views/backstageManagement/operationLogManagement/index'),
+        meta: { title: '__operationLogManagement', icon: 'el-icon-user-solid', permission: 1001 }
+      },
+      {
         // 公告管理
-        path: 'announcementManagement',
-        name: 'AnnouncementManagement',
-        component: () => import('@/views/backstageManagement/announcementManagement/index'),
+        path: 'accountManagement',
+        name: 'AccountManagement',
+        component: () => import('@/views/backstageManagement/accountManagement/index'),
         meta: { title: '__announcementManagement', icon: 'el-icon-user-solid', permission: 1001 }
-      },
-      {
-        // 系統管理
-        path: 'systemManagement',
-        name: 'SystemManagement',
-        component: () => import('@/views/backstageManagement/systemManagement/index'),
-        meta: { title: '__systemManagement', icon: 'el-icon-user-solid', permission: 1001 }
-      },
-      {
-        // 修改密碼
-        path: 'passwordReset',
-        name: 'PasswordReset',
-        component: () => import('@/views/backstageManagement/passwordReset/index'),
-        meta: { title: '__passwordReset', icon: 'el-icon-user-solid', permission: 1004 }
-      },
-      {
-        // 商戶API
-        path: 'userAPI',
-        name: 'UserAPI',
-        component: () => import('@/views/backstageManagement/userAPI/index'),
-        meta: { title: '__userAPI', icon: 'el-icon-user-solid', permission: 1001 }
       }
     ]
   },
@@ -200,6 +193,20 @@ export const asyncRoutes = [
         ]
       }
     ]
+  },
+
+  {
+    // 修改密碼
+    path: '/passwordReset',
+    component: Layout,
+    redirect: '/passwordReset',
+    meta: { title: '__passwordReset', icon: 'el-icon-user-solid' },
+    children: [{
+      path: 'passwordReset',
+      name: 'PasswordReset',
+      component: () => import('@/views/passwordReset/index'),
+      meta: { title: '__passwordReset' }
+    }]
   },
 
   {
