@@ -28,7 +28,7 @@
 import { modifyPassword } from '@/api/user'
 
 export default {
-  name: 'PasswordReset',
+  name: 'ModPassword',
   data() {
     const validate = (rule, value, callback) => {
       if (!value) {

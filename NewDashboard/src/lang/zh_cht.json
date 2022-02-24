@@ -59,5 +59,18 @@
     "__and": "與",
     "__inconsistent": "不一致",
     "__closeOthers": "關閉其他",
-    "__closeAll": "關閉全部"
+    "__closeAll": "關閉全部",
+    "__announcementTitle": "公告標題",
+    "__announcementContent": "公告內容",
+    "__announcementType": "公告類型",
+    "__marquee": "跑馬燈",
+    "__announcementDate": "公告時間",
+    "__maintainDate": "維護時間",
+    "__nextWeek": "未來一週",
+    "__nextMonth": "未來一個月",
+    "__nextThreeMonths": "未來三個月",
+    "__startDate": "開始日期",
+    "__endDate": "結束日期",
+    "__to": "至",
+    "__content": "內容"
 }

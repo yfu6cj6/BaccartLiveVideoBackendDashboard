@@ -37,7 +37,7 @@
     <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
+          <el-form label-position="left" inline>
             <el-form-item :label="$t('__remark')">
               <span>{{ props.row.remark }}</span>
             </el-form-item>
