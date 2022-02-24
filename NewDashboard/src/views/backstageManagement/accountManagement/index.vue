@@ -35,16 +35,25 @@
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-form label-position="left" inline class="demo-table-expand">
+            <el-form-item :label="$t('__remark')">
+              <span>{{ props.row.remark }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column prop="account" :label="$t('__account')" align="center" />
       <el-table-column prop="nickname" :label="$t('__nickname')" align="center" />
       <el-table-column prop="rolesNickname" :label="$t('__role')" align="center" />
-      <el-table-column prop="agentName" :label="$t('__agentName')" align="center" />
+      <el-table-column prop="agentName" width="80" :label="$t('__agentName')" align="center" />
       <el-table-column prop="time_zone.city_name" :label="$t('__cityName')" align="center" />
       <el-table-column prop="statusLabel" width="80" :label="$t('__status')" align="center" />
       <el-table-column :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-key" @click="onPasswordResetBtnClick(scope.row)">{{ $t("__resetPassword") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -86,11 +95,18 @@
       @close="closeDialogEven"
       @confirm="createDialogConfirmEven"
     />
+
+    <el-dialog :title="$t('__tip')" :visible.sync="resetDialogVisible" width="30%" :before-close="resetDialogClose">
+      <span>{{ newPassword }}</span>
+      <span slot="footer">
+        <el-button type="primary" @click="resetDialogVisible = false">{{ $t('__confirm') }}</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { accountSearch, accountCreate, accountEdit } from '@/api/backstageManagement/accountManagement'
+import { accountSearch, accountCreate, accountEdit, resetPassword } from '@/api/backstageManagement/accountManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
@@ -115,8 +131,10 @@ export default {
       agents: [],
       status: [],
       timeZones: [],
+      newPassword: '',
       editDialogVisible: false,
-      createDialogVisible: false
+      createDialogVisible: false,
+      resetDialogVisible: false
     }
   },
   computed: {
@@ -237,6 +255,28 @@ export default {
           this.handleResponeError(err)
         })
       }).catch(_ => {})
+    },
+    onPasswordResetBtnClick(item) {
+      this.$confirm(this.$t('__confirmReset')).then(_ => {
+        this.selectLoading = true
+        this.dataLoading = true
+        resetPassword(item).then((res) => {
+          this.selectLoading = false
+          this.dataLoading = false
+          this.resetDialogVisible = true
+          this.newPassword = this.$t('__newPassword') + ': ' + res.password
+        }).catch(() => {
+          this.selectLoading = false
+          this.dataLoading = false
+          this.$message({
+            message: 'Reset failed',
+            type: 'error'
+          })
+        })
+      }).catch(_ => {})
+    },
+    resetDialogClose() {
+      this.resetDialogVisible = false
     },
     closeDialogEven() {
       this.createDialogVisible = false

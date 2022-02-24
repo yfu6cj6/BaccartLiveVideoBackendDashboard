@@ -115,14 +115,14 @@ export default {
   },
   data: function() {
     const validate = (rule, value, callback) => {
-      if (value === undefined || value.length < 1) {
+      if (!value) {
         callback(new Error(this.$t('__requiredField')))
       } else {
         callback()
       }
     }
     const validateConfirmPassword = (rule, value, callback) => {
-      if (this.confirmPassword.length < 1) {
+      if (!this.confirmPassword.length) {
         callback(new Error(this.$t('__requiredField')))
       } else if (this.confirmPassword !== this.editForm.password) {
         callback(new Error(this.$t('__confirmPassword') + this.$t('__and') + this.$t('__password') + this.$t('__inconsistent')))

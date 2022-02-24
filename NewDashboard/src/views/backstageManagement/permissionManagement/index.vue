@@ -31,6 +31,18 @@
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-form label-position="left" class="demo-table-expand">
+            <el-form-item label="requestContent">
+              <span>{{ props.row.request_content }}</span>
+            </el-form-item>
+            <el-form-item label="responseContent">
+              <span>{{ props.row.response_content }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column prop="id" width="80" label="ID" align="center" />
       <el-table-column prop="name" width="400" :label="$t('__name')" align="center" />
       <el-table-column prop="nickname" width="140" :label="$t('__nickname')" align="center" />

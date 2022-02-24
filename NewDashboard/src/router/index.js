@@ -132,12 +132,12 @@ export const asyncRoutes = [
     path: '/passwordReset',
     component: Layout,
     redirect: '/passwordReset',
-    meta: { title: '__passwordReset', icon: 'el-icon-user-solid' },
+    meta: { title: '__modPassword', icon: 'el-icon-user-solid' },
     children: [{
-      path: 'passwordReset',
-      name: 'PasswordReset',
-      component: () => import('@/views/passwordReset/index'),
-      meta: { title: '__passwordReset' }
+      path: 'modPassword',
+      name: 'ModPassword',
+      component: () => import('@/views/modPassword/index'),
+      meta: { title: '__modPassword' }
     }]
   },
 

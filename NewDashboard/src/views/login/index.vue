@@ -113,7 +113,7 @@ export default {
               })
             } else {
               this.$message({
-                message: 'Login successful',
+                message: 'Login successfully',
                 type: 'success'
               })
               this.$router.push({ path: '/home' })

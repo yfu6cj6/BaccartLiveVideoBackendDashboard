@@ -23,3 +23,11 @@ export function accountEdit(data) {
     data: data
   })
 }
+
+export function resetPassword(data) {
+  return request({
+    url: '/user/resetPassword',
+    method: 'post',
+    data: data
+  })
+}

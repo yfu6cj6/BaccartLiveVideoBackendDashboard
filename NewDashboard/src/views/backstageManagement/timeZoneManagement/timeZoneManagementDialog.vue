@@ -54,7 +54,7 @@ export default {
   },
   data: function() {
     const validate = (rule, value, callback) => {
-      if (value === undefined || value.length < 1) {
+      if (!value) {
         callback(new Error(this.$t('__requiredField')))
       } else {
         callback()

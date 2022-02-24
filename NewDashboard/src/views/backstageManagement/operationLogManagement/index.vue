@@ -9,7 +9,7 @@
       :model="form"
       :rules="rules"
     >
-      <el-form-item style="padding-right: 10px;" :label="$t('__oldPassword')" prop="oldPassword">
+      <el-form-item style="padding-right: 10px;" :label="$t('__currentPassword')" prop="oldPassword">
         <el-input v-model="form.oldPassword" />
       </el-form-item>
       <el-form-item style="padding-right: 10px;" :label="$t('__newPassword')" prop="newPassword">
@@ -25,7 +25,6 @@
   </div>
 </template>
 <script>
-import { modifyPassword } from '@/api/backstageManagement'
 
 export default {
   name: 'UserAPI',
@@ -59,27 +58,6 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          this.submitLoading = true
-          modifyPassword(this.form).then((res) => {
-            this.reset()
-            this.$message({
-              title: res.Error.Code,
-              message: this.$t('__revise') + this.$t('__success'),
-              type: 'success'
-            })
-            this.submitLoading = false
-          }).catch((error) => {
-            this.$message({
-              title: error.Error.Code,
-              message: this.$t('__revise') + this.$t('__fail'),
-              type: 'error'
-            })
-            this.submitLoading = false
-          })
-        }
-      })
     },
     reset() {
       this.form.oldPassword = ''

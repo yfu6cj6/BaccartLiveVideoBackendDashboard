@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="20%" :before-close="onClose">
+  <el-dialog :title="title" :visible.sync="visible" width="30%" :before-close="onClose">
     <el-row>
       <el-col :span="24">
         <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
@@ -19,6 +19,12 @@
             <el-select v-model="editForm.method">
               <el-option v-for="item in methodType" :key="item" :label="item" :value="item" />
             </el-select>
+          </el-form-item>
+          <el-form-item label="requestContent" prop="request_content">
+            <el-input v-model="editForm.request_content" type="textarea" :rows="2" />
+          </el-form-item>
+          <el-form-item label="responseContent" prop="response_content">
+            <el-input v-model="editForm.response_content" type="textarea" :rows="2" />
           </el-form-item>
           <el-form-item>
             <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
@@ -69,7 +75,7 @@ export default {
   },
   data: function() {
     const validate = (rule, value, callback) => {
-      if (value === undefined || value.length < 1) {
+      if (!value) {
         callback(new Error(this.$t('__requiredField')))
       } else {
         callback()
