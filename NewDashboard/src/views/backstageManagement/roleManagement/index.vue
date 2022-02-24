@@ -1,6 +1,9 @@
 <template>
   <div class="roleManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-refresh-right" @click="onSubmit()">{{ $t("__refresh") }}</el-button>
+      </el-form-item>
       <el-form-item class="inputTitle" label="ID">
         <el-input v-model="searchForm.id" />
       </el-form-item>
@@ -118,6 +121,39 @@ export default {
     onReset() {
       this.searchForm = JSON.parse(JSON.stringify(defaultForm))
     },
+    handleRespone(res) {
+      this.allDataByClient = res.rows
+      this.totalCount = res.rows.length
+      this.searchTypes = []
+      this.searchTypes.push({ 'key': 'All', 'nickname': 'All' })
+      this.searchTypes = this.searchTypes.concat(res.types)
+      this.types = res.types
+      this.handlePageChangeByClient(this.currentPage)
+      this.selectLoading = false
+      this.dataLoading = false
+    },
+    handleResponeError(err) {
+      this.selectLoading = false
+      this.dataLoading = false
+      if (err.data.code !== 401) {
+        const { name, nickname, type } = err.data.message
+        const log = () => {
+          if (name !== undefined) {
+            return name[0]
+          } else if (nickname !== undefined) {
+            return nickname[0]
+          } else if (type !== undefined) {
+            return type[0]
+          } else {
+            return 'Create failed'
+          }
+        }
+        this.$message({
+          message: log(),
+          type: 'error'
+        })
+      }
+    },
     onSubmit() {
       this.tableData = []
       this.onShowAllBtnClick(this.searchForm)
@@ -130,15 +166,7 @@ export default {
         data.type = undefined
       }
       roleSearch(data).then((res) => {
-        this.allDataByClient = res.rows
-        this.totalCount = res.rows.length
-        this.searchTypes = []
-        this.searchTypes.push({ 'key': 'All', 'nickname': 'All' })
-        this.searchTypes = this.searchTypes.concat(res.types)
-        this.types = res.types
-        this.handlePageChangeByClient(this.currentPage)
-        this.selectLoading = false
-        this.dataLoading = false
+        this.handleRespone(res)
       })
     },
     onCreateBtnClick() {
@@ -148,32 +176,12 @@ export default {
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
+      this.selectLoading = true
       this.dataLoading = true
       roleCreate(data).then((res) => {
-        this.allDataByClient = res.rows
-        this.totalCount = res.rows.length
-        this.handlePageChangeByClient(this.currentPage)
-        this.dataLoading = false
+        this.handleRespone(res)
       }).catch((err) => {
-        if (err.data.code !== 401) {
-          this.dataLoading = false
-          const { name, nickname, type } = err.data.message
-          const log = () => {
-            if (name !== undefined) {
-              return name[0]
-            } else if (nickname !== undefined) {
-              return nickname[0]
-            } else if (type !== undefined) {
-              return type[0]
-            } else {
-              return 'Create failed'
-            }
-          }
-          this.$message({
-            message: log(),
-            type: 'error'
-          })
-        }
+        this.handleResponeError(err)
       })
     },
     onPermissionBtnClick(item) {
@@ -187,15 +195,13 @@ export default {
     },
     permissionDialogConfirmEven(selection) {
       this.permissionDialogVisible = false
+      this.selectLoading = true
       this.dataLoading = true
       const requestData = { id: this.selectForm.id, permissions: selection.map(element => { return element.name }) }
       setPermissions(requestData).then((res) => {
-        this.allDataByClient = res.rows
-        this.totalCount = res.rows.length
-        this.handlePageChangeByClient(this.currentPage)
-        this.dataLoading = false
-      }).catch(() => {
-        this.dataLoading = false
+        this.handleRespone(res)
+      }).catch((err) => {
+        this.handleResponeError(err)
       })
     },
     onEditBtnClick(item) {
@@ -205,14 +211,12 @@ export default {
     editDialogConfirmEven(data) {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
+        this.selectLoading = true
         this.dataLoading = true
         roleEdit(data).then((res) => {
-          this.allDataByClient = res.rows
-          this.totalCount = res.rows.length
-          this.handlePageChangeByClient(this.currentPage)
-          this.dataLoading = false
-        }).catch(() => {
-          this.dataLoading = false
+          this.handleRespone(res)
+        }).catch((err) => {
+          this.handleResponeError(err)
         })
       }).catch(_ => {})
     },
@@ -220,10 +224,7 @@ export default {
       this.$confirm(this.$t('__confirmDeletion')).then(_ => {
         this.dataLoading = true
         roleDelete(item.id).then((res) => {
-          this.allDataByClient = res.rows
-          this.totalCount = res.rows.length
-          this.handlePageChangeByClient(this.currentPage)
-          this.dataLoading = false
+          this.handleRespone(res)
         })
       }).catch(_ => {})
     },

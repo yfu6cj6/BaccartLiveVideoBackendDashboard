@@ -1,6 +1,9 @@
 <template>
   <div class="permissionManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-refresh-right" @click="onSubmit()">{{ $t("__refresh") }}</el-button>
+      </el-form-item>
       <el-form-item class="inputTitle" label="ID">
         <el-input v-model="searchForm.id" />
       </el-form-item>
@@ -94,6 +97,35 @@ export default {
     onReset() {
       this.searchForm = {}
     },
+    handleRespone(res) {
+      this.allDataByClient = res
+      this.totalCount = res.length
+      this.handlePageChangeByClient(this.currentPage)
+      this.selectLoading = false
+      this.dataLoading = false
+    },
+    handleResponeError(err) {
+      this.selectLoading = false
+      this.dataLoading = false
+      if (err.data.code !== 401) {
+        const { name, code, symbol } = err.data.message
+        const log = () => {
+          if (name !== undefined) {
+            return name[0]
+          } else if (code !== undefined) {
+            return code[0]
+          } else if (symbol !== undefined) {
+            return symbol[0]
+          } else {
+            return 'Create failed'
+          }
+        }
+        this.$message({
+          message: log(),
+          type: 'error'
+        })
+      }
+    },
     onSubmit() {
       this.tableData = []
       this.onShowAllBtnClick(this.searchForm)
@@ -102,11 +134,7 @@ export default {
       this.selectLoading = true
       this.dataLoading = true
       currencySearch(data).then((res) => {
-        this.allDataByClient = res
-        this.totalCount = res.length
-        this.handlePageChangeByClient(this.currentPage)
-        this.selectLoading = false
-        this.dataLoading = false
+        this.handleRespone(res)
       })
     },
     onCreateBtnClick() {
@@ -116,32 +144,12 @@ export default {
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
+      this.selectLoading = true
       this.dataLoading = true
       currencyCreate(data).then((res) => {
-        this.allDataByClient = res
-        this.totalCount = res.length
-        this.handlePageChangeByClient(this.currentPage)
-        this.dataLoading = false
+        this.handleRespone(res)
       }).catch((err) => {
-        if (err.data.code !== 401) {
-          this.dataLoading = false
-          const { name, code, symbol } = err.data.message
-          const log = () => {
-            if (name !== undefined) {
-              return name[0]
-            } else if (code !== undefined) {
-              return code[0]
-            } else if (symbol !== undefined) {
-              return symbol[0]
-            } else {
-              return 'Create failed'
-            }
-          }
-          this.$message({
-            message: log(),
-            type: 'error'
-          })
-        }
+        this.handleResponeError(err)
       })
     },
     onEditBtnClick(item) {
@@ -152,25 +160,21 @@ export default {
     editDialogConfirmEven(data) {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
+        this.selectLoading = true
         this.dataLoading = true
         currencyEdit(data).then((res) => {
-          this.allDataByClient = res
-          this.totalCount = res.length
-          this.handlePageChangeByClient(this.currentPage)
-          this.dataLoading = false
-        }).catch(() => {
-          this.dataLoading = false
+          this.handleRespone(res)
+        }).catch((err) => {
+          this.handleResponeError(err)
         })
       }).catch(_ => {})
     },
     onDeleteBtnClick(item) {
       this.$confirm(this.$t('__confirmDeletion')).then(_ => {
+        this.selectLoading = true
         this.dataLoading = true
         currencyDelete(item.id).then((res) => {
-          this.allDataByClient = res
-          this.totalCount = res.length
-          this.handlePageChangeByClient(this.currentPage)
-          this.dataLoading = false
+          this.handleRespone(res)
         })
       }).catch(_ => {})
     },

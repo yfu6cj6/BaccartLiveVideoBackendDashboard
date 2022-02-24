@@ -1,6 +1,9 @@
 <template>
   <div class="permissionManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-refresh-right" @click="onSubmit()">{{ $t("__refresh") }}</el-button>
+      </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__account')">
         <el-input v-model="searchForm.account" />
       </el-form-item>
@@ -8,7 +11,7 @@
         <el-input v-model="searchForm.nickname" />
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__role')">
-        <el-select v-model="searchForm.role" multiple style="width: 300px">
+        <el-select v-model="searchForm.roles" multiple style="width: 300px">
           <el-option v-for="item in roles" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
@@ -34,10 +37,10 @@
     <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
       <el-table-column prop="account" :label="$t('__account')" align="center" />
       <el-table-column prop="nickname" :label="$t('__nickname')" align="center" />
-      <el-table-column prop="roles" :label="$t('__role')" align="center" />
+      <el-table-column prop="rolesNickname" :label="$t('__role')" align="center" />
       <el-table-column prop="agentName" :label="$t('__agentName')" align="center" />
       <el-table-column prop="time_zone.city_name" :label="$t('__cityName')" align="center" />
-      <el-table-column prop="status" width="80" :label="$t('__status')" align="center" />
+      <el-table-column prop="statusLabel" width="80" :label="$t('__status')" align="center" />
       <el-table-column :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
@@ -61,6 +64,11 @@
       :visible="editDialogVisible"
       :confirm="$t('__revise')"
       :form="selectForm"
+      :roles="roles"
+      :agents="agents"
+      :account-status="accountStatus"
+      :time-zones="timeZones"
+      :has-password="false"
       @close="closeDialogEven"
       @confirm="editDialogConfirmEven"
     />
@@ -70,6 +78,11 @@
       :visible="createDialogVisible"
       :confirm="$t('__confirm')"
       :form="selectForm"
+      :roles="roles"
+      :agents="agents"
+      :account-status="accountStatus"
+      :time-zones="timeZones"
+      :has-password="true"
       @close="closeDialogEven"
       @confirm="createDialogConfirmEven"
     />
@@ -82,9 +95,10 @@ import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import AccountManagementDialog from './accountManagementDialog'
+import { mapGetters } from 'vuex'
 
 const defaultForm = {
-  role: [],
+  roles: [],
   agent: [],
   status: 'All'
 }
@@ -99,31 +113,72 @@ export default {
       selectForm: {},
       roles: [],
       agents: [],
-      status: [{
-        key: 'All',
-        nickname: '__all'
-      },
-      {
-        key: 0,
-        nickname: '__close'
-      },
-      {
-        key: 1,
-        nickname: '__open'
-      }],
+      status: [],
+      timeZones: [],
       editDialogVisible: false,
       createDialogVisible: false
     }
   },
   computed: {
+    ...mapGetters([
+      'accountStatus'
+    ])
   },
   created() {
+    this.$store.dispatch('backstageManagement/setAccountStatus')
+    this.status.push({ key: 'All', nickname: '__all' })
+    this.status = this.status.concat(this.accountStatus)
     this.setHeight()
     this.handleCurrentChange(1)
   },
   methods: {
     onReset() {
       this.searchForm = JSON.parse(JSON.stringify(defaultForm))
+    },
+    handleRespone(res) {
+      this.roles = res.roles
+      this.agents = res.agents
+      this.timeZones = res.timeZones
+      res.rows.forEach(element => {
+        element.rolesNickname = []
+        element.roles.forEach(role => {
+          element.rolesNickname.push(this.roles.find((el) => role === el.key).nickname)
+        })
+      })
+      this.allDataByClient = res.rows
+      this.allDataByClient.forEach(element => {
+        if (element.status === 0) {
+          element.statusLabel = this.$t('__close')
+        } else {
+          element.statusLabel = this.$t('__open')
+        }
+      })
+      this.totalCount = res.rows.length
+      this.handlePageChangeByClient(this.currentPage)
+      this.selectLoading = false
+      this.dataLoading = false
+    },
+    handleResponeError(err) {
+      this.selectLoading = false
+      this.dataLoading = false
+      if (err.data.code !== 401) {
+        const { account, password, nickname } = err.data.message
+        const log = () => {
+          if (account !== undefined) {
+            return account[0]
+          } else if (password !== undefined) {
+            return password[0]
+          } else if (nickname !== undefined) {
+            return nickname[0]
+          } else {
+            return 'Create failed'
+          }
+        }
+        this.$message({
+          message: log(),
+          type: 'error'
+        })
+      }
     },
     onSubmit() {
       this.tableData = []
@@ -136,74 +191,50 @@ export default {
       if (data.status === 'All') {
         data.status = undefined
       }
-      if (data.role && data.role.length === 0) {
-        data.role = undefined
+      if (data.roles && data.roles.length === 0) {
+        data.roles = undefined
       }
       if (data.agent && data.agent.length === 0) {
         data.agent = undefined
       }
-      console.log(JSON.stringify(data))
       accountSearch(data).then((res) => {
-        this.allDataByClient = res.rows
-        this.totalCount = res.rows.length
-        this.roles = res.roles
-        this.agents = res.agents
-        this.handlePageChangeByClient(this.currentPage)
-        this.selectLoading = false
-        this.dataLoading = false
+        this.handleRespone(res)
       })
     },
     onCreateBtnClick() {
       this.selectForm = JSON.parse(JSON.stringify(defaultForm))
+      this.selectForm.agentId = this.agents[0].key
+      this.selectForm.status = this.accountStatus[1].key
+      this.selectForm.timeZone = this.timeZones[0].key
       this.createDialogVisible = true
       this.editDialogVisible = false
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
+      this.selectLoading = true
       this.dataLoading = true
       accountCreate(data).then((res) => {
-        this.allDataByClient = res.rows
-        this.totalCount = res.rows.length
-        this.handlePageChangeByClient(this.currentPage)
-        this.dataLoading = false
+        this.handleRespone(res)
       }).catch((err) => {
-        if (err.data.code !== 401) {
-          this.dataLoading = false
-          const { name, code, symbol } = err.data.message
-          const log = () => {
-            if (name !== undefined) {
-              return name[0]
-            } else if (code !== undefined) {
-              return code[0]
-            } else if (symbol !== undefined) {
-              return symbol[0]
-            } else {
-              return 'Create failed'
-            }
-          }
-          this.$message({
-            message: log(),
-            type: 'error'
-          })
-        }
+        this.handleResponeError(err)
       })
     },
     onEditBtnClick(item) {
       this.selectForm = JSON.parse(JSON.stringify(item))
+      this.selectForm.agentId = this.selectForm.agent_id
+      this.selectForm.timeZone = this.selectForm.time_zone.id
       this.createDialogVisible = false
       this.editDialogVisible = true
     },
     editDialogConfirmEven(data) {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
+        this.selectLoading = true
         this.dataLoading = true
         accountEdit(data).then((res) => {
-          this.allDataByClient = res.rows
-          this.totalCount = res.rows.length
-          this.handlePageChangeByClient(this.currentPage)
-          this.dataLoading = false
-        }).catch(() => {
-          this.dataLoading = false
+          this.handleRespone(res)
+        }).catch((err) => {
+          this.handleResponeError(err)
         })
       }).catch(_ => {})
     },

@@ -1,6 +1,9 @@
 <template>
   <div class="permissionManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-refresh-right" @click="onSubmit()">{{ $t("__refresh") }}</el-button>
+      </el-form-item>
       <el-form-item class="inputTitle" label="ID">
         <el-input v-model="searchForm.id" />
       </el-form-item>
@@ -14,7 +17,7 @@
         <el-input v-model="searchForm.uri" />
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__method')">
-        <el-select v-model="searchForm.methodType">
+        <el-select v-model="searchForm.methodType" multiple>
           <el-option v-for="item in searchMethodType" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
@@ -80,17 +83,13 @@ import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import PermissionManagementDialog from './permissionManagementDialog'
 
-const defaultForm = {
-  methodType: 'All'
-}
-
 export default {
   name: 'PermissionManagement',
   components: { PermissionManagementDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
-      searchForm: JSON.parse(JSON.stringify(defaultForm)),
+      searchForm: {},
       selectForm: {},
       searchMethodType: [],
       methodType: [],
@@ -106,7 +105,38 @@ export default {
   },
   methods: {
     onReset() {
-      this.searchForm = JSON.parse(JSON.stringify(defaultForm))
+      this.searchForm = {}
+    },
+    handleRespone(res) {
+      this.allDataByClient = res.rows
+      this.totalCount = res.rows.length
+      this.searchMethodType = res.methodType
+      this.methodType = []
+      this.methodType.push('None')
+      this.methodType = this.methodType.concat(res.methodType)
+      this.handlePageChangeByClient(this.currentPage)
+      this.selectLoading = false
+      this.dataLoading = false
+    },
+    handleResponeError(err) {
+      this.selectLoading = false
+      this.dataLoading = false
+      if (err.data.code !== 401) {
+        const { name, nickname } = err.data.message
+        const log = () => {
+          if (name !== undefined) {
+            return name[0]
+          } else if (nickname !== undefined) {
+            return nickname[0]
+          } else {
+            return 'Create failed'
+          }
+        }
+        this.$message({
+          message: log(),
+          type: 'error'
+        })
+      }
     },
     onSubmit() {
       this.tableData = []
@@ -120,17 +150,7 @@ export default {
         data.methodType = undefined
       }
       permissionSearch(data).then((res) => {
-        this.allDataByClient = res.rows
-        this.totalCount = res.rows.length
-        this.searchMethodType = []
-        this.searchMethodType.push('All')
-        this.searchMethodType = this.searchMethodType.concat(res.methodType)
-        this.methodType = []
-        this.methodType.push('None')
-        this.methodType = this.methodType.concat(res.methodType)
-        this.handlePageChangeByClient(this.currentPage)
-        this.selectLoading = false
-        this.dataLoading = false
+        this.handleRespone(res)
       })
     },
     onCreateBtnClick() {
@@ -141,33 +161,15 @@ export default {
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
+      this.selectLoading = true
       this.dataLoading = true
       if (data.method !== 'None') {
         data.methodType = data.method
       }
       permissionCreate(data).then((res) => {
-        this.allDataByClient = res.rows
-        this.totalCount = res.rows.length
-        this.handlePageChangeByClient(this.currentPage)
-        this.dataLoading = false
+        this.handleRespone(res)
       }).catch((err) => {
-        if (err.data.code !== 401) {
-          this.dataLoading = false
-          const { city_name, time_zone } = err.data.message
-          const log = () => {
-            if (time_zone !== undefined) {
-              return time_zone[0]
-            } else if (city_name !== undefined) {
-              return city_name[0]
-            } else {
-              return 'Create failed'
-            }
-          }
-          this.$message({
-            message: log(),
-            type: 'error'
-          })
-        }
+        this.handleResponeError(err)
       })
     },
     onEditBtnClick(item) {
@@ -181,28 +183,24 @@ export default {
     editDialogConfirmEven(data) {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
+        this.selectLoading = true
         this.dataLoading = true
         if (data.method !== 'None') {
           data.methodType = data.method
         }
         permissionEdit(data).then((res) => {
-          this.allDataByClient = res.rows
-          this.totalCount = res.rows.length
-          this.handlePageChangeByClient(this.currentPage)
-          this.dataLoading = false
-        }).catch(() => {
-          this.dataLoading = false
+          this.handleRespone(res)
+        }).catch((err) => {
+          this.handleResponeError(err)
         })
       }).catch(_ => {})
     },
     onDeleteBtnClick(item) {
       this.$confirm(this.$t('__confirmDeletion')).then(_ => {
+        this.selectLoading = true
         this.dataLoading = true
         permissionDelete(item.id).then((res) => {
-          this.allDataByClient = res.rows
-          this.totalCount = res.rows.length
-          this.handlePageChangeByClient(this.currentPage)
-          this.dataLoading = false
+          this.handleRespone(res)
         })
       }).catch(_ => {})
     },
@@ -247,6 +245,6 @@ export default {
 }
 
 .el-select {
-  width: 110px;
+  width: 180px;
 }
 </style>

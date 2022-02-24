@@ -1,15 +1,26 @@
 // import { i18n } from '@/lang/lang'
 
 const state = {
+  accountStatus: status
 }
 
+const status = [{
+  key: '0',
+  nickname: '__close'
+},
+{
+  key: '1',
+  nickname: '__open'
+}]
+
 const mutations = {
-  CHANGE_SELECT_LANG(state) {
+  SET_ACCOUNT_STATUS(state) {
+    state.accountStatus = status
   }
 }
 const actions = {
-  changeSelectLang({ commit }) {
-    commit('CHANGE_SELECT_LANG')
+  setAccountStatus({ commit }) {
+    commit('SET_ACCOUNT_STATUS')
   }
 }
 

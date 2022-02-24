@@ -7,6 +7,7 @@ const getters = {
   agentName: state => state.user.agentName,
   nickname: state => state.user.nickname,
   permissions: state => state.user.permissions,
-  permission_routes: state => state.permission.permission_routes
+  permission_routes: state => state.permission.permission_routes,
+  accountStatus: state => state.backstageManagement.accountStatus
 }
 export default getters
