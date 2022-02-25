@@ -142,6 +142,20 @@ export const asyncRoutes = [
   },
 
   {
+    // IP白名單
+    path: '/ipWhitelist',
+    component: Layout,
+    redirect: '/ipWhitelist',
+    meta: { title: '__ipWhitelist', icon: 'el-icon-user-solid' },
+    children: [{
+      path: 'ipWhitelist',
+      name: 'IpWhitelist',
+      component: () => import('@/views/ipWhitelist/index'),
+      meta: { title: '__ipWhitelist' }
+    }]
+  },
+
+  {
     path: '/logout',
     name: 'Logout',
     component: () => import('@/views/logout/index'),

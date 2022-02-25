@@ -72,5 +72,6 @@
     "__startDate": "開始日期",
     "__endDate": "結束日期",
     "__to": "至",
-    "__content": "內容"
+    "__content": "內容",
+    "__ipWhitelist": "IP白名單"
 }

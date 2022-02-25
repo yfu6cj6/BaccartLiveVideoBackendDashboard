@@ -49,7 +49,7 @@ service.interceptors.response.use(
     if (res.code === 401) {
       store.dispatch('user/resetToken').then(() => {
         router.push({ path: '/logout' })
-        Message.error(i18n.messages[i18n.locale]['__operationField'] || 'Has Error')
+        Message.error(res.message || i18n.messages[i18n.locale]['__operationField'])
       })
       return Promise.reject(response)
     }
@@ -79,7 +79,7 @@ service.interceptors.response.use(
     console.log('errstatus: ' + error.response.status + ' errstatusText: ' + error.response.statusText) // for debug
     store.dispatch('user/resetToken').then(() => {
       router.push({ path: '/logout' })
-      Message.error(i18n.messages[i18n.locale]['__operationField'] || 'Has Error')
+      Message.error(error.response.statusText || 'Has Error')
     })
     return Promise.reject(error)
   }

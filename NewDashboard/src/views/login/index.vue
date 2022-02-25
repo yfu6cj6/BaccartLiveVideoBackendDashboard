@@ -149,6 +149,8 @@ export default {
               })
               this.$router.push({ path: '/home' })
             }
+            this.loginForm.captcha = ''
+            this.loading = false
           }).catch((err) => {
             this.captchaData = err.data.captcha
             this.loginForm.key = this.captchaData.key

@@ -115,7 +115,7 @@ export default {
   },
   data: function() {
     const validate = (rule, value, callback) => {
-      if (!value) {
+      if (!value || value.length < 1) {
         callback(new Error(this.$t('__requiredField')))
       } else {
         callback()
@@ -136,10 +136,7 @@ export default {
         password: [{ required: true, trigger: 'blur', validator: validate }],
         confirmPassword: [{ required: true, trigger: 'blur', validator: validateConfirmPassword }],
         nickname: [{ required: true, trigger: 'blur', validator: validate }],
-        timeZone: [{ required: true, trigger: 'blur', validator: validate }],
-        roles: [{ required: true, trigger: 'blur', validator: validate }],
-        agentId: [{ required: true, trigger: 'blur', validator: validate }],
-        status: [{ required: true, trigger: 'blur', validator: validate }]
+        roles: [{ required: true, trigger: 'blur', validator: validate }]
       },
       editForm: {},
       confirmPassword: ''

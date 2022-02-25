@@ -6,7 +6,7 @@
           <el-form-item label="ID" prop="id">
             <el-input v-model="editForm.id" :disabled="true" />
           </el-form-item>
-          <el-form-item class="inputTitle" :label="$t('__marquee')">
+          <el-form-item class="inputTitle" :label="$t('__marquee')" prop="is_marquee">
             <el-select v-model="editForm.is_marquee">
               <el-option v-for="item in announcementMarquee" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
             </el-select>
@@ -19,7 +19,7 @@
               <el-option v-for="item in methodType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
             </el-select>
           </el-form-item>
-          <el-form-item class="inputTitle" :label="$t('__announcementDate')">
+          <el-form-item class="inputTitle" :label="$t('__announcementDate')" prop="announcementedAt">
             <el-date-picker
               v-model="editForm.announcementedAt"
               type="datetimerange"
@@ -31,7 +31,7 @@
               :picker-options="pickerOptions"
             />
           </el-form-item>
-          <el-form-item class="inputTitle" :label="$t('__maintainDate')">
+          <el-form-item class="inputTitle" :label="$t('__maintainDate')" prop="maintainedAt">
             <el-date-picker
               v-model="editForm.maintainedAt"
               type="datetimerange"
@@ -117,9 +117,9 @@ export default {
     }
     return {
       rules: {
-        name: [{ required: true, trigger: 'blur', validator: validate }],
-        code: [{ required: true, trigger: 'blur', validator: validate }],
-        symbol: [{ required: true, trigger: 'blur', validator: validate }]
+        title: [{ required: true, trigger: 'blur', validator: validate }],
+        announcementedAt: [{ required: true, trigger: 'blur', validator: validate }],
+        maintainedAt: [{ required: true, trigger: 'blur', validator: validate }]
       },
       editForm: {}
     }

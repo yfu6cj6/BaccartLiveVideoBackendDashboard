@@ -6,16 +6,11 @@
           <el-form-item label="ID" prop="id">
             <el-input v-model="editForm.id" :disabled="true" />
           </el-form-item>
-          <el-form-item :label="$t('__name')" prop="name">
-            <el-input v-model="editForm.name" />
+          <el-form-item :label="$t('__account')" prop="account">
+            <el-input v-model="editForm.account" />
           </el-form-item>
-          <el-form-item :label="$t('__nickname')" prop="nickname">
-            <el-input v-model="editForm.nickname" />
-          </el-form-item>
-          <el-form-item :label="$t('__type')" prop="type">
-            <el-select v-model="editForm.type">
-              <el-option v-for="item in types" :key="item.key" :label="item.nickname" :value="item.key" />
-            </el-select>
+          <el-form-item label="IP" prop="ip">
+            <el-input v-model="editForm.ip" />
           </el-form-item>
           <el-form-item>
             <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
@@ -29,7 +24,7 @@
 
 <script>
 export default {
-  name: 'RoleManagementDialog',
+  name: 'IpWhitelistDialog',
   props: {
     'title': {
       type: String,
@@ -55,13 +50,6 @@ export default {
       default() {
         return {}
       }
-    },
-    'types': {
-      type: Array,
-      require: true,
-      default() {
-        return []
-      }
     }
   },
   data: function() {
@@ -74,8 +62,8 @@ export default {
     }
     return {
       rules: {
-        name: [{ required: true, trigger: 'blur', validator: validate }],
-        nickname: [{ required: true, trigger: 'blur', validator: validate }]
+        account: [{ required: true, trigger: 'blur', validator: validate }],
+        ip: [{ required: true, trigger: 'blur', validator: validate }]
       },
       editForm: {}
     }
