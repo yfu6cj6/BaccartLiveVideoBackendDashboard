@@ -25,9 +25,10 @@
   </div>
 </template>
 <script>
+import { operationLogSearch } from '@/api/backstageManagement/operationLogManagement'
 
 export default {
-  name: 'UserAPI',
+  name: 'OperationLogManagement',
   data() {
     const validatePassword = (rule, value, callback) => {
       if (!value) callback(new Error(this.$t('__enter') + this.$t('__password')))
@@ -55,6 +56,11 @@ export default {
     checkInput() {
       return this.form.oldPassword && this.form.newPassword && !this.confirmPassword
     }
+  },
+  created() {
+    operationLogSearch({}).then((res) => {
+      console.log('!!: ' + JSON.stringify(res))
+    })
   },
   methods: {
     onSubmit() {

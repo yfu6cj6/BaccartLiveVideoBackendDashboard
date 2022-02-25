@@ -34,7 +34,6 @@
           name="password"
           tabindex="2"
           auto-complete="on"
-          @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd()">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
@@ -49,6 +48,7 @@
           name="captcha"
           type="text"
           auto-complete="on"
+          @keyup.enter.native="handleLogin"
         />
         <span class="captcha-container">
           <el-image :src="captchaData.img" />
@@ -154,6 +154,7 @@ export default {
           }).catch((err) => {
             this.captchaData = err.data.captcha
             this.loginForm.key = this.captchaData.key
+            this.$refs.captcha.focus()
             this.loginForm.captcha = ''
             this.$message({
               message: err.data.message,
