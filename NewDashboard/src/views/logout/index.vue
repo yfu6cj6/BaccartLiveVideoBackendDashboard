@@ -1,7 +1,10 @@
 <script>
+import { logout } from '@/api/user'
+
 export default {
   created() {
-    this.$store.dispatch('user/logout').then(() => {
+    logout().then(() => {
+      this.$store.dispatch('user/logout')
       this.$message({
         message: 'Logout successfully',
         type: 'success'

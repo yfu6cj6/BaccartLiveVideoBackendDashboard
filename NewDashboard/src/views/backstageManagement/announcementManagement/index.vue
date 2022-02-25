@@ -60,7 +60,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="id" width="50" label="ID" align="center" />
-      <el-table-column prop="type" :label="$t('__announcementType')" align="center" />
+      <el-table-column prop="type" width="100" :label="$t('__announcementType')" align="center" />
       <el-table-column prop="is_marquee" width="80" :label="$t('__marquee')" align="center" />
       <el-table-column prop="title" :label="$t('__announcementTitle')" align="center" />
       <el-table-column prop="announcement_started_at" width="160" :label="$t('__announcementDate')" align="center" />

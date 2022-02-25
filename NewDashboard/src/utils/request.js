@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getToken, setToken, getTokenType, setTokenType } from '@/utils/auth'
+import { getToken, setToken, removeToken, getTokenType, setTokenType, removeTokenType } from '@/utils/auth'
 import store from '@/store/index'
 import router from '@/router/index'
 import { Message } from 'element-ui'
@@ -53,12 +53,27 @@ service.interceptors.response.use(
       })
       return Promise.reject(response)
     }
-    setToken(res.access_token)
-    setTokenType(res.token_type)
+
+    if (res.access_token) {
+      setToken(res.access_token)
+    } else {
+      removeToken()
+    }
+    if (res.token_type) {
+      setTokenType(res.token_type)
+    } else {
+      removeTokenType()
+    }
+
     if (res.code !== 200) {
       return Promise.reject(response)
+    } else {
+      if (res.data) {
+        return res.data
+      } else {
+        return res
+      }
     }
-    return res.data
   },
   error => {
     console.log('err' + error.Error.Message) // for debug

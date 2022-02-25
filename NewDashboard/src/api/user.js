@@ -29,3 +29,10 @@ export function modifyPassword(data) {
     data: data
   })
 }
+
+export function generateCaptcha() {
+  return request({
+    url: '/captcha',
+    method: 'get'
+  })
+}

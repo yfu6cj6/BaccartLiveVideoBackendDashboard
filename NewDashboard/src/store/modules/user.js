@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { getInfo } from '@/api/user'
 import { removeToken, removeTokenType } from '@/utils/auth'
 
 const getDefaultState = () => {
@@ -29,15 +29,7 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { account, password } = userInfo
-    return new Promise((resolve, reject) => {
-      login({ account: account.trim(), password: password }).then(res => {
-        commit('SET_USER', res)
-        resolve(res)
-      }).catch(error => {
-        reject(error)
-      })
-    })
+    commit('SET_USER', userInfo)
   },
 
   // get user info
@@ -54,16 +46,9 @@ const actions = {
 
   // user logout
   logout({ commit, state }) {
-    return new Promise((resolve, reject) => {
-      logout().then(() => {
-        removeToken() // must remove  token  first
-        removeTokenType()
-        commit('RESET_STATE')
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
+    removeToken() // must remove  token  first
+    removeTokenType()
+    commit('RESET_STATE')
   },
 
   // remove token

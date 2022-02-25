@@ -36,8 +36,26 @@
           auto-complete="on"
           @keyup.enter.native="handleLogin"
         />
-        <span class="show-pwd" @click="showPwd">
+        <span class="show-pwd" @click="showPwd()">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+        </span>
+      </el-form-item>
+
+      <el-form-item prop="captcha">
+        <el-input
+          ref="captcha"
+          v-model="loginForm.captcha"
+          placeholder="Enter Captcha"
+          name="captcha"
+          type="text"
+          auto-complete="on"
+        />
+        <span class="captcha-container">
+          <el-image :src="captchaData.img" />
+        </span>
+
+        <span class="refresh" @click="refreshCaptcha()">
+          <i class="el-icon-refresh-right" />
         </span>
       </el-form-item>
 
@@ -48,6 +66,7 @@
 </template>
 
 <script>
+import { login, generateCaptcha } from '@/api/user'
 import { validLoginAccount } from '@/utils/validate'
 
 export default {
@@ -67,27 +86,32 @@ export default {
         callback()
       }
     }
+    const validateCaptcha = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t('__requiredField')))
+      } else {
+        callback()
+      }
+    }
     return {
       loginForm: {
         account: '',
-        password: ''
+        password: '',
+        captcha: '',
+        key: ''
       },
       loginRules: {
         account: [{ required: true, trigger: 'blur', validator: validateAccount }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        captcha: [{ required: true, trigger: 'blur', validator: validateCaptcha }]
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      captchaData: {}
     }
   },
-  watch: {
-    $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect
-      },
-      immediate: true
-    }
+  created() {
+    this.refreshCaptcha()
   },
   methods: {
     showPwd() {
@@ -100,13 +124,20 @@ export default {
         this.$refs.password.focus()
       })
     },
+    refreshCaptcha() {
+      generateCaptcha().then((res) => {
+        this.captchaData = res
+        this.loginForm.key = this.captchaData.key
+      })
+    },
     handleLogin() {
       this.loading = true
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.$store.dispatch('user/login', this.loginForm).then((response) => {
+          login(this.loginForm).then((res) => {
+            this.$store.dispatch('user/login', res)
             // status = '0' 已被停權
-            if (response.user.status === '0') {
+            if (res.user.status === '0') {
               this.$message({
                 message: 'Login failed, the account has been suspended',
                 type: 'error'
@@ -118,9 +149,12 @@ export default {
               })
               this.$router.push({ path: '/home' })
             }
-          }).catch(() => {
+          }).catch((err) => {
+            this.captchaData = err.data.captcha
+            this.loginForm.key = this.captchaData.key
+            this.loginForm.captcha = ''
             this.$message({
-              message: 'Login failed, please confirm your account or password',
+              message: err.data.message,
               type: 'error'
             })
             this.loading = false
@@ -154,7 +188,7 @@ $cursor: #fff;
   .el-input {
     display: inline-block;
     height: 47px;
-    width: 85%;
+    width: calc(100% - 100px - 50px);
 
     input {
       background: transparent;
@@ -202,11 +236,23 @@ $light_gray:#eee;
     overflow: hidden;
   }
 
+  .el-image {
+    margin: 22px 0 0;
+  }
+
   .svg-container {
     padding: 6px 5px 6px 15px;
     color: $dark_gray;
     vertical-align: middle;
     width: 30px;
+    display: inline-block;
+  }
+
+  .captcha-container {
+    color: $dark_gray;
+    vertical-align: middle;
+    width: 100px;
+    height: auto;
     display: inline-block;
   }
 
@@ -226,6 +272,16 @@ $light_gray:#eee;
     position: absolute;
     right: 10px;
     top: 7px;
+    font-size: 16px;
+    color: $dark_gray;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .refresh {
+    position: absolute;
+    right: 15px;
+    top: 15px;
     font-size: 16px;
     color: $dark_gray;
     cursor: pointer;
