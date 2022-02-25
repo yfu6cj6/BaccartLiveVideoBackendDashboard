@@ -1,19 +1,50 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="20%" :before-close="onClose">
+  <el-dialog :title="title" :visible.sync="visible" width="25%" :before-close="onClose">
     <el-row>
       <el-col :span="24">
         <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
           <el-form-item label="ID" prop="id">
             <el-input v-model="editForm.id" :disabled="true" />
           </el-form-item>
-          <el-form-item :label="$t('__name')" prop="name">
-            <el-input v-model="editForm.name" />
+          <el-form-item class="inputTitle" :label="$t('__marquee')">
+            <el-select v-model="editForm.is_marquee">
+              <el-option v-for="item in announcementMarquee" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+            </el-select>
           </el-form-item>
-          <el-form-item :label="$t('__code')" prop="code">
-            <el-input v-model="editForm.code" />
+          <el-form-item :label="$t('__announcementTitle')" prop="title">
+            <el-input v-model="editForm.title" />
           </el-form-item>
-          <el-form-item :label="$t('__symbol')" prop="symbol">
-            <el-input v-model="editForm.symbol" />
+          <el-form-item :label="$t('__announcementType')" prop="type">
+            <el-select v-model="editForm.type">
+              <el-option v-for="item in methodType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+            </el-select>
+          </el-form-item>
+          <el-form-item class="inputTitle" :label="$t('__announcementDate')">
+            <el-date-picker
+              v-model="editForm.announcementedAt"
+              type="datetimerange"
+              align="right"
+              unlink-panels
+              :range-separator="$t('__to')"
+              :start-placeholder="$t('__startDate')"
+              :end-placeholder="$t('__endDate')"
+              :picker-options="pickerOptions"
+            />
+          </el-form-item>
+          <el-form-item class="inputTitle" :label="$t('__maintainDate')">
+            <el-date-picker
+              v-model="editForm.maintainedAt"
+              type="datetimerange"
+              align="right"
+              unlink-panels
+              :range-separator="$t('__to')"
+              :start-placeholder="$t('__startDate')"
+              :end-placeholder="$t('__endDate')"
+              :picker-options="pickerOptions"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('__announcementContent')" prop="content">
+            <el-input v-model="editForm.content" type="textarea" :rows="2" />
           </el-form-item>
           <el-form-item>
             <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
@@ -47,11 +78,32 @@ export default {
         return ''
       }
     },
+    'pickerOptions': {
+      type: Object,
+      require: true,
+      default() {
+        return {}
+      }
+    },
     'form': {
       type: Object,
       require: true,
       default() {
         return {}
+      }
+    },
+    'methodType': {
+      type: Array,
+      require: true,
+      default() {
+        return []
+      }
+    },
+    'announcementMarquee': {
+      type: Array,
+      require: true,
+      default() {
+        return []
       }
     }
   },
@@ -101,5 +153,12 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.el-select {
+  width: 180px;
+}
+
+.el-input {
+  width: 220px;
+}
 </style>

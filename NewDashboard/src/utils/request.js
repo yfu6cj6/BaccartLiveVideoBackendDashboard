@@ -76,7 +76,11 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error.Error.Message) // for debug
+    console.log('errstatus: ' + error.response.status + ' errstatusText: ' + error.response.statusText) // for debug
+    store.dispatch('user/resetToken').then(() => {
+      router.push({ path: '/logout' })
+      Message.error(i18n.messages[i18n.locale]['__operationField'] || 'Has Error')
+    })
     return Promise.reject(error)
   }
 )

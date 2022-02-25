@@ -209,12 +209,6 @@ export default {
       if (data.status === 'All') {
         data.status = undefined
       }
-      if (data.roles && data.roles.length === 0) {
-        data.roles = undefined
-      }
-      if (data.agent && data.agent.length === 0) {
-        data.agent = undefined
-      }
       accountSearch(data).then((res) => {
         this.handleRespone(res)
       })
