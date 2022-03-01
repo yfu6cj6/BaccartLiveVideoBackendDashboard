@@ -2,7 +2,7 @@
   <div class="permissionManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="onSubmit()">{{ $t("__refresh") }}</el-button>
+        <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
       <el-form-item class="inputTitle" label="ID">
         <el-input v-model="searchForm.id" />
@@ -23,7 +23,7 @@
       </el-form-item>
       <el-form-item>
         <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="onSubmit()">{{ $t("__search") }}</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
         <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
         <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
       </el-form-item>
@@ -48,7 +48,7 @@
       <el-table-column prop="nickname" width="140" :label="$t('__nickname')" align="center" />
       <el-table-column prop="uri" label="Uri" align="center" />
       <el-table-column prop="method" width="100" :label="$t('__method')" align="center" />
-      <el-table-column width="400" :label="$t('__operate')" align="center">
+      <el-table-column width="200" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>

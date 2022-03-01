@@ -9,7 +9,7 @@
     "__permissionManagement": "權限管理",
     "__timeZoneManagement": "時區管理",
     "__currencyManagement": "幣別管理",
-    "__operationLogManagement": "日誌管理",
+    "__logManagement": "日誌管理",
     "__announcementManagement": "公告管理",
     "__modPassword": "修改密碼",
     "__timeZone": "時區",
@@ -69,9 +69,18 @@
     "__nextWeek": "未來一週",
     "__nextMonth": "未來一個月",
     "__nextThreeMonths": "未來三個月",
+    "__lastWeek": "最近一週",
+    "__lastMonth": "最近一個月",
+    "__lastThreeMonths": "最近三個月",
     "__startDate": "開始日期",
     "__endDate": "結束日期",
     "__to": "至",
     "__content": "內容",
-    "__ipWhitelist": "IP白名單"
+    "__ipWhitelist": "IP白名單",
+    "__agencyAnnouncement": "代理公告",
+    "__gameAnnouncement": "遊戲公告",
+    "__noMore": "沒有更多資料",
+    "__description": "說明",
+    "__createdAt": "紀錄時間",
+    "__operationLog": "操作日誌"
 }

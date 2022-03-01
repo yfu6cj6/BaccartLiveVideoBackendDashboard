@@ -69,75 +69,72 @@ export const constantRoutes = [
 
 export const asyncRoutes = [
   {
+    // 後台管理
     path: '/backstageManagement',
     component: Layout,
     redirect: '/',
     name: 'backstageManagement',
-    meta: { title: '__backstageManagement', icon: 'el-icon-document', permission: 1000 },
+    meta: { title: '__backstageManagement', icon: 'el-icon-document', permission: 'BackStageManage' },
+    displayChildren: true,
     children: [
       {
         // 帳號管理
         path: 'accountManagement',
         name: 'AccountManagement',
         component: () => import('@/views/backstageManagement/accountManagement/index'),
-        meta: { title: '__accountManagement', icon: 'el-icon-user-solid', permission: 1001 }
+        meta: { title: '__accountManagement', icon: 'el-icon-user-solid', permission: 'BackStageManage.AccountManage' }
       },
       {
         // 角色管理
         path: 'roleManagement',
         name: 'RoleManagement',
         component: () => import('@/views/backstageManagement/roleManagement/index'),
-        meta: { title: '__roleManagement', icon: 'el-icon-user-solid', permission: 1001 }
+        meta: { title: '__roleManagement', icon: 'el-icon-user-solid', permission: 'BackStageManage.RoleManage' }
       },
       {
         // 權限管理
         path: 'permissionManagement',
         name: 'PermissionManagement',
         component: () => import('@/views/backstageManagement/permissionManagement/index'),
-        meta: { title: '__permissionManagement', icon: 'el-icon-user-solid', permission: 1001 }
+        meta: { title: '__permissionManagement', icon: 'el-icon-user-solid', permission: 'BackStageManage.PermissionManage' }
       },
       {
         // 時區管理
         path: 'timeZoneManagement',
         name: 'TimeZoneManagement',
         component: () => import('@/views/backstageManagement/timeZoneManagement/index'),
-        meta: { title: '__timeZoneManagement', icon: 'el-icon-user-solid', permission: 1001 }
+        meta: { title: '__timeZoneManagement', icon: 'el-icon-user-solid', permission: 'BackStageManage.TimeZoneManage' }
       },
       {
         // 幣別管理
         path: 'currencyManagement',
         name: 'CurrencyManagement',
         component: () => import('@/views/backstageManagement/currencyManagement/index'),
-        meta: { title: '__currencyManagement', icon: 'el-icon-user-solid', permission: 1001 }
-      },
-      {
-        // 日誌管理
-        path: 'operationLogManagement',
-        name: 'OperationLogManagement',
-        component: () => import('@/views/backstageManagement/operationLogManagement/index'),
-        meta: { title: '__operationLogManagement', icon: 'el-icon-user-solid', permission: 1001 }
+        meta: { title: '__currencyManagement', icon: 'el-icon-user-solid', permission: 'BackStageManage.CurrencyManage' }
       },
       {
         // 公告管理
         path: 'announcementManagement',
         name: 'AnnouncementManagement',
         component: () => import('@/views/backstageManagement/announcementManagement/index'),
-        meta: { title: '__announcementManagement', icon: 'el-icon-user-solid', permission: 1001 }
+        meta: { title: '__announcementManagement', icon: 'el-icon-user-solid', permission: 'BackStageManage.AnnouncementManage' }
       }
     ]
   },
 
   {
-    // 修改密碼
-    path: '/passwordReset',
+    // 日誌管理
+    path: '/logManagement',
     component: Layout,
-    redirect: '/passwordReset',
-    meta: { title: '__modPassword', icon: 'el-icon-user-solid' },
+    redirect: '/logManagement',
+    meta: { title: '__logManagement', icon: 'el-icon-document', permission: 'LogManage' },
+    displayChildren: true,
     children: [{
-      path: 'modPassword',
-      name: 'ModPassword',
-      component: () => import('@/views/modPassword/index'),
-      meta: { title: '__modPassword' }
+      // 操作日誌
+      path: 'operationLog',
+      name: 'OperationLog',
+      component: () => import('@/views/logManagement/operationLog/index'),
+      meta: { title: '__operationLog', icon: 'el-icon-document', permission: 'LogManage.OperationLog' }
     }]
   },
 
@@ -146,12 +143,26 @@ export const asyncRoutes = [
     path: '/ipWhitelist',
     component: Layout,
     redirect: '/ipWhitelist',
-    meta: { title: '__ipWhitelist', icon: 'el-icon-user-solid' },
+    meta: { title: '__ipWhitelist', icon: 'el-icon-user-solid', permission: 'WhitelistManage' },
     children: [{
       path: 'ipWhitelist',
       name: 'IpWhitelist',
       component: () => import('@/views/ipWhitelist/index'),
       meta: { title: '__ipWhitelist' }
+    }]
+  },
+
+  {
+    // 修改密碼
+    path: '/passwordReset',
+    component: Layout,
+    redirect: '/passwordReset',
+    meta: { title: '__modPassword', icon: 'el-icon-user-solid', permission: 'ModPassword' },
+    children: [{
+      path: 'modPassword',
+      name: 'ModPassword',
+      component: () => import('@/views/modPassword/index'),
+      meta: { title: '__modPassword' }
     }]
   },
 

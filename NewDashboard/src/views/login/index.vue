@@ -51,7 +51,7 @@
           @keyup.enter.native="handleLogin"
         />
         <span class="captcha-container">
-          <el-image :src="captchaData.img" />
+          <img class="captcha-content" :src="captchaImg">
         </span>
 
         <span class="refresh" @click="refreshCaptcha()">
@@ -108,6 +108,11 @@ export default {
       loading: false,
       passwordType: 'password',
       captchaData: {}
+    }
+  },
+  computed: {
+    captchaImg() {
+      return this.captchaData.img
     }
   },
   created() {
@@ -251,12 +256,19 @@ $light_gray:#eee;
     display: inline-block;
   }
 
-  .captcha-container {
-    color: $dark_gray;
-    vertical-align: middle;
-    width: 100px;
-    height: auto;
-    display: inline-block;
+  .captcha {
+    &-container {
+      color: $dark_gray;
+      vertical-align: middle;
+      width: 100px;
+      height: auto;
+      display: inline-block;
+    }
+
+    &-content {
+      width: 100%;
+      vertical-align: middle;
+    }
   }
 
   .title-container {
@@ -283,8 +295,8 @@ $light_gray:#eee;
 
   .refresh {
     position: absolute;
-    right: 15px;
-    top: 15px;
+    right: 14px;
+    top: 7px;
     font-size: 16px;
     color: $dark_gray;
     cursor: pointer;

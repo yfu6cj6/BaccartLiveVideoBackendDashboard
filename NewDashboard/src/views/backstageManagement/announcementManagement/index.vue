@@ -2,7 +2,7 @@
   <div class="permissionManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="onSubmit()">{{ $t("__refresh") }}</el-button>
+        <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__announcementTitle')">
         <el-input v-model="searchForm.title" />
@@ -46,7 +46,7 @@
       </el-form-item>
       <el-form-item>
         <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="onSubmit()">{{ $t("__search") }}</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
         <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
         <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
       </el-form-item>
@@ -211,14 +211,14 @@ export default {
       this.selectLoading = false
       this.dataLoading = false
       if (err.data.code !== 401) {
-        const { name, code, symbol } = err.data.message
+        const { title, announcementedAt, maintainedAt } = err.data.message
         const log = () => {
-          if (name !== undefined) {
-            return name[0]
-          } else if (code !== undefined) {
-            return code[0]
-          } else if (symbol !== undefined) {
-            return symbol[0]
+          if (title !== undefined) {
+            return title[0]
+          } else if (announcementedAt !== undefined) {
+            return announcementedAt[0]
+          } else if (maintainedAt !== undefined) {
+            return maintainedAt[0]
           } else {
             return 'Create failed'
           }
