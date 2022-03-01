@@ -25,12 +25,12 @@
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
-      <el-table-column prop="id" width="80" label="ID" align="center" />
-      <el-table-column prop="name" :label="$t('__name')" align="center" />
-      <el-table-column prop="code" :label="$t('__code')" align="center" />
-      <el-table-column prop="symbol" :label="$t('__symbol')" align="center" />
-      <el-table-column :label="$t('__operate')" align="center">
+    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
+      <el-table-column prop="id" min-width="25px" label="ID" align="center" />
+      <el-table-column prop="name" min-width="80px" :label="$t('__name')" align="center" />
+      <el-table-column prop="code" min-width="80px" :label="$t('__code')" align="center" />
+      <el-table-column prop="symbol" min-width="80px" :label="$t('__symbol')" align="center" />
+      <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>

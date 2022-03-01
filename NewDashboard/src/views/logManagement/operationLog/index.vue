@@ -30,7 +30,7 @@
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border>
+    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
       <el-table-column v-if="showDetail" type="expand">
         <template slot-scope="props">
           <el-form label-position="left">
@@ -40,12 +40,12 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column prop="userNickName" :label="$t('__nickname')" align="center" />
-      <el-table-column prop="ip" label="IP" align="center" />
-      <el-table-column prop="description" :label="$t('__description')" align="center" />
-      <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
-      <el-table-column prop="uri" label="Uri" align="center" />
-      <el-table-column prop="method" :label="$t('__method')" align="center" />
+      <el-table-column prop="userNickName" min-width="60px" :label="$t('__nickname')" align="center" />
+      <el-table-column prop="ip" min-width="80px" label="IP" align="center" />
+      <el-table-column prop="description" min-width="60px" :label="$t('__description')" align="center" />
+      <el-table-column prop="created_at" min-width="100px" :label="$t('__createdAt')" align="center" />
+      <el-table-column prop="uri" min-width="120px" label="Uri" align="center" />
+      <el-table-column prop="method" min-width="60px" :label="$t('__method')" align="center" />
     </el-table>
 
     <el-pagination

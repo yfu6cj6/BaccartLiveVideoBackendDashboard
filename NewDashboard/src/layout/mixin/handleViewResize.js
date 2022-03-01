@@ -1,8 +1,10 @@
 export default {
   data() {
+    const windowsHeight = document.body.clientHeight
+    const windowsWidth = document.body.clientWidth
     return {
-      viewHeight: '',
-      viewWidth: ''
+      viewHeight: windowsHeight,
+      viewWidth: windowsWidth
     }
   },
   mounted() {

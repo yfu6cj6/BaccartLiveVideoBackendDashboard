@@ -27,12 +27,12 @@
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
-      <el-table-column prop="id" width="80" label="ID" align="center" />
-      <el-table-column prop="name" :label="$t('__name')" align="center" />
-      <el-table-column prop="nickname" :label="$t('__nickname')" align="center" />
-      <el-table-column prop="type" :label="$t('__type')" align="center" />
-      <el-table-column :label="$t('__operate')" align="center">
+    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
+      <el-table-column prop="id" min-width="25px" label="ID" align="center" />
+      <el-table-column prop="name" min-width="100px" :label="$t('__name')" align="center" />
+      <el-table-column prop="nickname" min-width="50px" :label="$t('__nickname')" align="center" />
+      <el-table-column prop="type" min-width="40px" :label="$t('__type')" align="center" />
+      <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-coordinate" @click="onPermissionBtnClick(scope.row)">{{ $t("__permission") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>

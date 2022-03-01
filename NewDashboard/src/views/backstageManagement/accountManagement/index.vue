@@ -34,7 +34,7 @@
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
+    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-form label-position="left" inline>
@@ -44,13 +44,13 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column prop="account" :label="$t('__account')" align="center" />
-      <el-table-column prop="nickname" :label="$t('__nickname')" align="center" />
-      <el-table-column prop="rolesNickname" :label="$t('__role')" align="center" />
-      <el-table-column prop="agentName" width="80" :label="$t('__agentName')" align="center" />
-      <el-table-column prop="time_zone.city_name" :label="$t('__cityName')" align="center" />
-      <el-table-column prop="statusLabel" width="80" :label="$t('__status')" align="center" />
-      <el-table-column :label="$t('__operate')" align="center">
+      <el-table-column prop="account" min-width="80px" :label="$t('__account')" align="center" />
+      <el-table-column prop="nickname" min-width="80px" :label="$t('__nickname')" align="center" />
+      <el-table-column prop="rolesNickname" min-width="80px" :label="$t('__role')" align="center" />
+      <el-table-column prop="agentName" min-width="80px" :label="$t('__agentName')" align="center" />
+      <el-table-column prop="time_zone.city_name" min-width="80px" :label="$t('__cityName')" align="center" />
+      <el-table-column prop="statusLabel" min-width="80px" :label="$t('__status')" align="center" />
+      <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-key" @click="onPasswordResetBtnClick(scope.row)">{{ $t("__resetPassword") }}</el-button>

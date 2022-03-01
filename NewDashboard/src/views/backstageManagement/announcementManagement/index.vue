@@ -53,7 +53,7 @@
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
+    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-form label-position="left">
@@ -63,15 +63,15 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column prop="id" width="50" label="ID" align="center" />
-      <el-table-column prop="type" width="100" :label="$t('__announcementType')" align="center" />
-      <el-table-column prop="marquee" width="80" :label="$t('__marquee')" align="center" />
-      <el-table-column prop="title" :label="$t('__announcementTitle')" align="center" />
-      <el-table-column prop="announcement_started_at" width="160" :label="$t('__announcementDate')" align="center" />
-      <el-table-column prop="announcement_ended_at" width="160" :label="$t('__announcementDate')" align="center" />
-      <el-table-column prop="maintain_started_at" width="160" :label="$t('__maintainDate')" align="center" />
-      <el-table-column prop="maintain_ended_at" width="160" :label="$t('__maintainDate')" align="center" />
-      <el-table-column :label="$t('__operate')" align="center">
+      <el-table-column prop="id" min-width="25px" label="ID" align="center" />
+      <el-table-column prop="type" min-width="55px" :label="$t('__announcementType')" align="center" />
+      <el-table-column prop="marquee" min-width="50px" :label="$t('__marquee')" align="center" />
+      <el-table-column prop="title" min-width="80px" :label="$t('__announcementTitle')" align="center" />
+      <el-table-column prop="announcement_started_at" min-width="55px" :label="$t('__announcementDate')" align="center" />
+      <el-table-column prop="announcement_ended_at" min-width="55px" :label="$t('__announcementDate')" align="center" />
+      <el-table-column prop="maintain_started_at" min-width="55px" :label="$t('__maintainDate')" align="center" />
+      <el-table-column prop="maintain_ended_at" min-width="55px" :label="$t('__maintainDate')" align="center" />
+      <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>

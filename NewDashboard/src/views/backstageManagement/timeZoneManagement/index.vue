@@ -22,11 +22,11 @@
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
-      <el-table-column prop="id" width="80" label="ID" align="center" />
-      <el-table-column prop="time_zone" :label="$t('__timeZone')" align="center" />
-      <el-table-column prop="city_name" :label="$t('__cityName')" align="center" />
-      <el-table-column :label="$t('__operate')" align="center">
+    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
+      <el-table-column prop="id" min-width="25px" label="ID" align="center" />
+      <el-table-column prop="time_zone" min-width="80px" :label="$t('__timeZone')" align="center" />
+      <el-table-column prop="city_name" min-width="80px" :label="$t('__cityName')" align="center" />
+      <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>

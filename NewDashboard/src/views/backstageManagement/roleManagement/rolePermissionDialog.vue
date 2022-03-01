@@ -74,11 +74,20 @@ export default {
     setData(data) {
       this.serverData = data
       this.$nextTick(() => {
-        this.serverData.allPermissions.forEach(allPermission => {
-          if (this.serverData.existPermissions.some(existPermission => existPermission && existPermission.name === allPermission.name)) {
-            this.$refs.multipleTable.toggleRowSelection(allPermission, true)
-          }
-        })
+        const administer = this.serverData.allPermissions.find(allPermission => allPermission.name === 'Administer')
+        const administerIndex = this.serverData.allPermissions.indexOf(administer)
+        if (administerIndex >= 0) {
+          this.serverData.allPermissions.splice(administerIndex, 1)
+        }
+        if (this.serverData.existPermissions[0].name === 'Administer') {
+          this.$refs.multipleTable.toggleAllSelection()
+        } else {
+          this.serverData.allPermissions.forEach(allPermission => {
+            if (this.serverData.existPermissions.some(existPermission => existPermission.name === allPermission.name)) {
+              this.$refs.multipleTable.toggleRowSelection(allPermission, true)
+            }
+          })
+        }
       })
     }
   }
