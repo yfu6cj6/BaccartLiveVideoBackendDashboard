@@ -14,6 +14,7 @@ const getters = {
   permissions: state => state.user.permissions,
   credit_limit: state => state.user.credit_limit,
   permission_routes: state => state.permission.permission_routes,
+  bulletinMsg: state => state.backstageManagement.bulletinMsg,
   accountStatus: state => state.backstageManagement.accountStatus,
   announcementMarquee: state => state.backstageManagement.announcementMarquee
 }

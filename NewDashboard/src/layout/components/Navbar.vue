@@ -45,9 +45,7 @@ export default {
     Hamburger
   },
   data: function() {
-    return {
-      bulletinMsg: '12345678910'
-    }
+    return {}
   },
   computed: {
     ...mapGetters([
@@ -55,11 +53,14 @@ export default {
       'marquee',
       'agentName',
       'nickname',
-      'credit_limit'
+      'credit_limit',
+      'bulletinMsg'
     ]),
     isCollapse() {
       return !this.sidebar.opened
     }
+  },
+  created() {
   },
   methods: {
     changeLocale: function(locale) {

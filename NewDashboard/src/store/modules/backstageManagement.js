@@ -1,6 +1,7 @@
 // import { i18n } from '@/lang/lang'
 
 const state = {
+  bulletinMsg: '',
   accountStatus: status,
   announcementMarquee: marquee
 }
@@ -24,6 +25,9 @@ const marquee = [{
 }]
 
 const mutations = {
+  SET_BULLETIN_MSG(state, msg) {
+    state.bulletinMsg = msg
+  },
   SET_ACCOUNT_STATUS(state) {
     state.accountStatus = status
   },
@@ -32,6 +36,9 @@ const mutations = {
   }
 }
 const actions = {
+  setBulletinMsg({ commit }, msg) {
+    commit('SET_BULLETIN_MSG', msg)
+  },
   setAccountStatus({ commit }) {
     commit('SET_ACCOUNT_STATUS')
   },
