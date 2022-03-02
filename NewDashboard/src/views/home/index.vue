@@ -48,25 +48,31 @@ export default {
       return this.agentAnnouncements.length > 0
     }
   },
+  activated() {
+    this.searchAnnouncement()
+  },
   created() {
-    announcementSearch({}).then((res) => {
-      this.gameAnnouncements = []
-      this.agentAnnouncements = []
-      let bulletinMsg = ''
-      res.rows.forEach(element => {
-        if (element.is_marquee === '1') {
-          bulletinMsg += (element.content + '　　')
-        }
-        if (element.type === 'game') {
-          this.gameAnnouncements.push(element)
-        } else if (element.type === 'agent') {
-          this.agentAnnouncements.push(element)
-        }
-      })
-      this.$store.dispatch('backstageManagement/setBulletinMsg', bulletinMsg)
-    })
+    this.searchAnnouncement()
   },
   methods: {
+    searchAnnouncement() {
+      announcementSearch({}).then((res) => {
+        this.gameAnnouncements = []
+        this.agentAnnouncements = []
+        const bulletinMsg = []
+        res.rows.forEach(element => {
+          if (element.is_marquee === '1') {
+            bulletinMsg.push(element.content)
+          }
+          if (element.type === 'game') {
+            this.gameAnnouncements.push(element)
+          } else if (element.type === 'agent') {
+            this.agentAnnouncements.push(element)
+          }
+        })
+        this.$store.dispatch('settings/changeSetting', { marqueeMsg: bulletinMsg })
+      })
+    }
   }
 }
 </script>

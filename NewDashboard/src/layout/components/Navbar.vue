@@ -24,11 +24,8 @@
         <span class="language-item">
           {{ $t('__creditlimit') }}: {{ credit_limit }}
         </span>
-        <span v-if="marquee" class="bulletin">
-          <i class="el-icon-mic" />
-          <marquee direction="left">
-            {{ bulletinMsg }}
-          </marquee>
+        <span v-if="marqueeMsg.length > 0" class="marquee">
+          <p>{{ marqueeMsg }}</p>
         </span>
       </el-col>
     </div>
@@ -50,11 +47,10 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'marquee',
+      'marqueeMsg',
       'agentName',
       'nickname',
-      'credit_limit',
-      'bulletinMsg'
+      'credit_limit'
     ]),
     isCollapse() {
       return !this.sidebar.opened
@@ -92,27 +88,6 @@ export default {
   background: #1a6396;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
 }
-.bulletin {
-  width: 100%;
-  max-width: 50%;
-  background-color: #0d325e;
-  color: #fff;
-  position: absolute;
-  top: 25%;
-  right: 0%;
-  border-radius: 1em;
-  padding: 0.5em 1.5em 0.25em 2.5em;
-  font-size: 14px;
-  line-height: 14px;
-}
-.el-icon-mic {
-  position: absolute;
-  font-size: 14px;
-  color: #ff9800;
-  font-size: 1.4em;
-  left: 0.5em;
-  top: 0.25em;
-}
 .language {
   &-container {
     height: 50px;
@@ -140,5 +115,26 @@ export default {
 }
 .el-icon-arrow-down {
   font-size: 12px;
+}
+.marquee {
+  width: 100%;
+  max-width: 45%;
+	background-color: #0d325e;
+	color: white;
+  position: absolute;
+  white-space: nowrap;
+  overflow: hidden;
+  box-sizing: border-box;
+  right: 0%;
+}
+.marquee p {
+  display: inline-block;
+  padding-left: 100%;
+  line-height: 0%;
+  animation: marquee 15s linear infinite;
+}
+@keyframes marquee {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(-100%, 0); }
 }
 </style>

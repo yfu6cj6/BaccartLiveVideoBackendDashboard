@@ -198,9 +198,16 @@ export default {
     },
     handleRespone(res) {
       this.methodType = res.methodType
+      const bulletinMsg = []
       res.rows.forEach(element => {
-        element.marquee = element.is_marquee === '1' ? 'V' : ''
+        if (element.is_marquee === '1') {
+          bulletinMsg.push(element.content)
+          element.marquee = 'V'
+        } else {
+          element.marquee = ''
+        }
       })
+      this.$store.dispatch('settings/changeSetting', { marqueeMsg: bulletinMsg })
       this.allDataByClient = res.rows
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
