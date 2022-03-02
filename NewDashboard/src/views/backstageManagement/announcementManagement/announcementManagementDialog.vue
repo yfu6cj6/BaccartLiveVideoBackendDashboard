@@ -46,13 +46,13 @@
           <el-form-item :label="$t('__announcementContent')" prop="content">
             <el-input v-model="editForm.content" type="textarea" :rows="2" />
           </el-form-item>
-          <el-form-item>
-            <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
-            <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
-          </el-form-item>
         </el-form>
       </el-col>
     </el-row>
+    <span slot="footer">
+      <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
+      <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
+    </span>
   </el-dialog>
 </template>
 

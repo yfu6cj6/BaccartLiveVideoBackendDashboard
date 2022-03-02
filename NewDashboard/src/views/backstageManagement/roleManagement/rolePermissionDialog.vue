@@ -7,12 +7,12 @@
           <el-table-column prop="name" :label="$t('__name')" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="nickname" :label="$t('__nickname')" width="150" align="center" :show-overflow-tooltip="true" />
         </el-table>
-        <div style="margin-top: 20px">
-          <el-button icon="el-icon-minus" @click="cancelSelection">{{ $t('__cancelSelect') }}</el-button>
-          <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
-        </div>
       </el-col>
     </el-row>
+    <span slot="footer">
+      <el-button icon="el-icon-minus" @click="cancelSelection">{{ $t('__cancelSelect') }}</el-button>
+      <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
+    </span>
   </el-dialog>
 </template>
 
