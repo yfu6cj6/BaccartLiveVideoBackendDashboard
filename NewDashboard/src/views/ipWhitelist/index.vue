@@ -38,7 +38,7 @@
       background
       :page-size="pageSize"
       :current-page.sync="currentPage"
-      @current-change="handleCurrentChange"
+      @current-change="handlePageChangeByClient"
     />
 
     <IpWhitelistDialog

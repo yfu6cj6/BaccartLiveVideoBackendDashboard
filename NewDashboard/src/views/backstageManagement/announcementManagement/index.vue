@@ -67,10 +67,10 @@
       <el-table-column prop="type" min-width="55px" :label="$t('__announcementType')" align="center" />
       <el-table-column prop="marquee" min-width="50px" :label="$t('__marquee')" align="center" />
       <el-table-column prop="title" min-width="80px" :label="$t('__announcementTitle')" align="center" />
-      <el-table-column prop="announcement_started_at" min-width="55px" :label="$t('__announcementDate')" align="center" />
-      <el-table-column prop="announcement_ended_at" min-width="55px" :label="$t('__announcementDate')" align="center" />
-      <el-table-column prop="maintain_started_at" min-width="55px" :label="$t('__maintainDate')" align="center" />
-      <el-table-column prop="maintain_ended_at" min-width="55px" :label="$t('__maintainDate')" align="center" />
+      <el-table-column prop="announcement_started_at" min-width="60px" :label="$t('__announcementDate')" align="center" />
+      <el-table-column prop="announcement_ended_at" min-width="60px" :label="$t('__announcementDate')" align="center" />
+      <el-table-column prop="maintain_started_at" min-width="60px" :label="$t('__maintainDate')" align="center" />
+      <el-table-column prop="maintain_ended_at" min-width="60px" :label="$t('__maintainDate')" align="center" />
       <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
@@ -86,7 +86,7 @@
       background
       :page-size="pageSize"
       :current-page.sync="currentPage"
-      @current-change="handleCurrentChange"
+      @current-change="handlePageChangeByClient"
     />
 
     <AnnouncementManagementDialog

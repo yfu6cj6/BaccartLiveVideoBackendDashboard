@@ -18,5 +18,11 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether need tagsView
    */
-  tagsView: true
+  tagsView: true,
+
+  /**
+   * @type {boolean} true | false
+   * @description Whether need marquee
+   */
+  marquee: true
 }

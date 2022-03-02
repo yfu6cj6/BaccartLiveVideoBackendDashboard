@@ -1,15 +1,6 @@
 <template>
   <div class="navbar">
     <hamburger :is-active="!isCollapse" class="hamburger" @toggleClick="toggleSideBar" />
-    <div class="bulletin">
-      <i class="el-icon-mic" />
-      <marquee direction="left">
-        {{ bulletinMsg }}
-      </marquee>
-    </div>
-    <div class="right-Agent">
-      {{ $t('__agent') }}: {{ agentName }}
-    </div>
     <div>
       <el-col class="language-container" :span="12">
         <span class="language-title">
@@ -24,6 +15,21 @@
             <el-dropdown-item @click.native="changeLocale('zh_chs')">{{ $t(getLang('zh_chs')) }}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
+        <span class="language-item">
+          Hi, {{ nickname }}
+        </span>
+        <span class="language-item">
+          {{ $t('__agent') }}: {{ agentName }}
+        </span>
+        <span class="language-item">
+          {{ $t('__creditlimit') }}: {{ credit_limit }}
+        </span>
+        <span v-if="marquee" class="bulletin">
+          <i class="el-icon-mic" />
+          <marquee direction="left">
+            {{ bulletinMsg }}
+          </marquee>
+        </span>
       </el-col>
     </div>
   </div>
@@ -40,13 +46,16 @@ export default {
   },
   data: function() {
     return {
-      agentName: this.$store.getters.agentName,
       bulletinMsg: '12345678910'
     }
   },
   computed: {
     ...mapGetters([
-      'sidebar'
+      'sidebar',
+      'marquee',
+      'agentName',
+      'nickname',
+      'credit_limit'
     ]),
     isCollapse() {
       return !this.sidebar.opened
@@ -89,7 +98,7 @@ export default {
   color: #fff;
   position: absolute;
   top: 25%;
-  left: 25%;
+  right: 0%;
   border-radius: 1em;
   padding: 0.5em 1.5em 0.25em 2.5em;
   font-size: 14px;
@@ -121,24 +130,14 @@ export default {
     height: 50px;
     padding-left: 15px;
   }
+  &-item {
+    margin: 0 0 0 1.5em;
+    color: #fff;
+    line-height: 50px;
+    font-size: .9em;
+  }
 }
 .el-icon-arrow-down {
   font-size: 12px;
-}
-.right-Agent {
-  float: right;
-  color: #fff;
-  height: 50px;
-  line-height: 50px;
-  padding: 0 1em;
-  font-size: .9em;
-}
-.right-prId {
-  float: right;
-  color: #fff;
-  height: 50px;
-  line-height: 50px;
-  padding: 0 1em;
-    font-size: .9em;
 }
 </style>

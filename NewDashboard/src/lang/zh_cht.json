@@ -82,5 +82,6 @@
     "__noMore": "沒有更多資料",
     "__description": "說明",
     "__createdAt": "紀錄時間",
-    "__operationLog": "操作日誌"
+    "__operationLog": "操作日誌",
+    "__creditlimit": "額度"
 }
