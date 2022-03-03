@@ -104,27 +104,9 @@ export default {
       this.selectLoading = false
       this.dataLoading = false
     },
-    handleResponeError(err) {
+    handleResponeError() {
       this.selectLoading = false
       this.dataLoading = false
-      if (err.data.code !== 401) {
-        const { name, code, symbol } = err.data.message
-        const log = () => {
-          if (name !== undefined) {
-            return name[0]
-          } else if (code !== undefined) {
-            return code[0]
-          } else if (symbol !== undefined) {
-            return symbol[0]
-          } else {
-            return 'Create failed'
-          }
-        }
-        this.$message({
-          message: log(),
-          type: 'error'
-        })
-      }
     },
     onSubmit() {
       this.tableData = []
@@ -148,8 +130,8 @@ export default {
       this.dataLoading = true
       currencyCreate(data).then((res) => {
         this.handleRespone(res)
-      }).catch((err) => {
-        this.handleResponeError(err)
+      }).catch(() => {
+        this.handleResponeError()
       })
     },
     onEditBtnClick(item) {
@@ -164,8 +146,8 @@ export default {
         this.dataLoading = true
         currencyEdit(data).then((res) => {
           this.handleRespone(res)
-        }).catch((err) => {
-          this.handleResponeError(err)
+        }).catch(() => {
+          this.handleResponeError()
         })
       }).catch(_ => {})
     },

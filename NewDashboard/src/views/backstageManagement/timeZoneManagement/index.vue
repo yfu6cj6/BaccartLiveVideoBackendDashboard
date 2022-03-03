@@ -100,25 +100,9 @@ export default {
       this.selectLoading = false
       this.dataLoading = false
     },
-    handleResponeError(err) {
+    handleResponeError() {
       this.selectLoading = false
       this.dataLoading = false
-      if (err.data.code !== 401) {
-        const { city_name, time_zone } = err.data.message
-        const log = () => {
-          if (time_zone !== undefined) {
-            return time_zone[0]
-          } else if (city_name !== undefined) {
-            return city_name[0]
-          } else {
-            return 'Create failed'
-          }
-        }
-        this.$message({
-          message: log(),
-          type: 'error'
-        })
-      }
     },
     onSubmit() {
       this.tableData = []
@@ -142,8 +126,8 @@ export default {
       this.dataLoading = true
       timezoneCreate(data).then((res) => {
         this.handleRespone(res)
-      }).catch((err) => {
-        this.handleResponeError(err)
+      }).catch(() => {
+        this.handleResponeError()
       })
     },
     onEditBtnClick(item) {
@@ -158,8 +142,8 @@ export default {
         this.dataLoading = true
         timezoneEdit(data).then((res) => {
           this.handleRespone(res)
-        }).catch((err) => {
-          this.handleResponeError(err)
+        }).catch(() => {
+          this.handleResponeError()
         })
       }).catch(_ => {})
     },

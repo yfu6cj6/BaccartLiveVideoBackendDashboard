@@ -97,25 +97,9 @@ export default {
       this.selectLoading = false
       this.dataLoading = false
     },
-    handleResponeError(err) {
+    handleResponeError() {
       this.selectLoading = false
       this.dataLoading = false
-      if (err.data.code !== 401) {
-        const { account, ip } = err.data.message
-        const log = () => {
-          if (account !== undefined) {
-            return account[0]
-          } else if (ip !== undefined) {
-            return ip[0]
-          } else {
-            return 'Create failed'
-          }
-        }
-        this.$message({
-          message: log(),
-          type: 'error'
-        })
-      }
     },
     onSubmit() {
       this.tableData = []
@@ -139,8 +123,8 @@ export default {
       this.dataLoading = true
       whitelistCreate(data).then((res) => {
         this.handleRespone(res)
-      }).catch((err) => {
-        this.handleResponeError(err)
+      }).catch(() => {
+        this.handleResponeError()
       })
     },
     onEditBtnClick(item) {
@@ -155,8 +139,8 @@ export default {
         this.dataLoading = true
         whitelistEdit(data).then((res) => {
           this.handleRespone(res)
-        }).catch((err) => {
-          this.handleResponeError(err)
+        }).catch(() => {
+          this.handleResponeError()
         })
       }).catch(_ => {})
     },

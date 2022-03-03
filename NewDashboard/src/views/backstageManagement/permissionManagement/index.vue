@@ -130,25 +130,9 @@ export default {
       this.selectLoading = false
       this.dataLoading = false
     },
-    handleResponeError(err) {
+    handleResponeError() {
       this.selectLoading = false
       this.dataLoading = false
-      if (err.data.code !== 401) {
-        const { name, nickname } = err.data.message
-        const log = () => {
-          if (name !== undefined) {
-            return name[0]
-          } else if (nickname !== undefined) {
-            return nickname[0]
-          } else {
-            return 'Create failed'
-          }
-        }
-        this.$message({
-          message: log(),
-          type: 'error'
-        })
-      }
     },
     onSubmit() {
       this.tableData = []
@@ -180,8 +164,8 @@ export default {
       }
       permissionCreate(data).then((res) => {
         this.handleRespone(res)
-      }).catch((err) => {
-        this.handleResponeError(err)
+      }).catch(() => {
+        this.handleResponeError()
       })
     },
     onEditBtnClick(item) {
@@ -202,8 +186,8 @@ export default {
         }
         permissionEdit(data).then((res) => {
           this.handleRespone(res)
-        }).catch((err) => {
-          this.handleResponeError(err)
+        }).catch(() => {
+          this.handleResponeError()
         })
       }).catch(_ => {})
     },

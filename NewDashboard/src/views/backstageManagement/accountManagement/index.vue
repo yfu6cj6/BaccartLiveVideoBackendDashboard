@@ -176,27 +176,9 @@ export default {
       this.selectLoading = false
       this.dataLoading = false
     },
-    handleResponeError(err) {
+    handleResponeError() {
       this.selectLoading = false
       this.dataLoading = false
-      if (err.data.code !== 401) {
-        const { account, password, nickname } = err.data.message
-        const log = () => {
-          if (account !== undefined) {
-            return account[0]
-          } else if (password !== undefined) {
-            return password[0]
-          } else if (nickname !== undefined) {
-            return nickname[0]
-          } else {
-            return 'Create failed'
-          }
-        }
-        this.$message({
-          message: log(),
-          type: 'error'
-        })
-      }
     },
     onSubmit() {
       this.tableData = []
@@ -227,8 +209,8 @@ export default {
       this.dataLoading = true
       accountCreate(data).then((res) => {
         this.handleRespone(res)
-      }).catch((err) => {
-        this.handleResponeError(err)
+      }).catch(() => {
+        this.handleResponeError()
       })
     },
     onEditBtnClick(item) {
@@ -245,8 +227,8 @@ export default {
         this.dataLoading = true
         accountEdit(data).then((res) => {
           this.handleRespone(res)
-        }).catch((err) => {
-          this.handleResponeError(err)
+        }).catch(() => {
+          this.handleResponeError()
         })
       }).catch(_ => {})
     },

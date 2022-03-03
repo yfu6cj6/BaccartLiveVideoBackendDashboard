@@ -222,27 +222,9 @@ export default {
       this.selectLoading = false
       this.dataLoading = false
     },
-    handleResponeError(err) {
+    handleResponeError() {
       this.selectLoading = false
       this.dataLoading = false
-      if (err.data.code !== 401) {
-        const { title, announcementedAt, maintainedAt } = err.data.message
-        const log = () => {
-          if (title !== undefined) {
-            return title[0]
-          } else if (announcementedAt !== undefined) {
-            return announcementedAt[0]
-          } else if (maintainedAt !== undefined) {
-            return maintainedAt[0]
-          } else {
-            return 'Create failed'
-          }
-        }
-        this.$message({
-          message: log(),
-          type: 'error'
-        })
-      }
     },
     onSubmit() {
       this.tableData = []
@@ -266,8 +248,8 @@ export default {
       this.handleRequest(data)
       announcementCreate(data).then((res) => {
         this.handleRespone(res)
-      }).catch((err) => {
-        this.handleResponeError(err)
+      }).catch(() => {
+        this.handleResponeError()
       })
     },
     onEditBtnClick(item) {
@@ -283,8 +265,8 @@ export default {
         this.handleRequest(data)
         announcementEdit(data).then((res) => {
           this.handleRespone(res)
-        }).catch((err) => {
-          this.handleResponeError(err)
+        }).catch(() => {
+          this.handleResponeError()
         })
       }).catch(_ => {})
     },

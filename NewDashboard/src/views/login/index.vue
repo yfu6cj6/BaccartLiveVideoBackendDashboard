@@ -161,10 +161,6 @@ export default {
             this.loginForm.key = this.captchaData.key
             this.$refs.captcha.focus()
             this.loginForm.captcha = ''
-            this.$message({
-              message: err.data.message,
-              type: 'error'
-            })
             this.loading = false
           })
         } else {

@@ -112,7 +112,16 @@ export default {
   },
   created() {
     this.setHeight()
-    this.handleCurrentChange(1)
+    const end = new Date()
+    const start = new Date()
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 3)
+    start.setHours(0)
+    start.setMinutes(0)
+    start.setSeconds(0)
+    end.setHours(23)
+    end.setMinutes(59)
+    end.setSeconds(59)
+    this.searchForm.searchTime = [start, end]
   },
   methods: {
     onReset() {

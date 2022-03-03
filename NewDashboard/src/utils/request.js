@@ -49,7 +49,7 @@ service.interceptors.response.use(
     if (res.code === 401) {
       store.dispatch('user/resetToken').then(() => {
         router.push({ path: '/logout' })
-        Message.error(res.message || i18n.messages[i18n.locale]['__operationField'])
+        showMsgLog(res.message)
       })
       return Promise.reject(response)
     }
@@ -66,6 +66,7 @@ service.interceptors.response.use(
     }
 
     if (res.code !== 200) {
+      showMsgLog(res.message)
       return Promise.reject(response)
     } else {
       if (res.data) {
@@ -84,5 +85,19 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+function showMsgLog(message) {
+  let msg
+  if (message) {
+    if (typeof message === 'string' || message instanceof String) {
+      msg = message.toString()
+    } else {
+      msg = message[Object.keys(message)[0]].toString()
+    }
+  } else {
+    msg = i18n.messages[i18n.locale]['__operationField']
+  }
+  Message.error(msg)
+}
 
 export default service

@@ -132,27 +132,9 @@ export default {
       this.selectLoading = false
       this.dataLoading = false
     },
-    handleResponeError(err) {
+    handleResponeError() {
       this.selectLoading = false
       this.dataLoading = false
-      if (err.data.code !== 401) {
-        const { name, nickname, type } = err.data.message
-        const log = () => {
-          if (name !== undefined) {
-            return name[0]
-          } else if (nickname !== undefined) {
-            return nickname[0]
-          } else if (type !== undefined) {
-            return type[0]
-          } else {
-            return 'Create failed'
-          }
-        }
-        this.$message({
-          message: log(),
-          type: 'error'
-        })
-      }
     },
     onSubmit() {
       this.tableData = []
@@ -180,8 +162,8 @@ export default {
       this.dataLoading = true
       roleCreate(data).then((res) => {
         this.handleRespone(res)
-      }).catch((err) => {
-        this.handleResponeError(err)
+      }).catch(() => {
+        this.handleResponeError()
       })
     },
     onPermissionBtnClick(item) {
@@ -200,8 +182,8 @@ export default {
       const requestData = { id: this.selectForm.id, permissions: selection.map(element => { return element.name }) }
       setPermissions(requestData).then((res) => {
         this.handleRespone(res)
-      }).catch((err) => {
-        this.handleResponeError(err)
+      }).catch(() => {
+        this.handleResponeError()
       })
     },
     onEditBtnClick(item) {
@@ -215,8 +197,8 @@ export default {
         this.dataLoading = true
         roleEdit(data).then((res) => {
           this.handleRespone(res)
-        }).catch((err) => {
-          this.handleResponeError(err)
+        }).catch(() => {
+          this.handleResponeError()
         })
       }).catch(_ => {})
     },
