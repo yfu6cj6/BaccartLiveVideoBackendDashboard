@@ -30,17 +30,20 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { announcementSearch } from '@/api/backstageManagement/announcementManagement'
 
 export default {
   name: 'Home',
   data() {
     return {
-      agentAnnouncements: ['1'],
-      gameAnnouncements: ['1']
     }
   },
   computed: {
+    ...mapGetters([
+      'gameAnnouncements',
+      'agentAnnouncements'
+    ]),
     showGameAnnouncements() {
       return this.gameAnnouncements.length > 0
     },
@@ -48,31 +51,26 @@ export default {
       return this.agentAnnouncements.length > 0
     }
   },
-  activated() {
-    this.searchAnnouncement()
-  },
   created() {
-    this.searchAnnouncement()
+    announcementSearch({}).then((res) => {
+      const gameAnnouncements = []
+      const agentAnnouncements = []
+      const bulletinMsg = []
+      res.rows.forEach(element => {
+        if (element.is_marquee === '1') {
+          bulletinMsg.push(element.content)
+        }
+        if (element.type === 'game') {
+          gameAnnouncements.push(element)
+        } else if (element.type === 'agent') {
+          agentAnnouncements.push(element)
+        }
+      })
+      this.$store.dispatch('settings/changeSetting', { marqueeMsg: bulletinMsg })
+      this.$store.dispatch('backstageManagement/setAnnouncements', { gameAnnouncements: gameAnnouncements, agentAnnouncements: agentAnnouncements })
+    })
   },
   methods: {
-    searchAnnouncement() {
-      announcementSearch({}).then((res) => {
-        this.gameAnnouncements = []
-        this.agentAnnouncements = []
-        const bulletinMsg = []
-        res.rows.forEach(element => {
-          if (element.is_marquee === '1') {
-            bulletinMsg.push(element.content)
-          }
-          if (element.type === 'game') {
-            this.gameAnnouncements.push(element)
-          } else if (element.type === 'agent') {
-            this.agentAnnouncements.push(element)
-          }
-        })
-        this.$store.dispatch('settings/changeSetting', { marqueeMsg: bulletinMsg })
-      })
-    }
   }
 }
 </script>

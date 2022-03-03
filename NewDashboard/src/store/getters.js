@@ -16,6 +16,8 @@ const getters = {
   permission_routes: state => state.permission.permission_routes,
   bulletinMsg: state => state.backstageManagement.bulletinMsg,
   accountStatus: state => state.backstageManagement.accountStatus,
-  announcementMarquee: state => state.backstageManagement.announcementMarquee
+  announcementMarquee: state => state.backstageManagement.announcementMarquee,
+  gameAnnouncements: state => state.backstageManagement.gameAnnouncements,
+  agentAnnouncements: state => state.backstageManagement.agentAnnouncements
 }
 export default getters

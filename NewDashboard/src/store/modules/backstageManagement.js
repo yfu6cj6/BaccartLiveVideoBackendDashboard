@@ -1,6 +1,8 @@
 const state = {
   accountStatus: status,
-  announcementMarquee: marquee
+  announcementMarquee: marquee,
+  gameAnnouncements: [],
+  agentAnnouncements: []
 }
 
 const status = [{
@@ -27,6 +29,10 @@ const mutations = {
   },
   SET_ANNOUNCEMENT_MARQUEE(state) {
     state.announcementMarquee = marquee
+  },
+  SET_ANNOUNCEMENTS(state, { gameAnnouncements, agentAnnouncements }) {
+    state.gameAnnouncements = gameAnnouncements
+    state.agentAnnouncements = agentAnnouncements
   }
 }
 const actions = {
@@ -35,6 +41,9 @@ const actions = {
   },
   setAnnouncementMarquee({ commit }) {
     commit('SET_ANNOUNCEMENT_MARQUEE')
+  },
+  setAnnouncements({ commit }, { gameAnnouncements, agentAnnouncements }) {
+    commit('SET_ANNOUNCEMENTS', { gameAnnouncements, agentAnnouncements })
   }
 }
 

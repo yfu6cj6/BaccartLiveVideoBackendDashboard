@@ -198,6 +198,8 @@ export default {
     },
     handleRespone(res) {
       this.methodType = res.methodType
+      const gameAnnouncements = []
+      const agentAnnouncements = []
       const bulletinMsg = []
       res.rows.forEach(element => {
         if (element.is_marquee === '1') {
@@ -206,8 +208,14 @@ export default {
         } else {
           element.marquee = ''
         }
+        if (element.type === 'game') {
+          gameAnnouncements.push(element)
+        } else if (element.type === 'agent') {
+          agentAnnouncements.push(element)
+        }
       })
       this.$store.dispatch('settings/changeSetting', { marqueeMsg: bulletinMsg })
+      this.$store.dispatch('backstageManagement/setAnnouncements', { gameAnnouncements: gameAnnouncements, agentAnnouncements: agentAnnouncements })
       this.allDataByClient = res.rows
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
