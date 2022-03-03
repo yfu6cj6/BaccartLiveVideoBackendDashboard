@@ -34,13 +34,14 @@
           name="password"
           tabindex="2"
           auto-complete="on"
+          @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd()">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
 
-      <el-form-item prop="captcha">
+      <el-form-item v-if="showCaptcha" prop="captcha">
         <el-input
           ref="captcha"
           v-model="loginForm.captcha"
@@ -107,7 +108,8 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      captchaData: {}
+      captchaData: {},
+      showCaptcha: process.env.NODE_ENV !== 'development'
     }
   },
   computed: {
@@ -116,7 +118,9 @@ export default {
     }
   },
   created() {
-    this.refreshCaptcha()
+    if (this.showCaptcha) {
+      this.refreshCaptcha()
+    }
   },
   methods: {
     showPwd() {
@@ -154,13 +158,14 @@ export default {
               })
               this.$router.push({ path: '/home' })
             }
-            this.loginForm.captcha = ''
             this.loading = false
           }).catch((err) => {
-            this.captchaData = err.data.captcha
-            this.loginForm.key = this.captchaData.key
-            this.$refs.captcha.focus()
-            this.loginForm.captcha = ''
+            if (this.showCaptcha) {
+              this.captchaData = err.data.captcha
+              this.loginForm.key = this.captchaData.key
+              this.loginForm.captcha = ''
+              this.$refs.captcha.focus()
+            }
             this.loading = false
           })
         } else {

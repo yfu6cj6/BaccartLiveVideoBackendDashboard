@@ -122,7 +122,7 @@ import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import AnnouncementManagementDialog from './announcementManagementDialog'
 import { mapGetters } from 'vuex'
-import { getFullDate } from '@/utils/transDate'
+import { getFullDate, getNextDate } from '@/utils/transDate'
 
 export default {
   name: 'AnnouncementManagement',
@@ -134,26 +134,17 @@ export default {
         shortcuts: [{
           text: this.$t('__nextWeek'),
           onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            end.setTime(end.getTime() + 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', [start, end])
+            picker.$emit('pick', getNextDate(7))
           }
         }, {
           text: this.$t('__nextMonth'),
           onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            end.setTime(end.getTime() + 3600 * 1000 * 24 * 30)
-            picker.$emit('pick', [start, end])
+            picker.$emit('pick', getNextDate(30))
           }
         }, {
           text: this.$t('__nextThreeMonths'),
           onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            end.setTime(end.getTime() + 3600 * 1000 * 24 * 90)
-            picker.$emit('pick', [start, end])
+            picker.$emit('pick', getNextDate(90))
           }
         }]
       },

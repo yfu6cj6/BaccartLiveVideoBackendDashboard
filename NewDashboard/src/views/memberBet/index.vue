@@ -32,21 +32,21 @@
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
-      <el-table-column v-if="showDetail" type="expand">
-        <template slot-scope="props">
-          <el-form label-position="left">
-            <el-form-item label="requestContent:">
-              <span>{{ props.row.request_content }}</span>
-            </el-form-item>
-          </el-form>
-        </template>
-      </el-table-column>
-      <el-table-column prop="userNickName" min-width="60px" :label="$t('__nickname')" align="center" sortable />
-      <el-table-column prop="ip" min-width="80px" label="IP" align="center" sortable />
-      <el-table-column prop="description" min-width="60px" :label="$t('__description')" align="center" />
-      <el-table-column prop="created_at" min-width="100px" :label="$t('__createdAt')" align="center" sortable />
-      <el-table-column prop="uri" min-width="120px" label="Uri" align="center" />
-      <el-table-column prop="method" min-width="60px" :label="$t('__method')" align="center" />
+      <el-table-column prop="agent" :label="$t('__agent')" align="center" />
+      <el-table-column prop="member" :label="$t('__player')" align="center" />
+      <el-table-column prop="order_number" :label="$t('__orderNumber')" align="center" />
+      <el-table-column prop="bet_time" :label="$t('__betTime')" align="center" />
+      <el-table-column prop="payout_time" :label="$t('__payoutTime')" align="center" />
+      <el-table-column prop="game_type" :label="$t('__gameType')" align="center" />
+      <el-table-column prop="round_id" :label="$t('__roundId')" align="center" />
+      <el-table-column prop="gameResult" :label="$t('__gameResult')" align="center" />
+      <el-table-column prop="status" :label="$t('__status')" align="center" />
+      <el-table-column prop="game_play" :label="$t('__gamePlay')" align="center" />
+      <el-table-column prop="bet_amount" :label="$t('__betAmount')" align="center" />
+      <el-table-column prop="payout" :label="$t('__payout')" align="center" />
+      <el-table-column prop="valid_bet_amount" :label="$t('__validBetAmount')" align="center" />
+      <el-table-column prop="device" :label="$t('__device')" align="center" />
+      <el-table-column prop="ip" label="IP" align="center" />
     </el-table>
 
     <el-pagination
@@ -63,18 +63,19 @@
 </template>
 
 <script>
-import { operationLogSearch, operationLogExport } from '@/api/logManagement/operationLog'
+import { memberBetSearch } from '@/api/memberBet'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import { getFullDate, getFullDateString, getLastDate, getLastDateClearTime } from '@/utils/transDate'
 
 const defaultForm = {
-  searchTime: getLastDateClearTime(3)
+  betTime: getLastDateClearTime(30),
+  payoutTime: getLastDateClearTime(30)
 }
 
 export default {
-  name: 'OperationLog',
+  name: 'MemberBet',
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
@@ -99,14 +100,14 @@ export default {
       searchForm: JSON.parse(JSON.stringify(defaultForm)),
       selectForm: {},
       editDialogVisible: false,
-      createDialogVisible: false,
-      showDetail: false
+      createDialogVisible: false
     }
   },
   computed: {
   },
   created() {
     this.setHeight()
+    this.handleCurrentChange(1)
   },
   methods: {
     onReset() {
@@ -117,16 +118,21 @@ export default {
       this.dataLoading = true
       data.page = this.currentPage
       data.rowsCount = this.pageSize
-      if (!data.searchTime) {
-        data.searchTime = JSON.parse(JSON.stringify(defaultForm)).searchTime
+      if (!data.betTime) {
+        data.betTime = JSON.parse(JSON.stringify(defaultForm)).betTime
       }
-      for (let i = 0, max = data.searchTime.length; i < max; i++) {
-        data.searchTime[i] = getFullDate(data.searchTime[i])
+      for (let i = 0, max = data.betTime.length; i < max; i++) {
+        data.betTime[i] = getFullDate(data.betTime[i])
+      }
+      if (!data.payoutTime) {
+        data.payoutTime = JSON.parse(JSON.stringify(defaultForm)).payoutTime
+      }
+      for (let i = 0, max = data.payoutTime.length; i < max; i++) {
+        data.payoutTime[i] = getFullDate(data.payoutTime[i])
       }
     },
     handleRespone(res) {
       this.tableData = res.rows
-      this.showDetail = res.showDetail
       this.currentPage = res.currentPage
       this.totalCount = res.totalCount
       this.selectLoading = false
@@ -137,7 +143,7 @@ export default {
     },
     onShowAllBtnClick(data) {
       this.handleRequest(data)
-      operationLogSearch(data).then((res) => {
+      memberBetSearch(data).then((res) => {
         this.handleRespone(res)
       })
     },
@@ -150,11 +156,11 @@ export default {
           data.searchTime[i] = getFullDate(data.searchTime[i])
         }
       }
-      operationLogExport(data).then((res) => {
-        this.onDataOut(res.rows)
-        this.selectLoading = false
-        this.dataLoading = false
-      })
+      // operationLogExport(data).then((res) => {
+      //   this.onDataOut(res.rows)
+      //   this.selectLoading = false
+      //   this.dataLoading = false
+      // })
     },
     onDataOut(tableData) {
       require.ensure([], () => {

@@ -31,3 +31,31 @@ export function getFullDateString(targetDate) {
   s = s > 9 ? s : `0${s}`
   return `${y}${m}${d}${h}${min}${s}`
 }
+
+export function getLastDate(last) {
+  const end = new Date()
+  const start = new Date()
+  start.setTime(start.getTime() - 3600 * 1000 * 24 * last)
+  return [start, end]
+}
+
+export function getLastDateClearTime(last) {
+  const end = new Date()
+  const start = new Date()
+  start.setTime(start.getTime() - 3600 * 1000 * 24 * last)
+
+  start.setHours(0)
+  start.setMinutes(0)
+  start.setSeconds(0)
+  end.setHours(23)
+  end.setMinutes(59)
+  end.setSeconds(59)
+  return [start, end]
+}
+
+export function getNextDate(next) {
+  const end = new Date()
+  const start = new Date()
+  end.setTime(end.getTime() + 3600 * 1000 * 24 * next)
+  return [start, end]
+}
