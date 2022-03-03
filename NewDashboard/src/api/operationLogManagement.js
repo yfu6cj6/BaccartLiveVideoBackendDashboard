@@ -7,3 +7,11 @@ export function operationLogSearch(data) {
     data: data
   })
 }
+
+export function operationLogExport(data) {
+  return request({
+    url: '/operationLog/export',
+    method: 'post',
+    data: data
+  })
+}

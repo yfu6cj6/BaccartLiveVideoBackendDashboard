@@ -26,6 +26,7 @@
         <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
         <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
         <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+        <el-button type="primary" icon="el-icon-download" @click="onExportBtnClick()">{{ $t("__export") }}</el-button>
       </el-form-item>
 
     </el-form>
@@ -62,11 +63,11 @@
 </template>
 
 <script>
-import { operationLogSearch } from '@/api/backstageManagement/operationLogManagement'
+import { operationLogSearch, operationLogExport } from '@/api/operationLogManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
-import { getFullDate } from '@/utils/transDate'
+import { getFullDate, getFullDateString } from '@/utils/transDate'
 
 export default {
   name: 'OperationLog',
@@ -144,6 +145,39 @@ export default {
       operationLogSearch(data).then((res) => {
         this.handleRespone(res)
       })
+    },
+    onExportBtnClick() {
+      this.selectLoading = true
+      this.dataLoading = true
+      const data = JSON.parse(JSON.stringify(this.searchForm))
+      if (data.searchTime) {
+        for (let i = 0, max = data.searchTime.length; i < max; i++) {
+          data.searchTime[i] = getFullDate(data.searchTime[i])
+        }
+      }
+      operationLogExport(data).then((res) => {
+        this.onDataOut(res.rows)
+        this.selectLoading = false
+        this.dataLoading = false
+      })
+    },
+    onDataOut(tableData) {
+      require.ensure([], () => {
+        const { export_json_to_excel } = require('@/vendor/Export2Excel')
+        const tHeader = []
+        const filterVal = []
+        for (const item in tableData[0]) {
+          tHeader.push(tableData[0][item])
+          filterVal.push(item)
+        }
+        tableData.splice(0, 1)
+        const list = JSON.parse(JSON.stringify(tableData))
+        const data = this.formatJson(filterVal, list)
+        export_json_to_excel({ header: tHeader, data: data, filename: 'OperationLog_' + getFullDateString(new Date()) })
+      })
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map((v) => filterVal.map(j => v[j]))
     }
   }
 }

@@ -124,7 +124,7 @@ export function export_table_to_excel(id) {
 
   /* original data */
   var data = oo[0]
-  var ws_name = "SheetJS"
+  var ws_name = "Table"
 
   var wb = new Workbook(),
   ws = sheet_from_array_of_arrays(data)
@@ -155,7 +155,8 @@ export function export_json_to_excel({
   filename,
   merges = [],
   autoWidth = true,
-  bookType = 'xlsx'
+  bookType = 'xlsx',
+  wsName = 'Table'
 } = {}) {
   /* original data */
   filename = filename || 'excel-list'
@@ -166,7 +167,7 @@ export function export_json_to_excel({
     data.unshift(multiHeader[i])
   }
 
-  var ws_name = "SheetJS"
+  var ws_name = wsName
   var wb = new Workbook(),
     ws = sheet_from_array_of_arrays(data)
 
