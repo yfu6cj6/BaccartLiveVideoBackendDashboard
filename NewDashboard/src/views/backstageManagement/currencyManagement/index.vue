@@ -5,7 +5,7 @@
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
       <el-form-item class="inputTitle" label="ID">
-        <el-input v-model="searchForm.id" />
+        <el-input v-model="searchForm.id" type="number" />
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__name')">
         <el-input v-model="searchForm.name" />

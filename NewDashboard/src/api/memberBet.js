@@ -7,3 +7,11 @@ export function memberBetSearch(data) {
     data: data
   })
 }
+
+export function memberBetExport(data) {
+  return request({
+    url: '/member/bet/export',
+    method: 'post',
+    data: data
+  })
+}

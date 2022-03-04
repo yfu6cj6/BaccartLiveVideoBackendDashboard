@@ -25,7 +25,6 @@
       <el-form-item>
         <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
         <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
         <el-button type="primary" icon="el-icon-download" @click="onExportBtnClick()">{{ $t("__export") }}</el-button>
       </el-form-item>
 
@@ -115,8 +114,6 @@ export default {
     handleRequest(data) {
       this.selectLoading = true
       this.dataLoading = true
-      data.page = this.currentPage
-      data.rowsCount = this.pageSize
       if (!data.searchTime) {
         data.searchTime = JSON.parse(JSON.stringify(defaultForm)).searchTime
       }
@@ -133,24 +130,18 @@ export default {
       this.dataLoading = false
     },
     onSubmit() {
-      this.onShowAllBtnClick(this.searchForm)
-    },
-    onShowAllBtnClick(data) {
-      this.handleRequest(data)
-      operationLogSearch(data).then((res) => {
+      this.searchForm.page = this.currentPage
+      this.searchForm.rowsCount = this.pageSize
+      this.handleRequest(this.searchForm)
+      operationLogSearch(this.searchForm).then((res) => {
         this.handleRespone(res)
       })
     },
     onExportBtnClick() {
       this.selectLoading = true
       this.dataLoading = true
-      const data = JSON.parse(JSON.stringify(this.searchForm))
-      if (data.searchTime) {
-        for (let i = 0, max = data.searchTime.length; i < max; i++) {
-          data.searchTime[i] = getFullDate(data.searchTime[i])
-        }
-      }
-      operationLogExport(data).then((res) => {
+      this.handleRequest(this.searchForm)
+      operationLogExport(this.searchForm).then((res) => {
         this.onDataOut(res.rows)
         this.selectLoading = false
         this.dataLoading = false

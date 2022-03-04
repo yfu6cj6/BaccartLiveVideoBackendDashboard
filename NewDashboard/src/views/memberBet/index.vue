@@ -4,9 +4,14 @@
       <el-form-item>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__createdAt')">
+      <el-form-item class="inputTitle">
+        <el-select v-model="searchTimeType">
+          <el-option v-for="item in memberBetTimeType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="inputTitle">
         <el-date-picker
-          v-model="searchForm.searchTime"
+          v-model="searchTime"
           type="datetimerange"
           align="right"
           unlink-panels
@@ -16,37 +21,95 @@
           :picker-options="pickerOptions"
         />
       </el-form-item>
-      <el-form-item class="inputTitle" label="IP">
-        <el-input v-model="searchForm.ip" />
+      <el-form-item class="inputTitle" :label="$t('__agent')">
+        <el-select v-model="searchForm.agent_id" multiple style="width: 300px">
+          <el-option v-for="item in searchItems.agents" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__description')">
-        <el-input v-model="searchForm.description" />
+      <el-form-item class="inputTitle" :label="$t('__player')">
+        <el-select v-model="searchForm.member_id" multiple style="width: 300px">
+          <el-option v-for="item in searchItems.members" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__orderNumber')">
+        <el-input v-model="searchForm.order_number" type="number" />
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__gameType')">
+        <el-select v-model="searchForm.game_type" multiple style="width: 300px">
+          <el-option v-for="item in searchItems.gameType" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__roundId')">
+        <el-input v-model="searchForm.round_id" type="number" />
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__tableId')">
+        <el-select v-model="searchForm.table_id" multiple style="width: 300px">
+          <el-option v-for="item in searchItems.tables" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__gameResult')">
+        <el-select v-model="searchForm.gameResult" multiple style="width: 300px">
+          <el-option v-for="item in searchItems.gameResult" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__status')">
+        <el-select v-model="searchForm.status" multiple style="width: 300px">
+          <el-option v-for="item in searchItems.orderStatus" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__gamePlay')">
+        <el-select v-model="searchForm.game_play" multiple style="width: 300px">
+          <el-option v-for="item in searchItems.game_play" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__betAmount')">
+        <el-input v-model="searchForm.bet_amount" type="number" />
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__payout')">
+        <el-input v-model="searchForm.payout" type="number" />
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__validBetAmount')">
+        <el-input v-model="searchForm.valid_bet_amount" type="number" />
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__device')">
+        <el-select v-model="searchForm.device" multiple style="width: 300px">
+          <el-option v-for="item in searchItems.deviceType" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="inputTitle" label="IP">
+        <el-input v-model="searchForm.user_ip" />
       </el-form-item>
       <el-form-item>
         <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
         <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
         <el-button type="primary" icon="el-icon-download" @click="onExportBtnClick()">{{ $t("__export") }}</el-button>
       </el-form-item>
-
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
-      <el-table-column prop="agent" :label="$t('__agent')" align="center" />
-      <el-table-column prop="member" :label="$t('__player')" align="center" />
-      <el-table-column prop="order_number" :label="$t('__orderNumber')" align="center" />
-      <el-table-column prop="bet_time" :label="$t('__betTime')" align="center" />
-      <el-table-column prop="payout_time" :label="$t('__payoutTime')" align="center" />
-      <el-table-column prop="game_type" :label="$t('__gameType')" align="center" />
-      <el-table-column prop="round_id" :label="$t('__roundId')" align="center" />
-      <el-table-column prop="gameResult" :label="$t('__gameResult')" align="center" />
-      <el-table-column prop="status" :label="$t('__status')" align="center" />
-      <el-table-column prop="game_play" :label="$t('__gamePlay')" align="center" />
-      <el-table-column prop="bet_amount" :label="$t('__betAmount')" align="center" />
-      <el-table-column prop="payout" :label="$t('__payout')" align="center" />
-      <el-table-column prop="valid_bet_amount" :label="$t('__validBetAmount')" align="center" />
-      <el-table-column prop="device" :label="$t('__device')" align="center" />
-      <el-table-column prop="ip" label="IP" align="center" />
+    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight" style="width=100%">
+      <el-table-column prop="agent" :width="agentWidth" :label="$t('__agent')" align="center" />
+      <el-table-column prop="member" :width="memberWidth" :label="$t('__player')" align="center" />
+      <el-table-column prop="order_number" :width="orderNumberWidth" :label="$t('__orderNumber')" align="center" />
+      <el-table-column prop="bet_time" :width="betTimeWidth" :label="$t('__betTime')" align="center" />
+      <el-table-column prop="payout_time" :width="payoutTimeWidth" :label="$t('__payoutTime')" align="center" />
+      <el-table-column prop="game_type" :width="gameTypeWidth" :label="$t('__gameType')" align="center" />
+      <el-table-column prop="round_id" :width="roundIdWidth" :label="$t('__roundId')" align="center" />
+      <el-table-column prop="gameResultLabel" :width="gameResultWidth" :label="$t('__gameResult')" align="center" />
+      <el-table-column prop="status" :width="statusWidth" :label="$t('__status')" align="center" />
+      <el-table-column prop="gamePlayLabel" :width="gamePlayWidth" :label="$t('__gamePlay')" align="center" />
+      <el-table-column prop="bet_amount" :width="betAmountWidth" :label="$t('__betAmount')" align="center" />
+      <el-table-column prop="payout" :width="payoutWidth" :label="$t('__payout')" align="center" />
+      <el-table-column prop="valid_bet_amount" :width="validBetAmountWidth" :label="$t('__validBetAmount')" align="center" />
+      <el-table-column prop="device" :width="deviceWidth" :label="$t('__device')" align="center" />
+      <el-table-column prop="ip" width="auto" label="IP" align="center" />
+      <!-- <template slot="append">
+        <el-table :data="subtotalInfo" :max-height="viewHeight">
+          <el-table-column prop="bet_amount" align="center" />
+          <el-table-column prop="payout" align="center" />
+          <el-table-column prop="valid_bet_amount" align="center" />
+          <el-table-column prop="count" align="center" />
+        </el-table>
+      </template> -->
     </el-table>
 
     <el-pagination
@@ -63,16 +126,16 @@
 </template>
 
 <script>
-import { memberBetSearch } from '@/api/memberBet'
+import { memberBetSearch, memberBetExport } from '@/api/memberBet'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import { getFullDate, getFullDateString, getLastDate, getLastDateClearTime } from '@/utils/transDate'
+import { formatNumber } from '@/utils/numberFormat'
+import { mapGetters } from 'vuex'
 
-const defaultForm = {
-  betTime: getLastDateClearTime(30),
-  payoutTime: getLastDateClearTime(30)
-}
+const defaultSearchTimeType = 'betTime'
+const defaultSearchTime = getLastDateClearTime(30)
 
 export default {
   name: 'MemberBet',
@@ -97,70 +160,135 @@ export default {
           }
         }]
       },
-      searchForm: JSON.parse(JSON.stringify(defaultForm)),
-      selectForm: {},
-      editDialogVisible: false,
-      createDialogVisible: false
+      searchTimeType: defaultSearchTimeType,
+      searchTime: defaultSearchTime,
+      searchForm: {},
+      searchItems: {},
+      totalInfo: {},
+      subtotalInfo: {}
     }
   },
   computed: {
+    ...mapGetters([
+      'memberBetTimeType'
+    ]),
+    agentWidth() {
+      return this.calculateWidth(this.$t('__agent'), 'agent', 10) + 'px'
+    },
+    memberWidth() {
+      return this.calculateWidth(this.$t('__player'), 'member', 10) + 'px'
+    },
+    orderNumberWidth() {
+      return this.calculateWidth(this.$t('__orderNumber'), 'order_number', 9) + 'px'
+    },
+    betTimeWidth() {
+      return this.calculateWidth(this.$t('__betTime'), 'bet_time', 9) + 'px'
+    },
+    payoutTimeWidth() {
+      return this.calculateWidth(this.$t('__payoutTime'), 'payout_time', 9) + 'px'
+    },
+    gameTypeWidth() {
+      return this.calculateWidth(this.$t('__gameType'), 'game_type', 9) + 'px'
+    },
+    roundIdWidth() {
+      return this.calculateWidth(this.$t('__roundId'), 'round_id', 11) + 'px'
+    },
+    gameResultWidth() {
+      return this.calculateWidth(this.$t('__gameResult'), 'gameResultLabel', 10) + 'px'
+    },
+    statusWidth() {
+      return this.calculateWidth(this.$t('__status'), 'status', 20) + 'px'
+    },
+    gamePlayWidth() {
+      return this.calculateWidth(this.$t('__gamePlay'), 'gamePlayLabel', 10) + 'px'
+    },
+    betAmountWidth() {
+      return this.calculateWidth(this.$t('__betAmount'), 'bet_amount', 9) + 'px'
+    },
+    payoutWidth() {
+      return this.calculateWidth(this.$t('__payout'), 'payout', 9) + 'px'
+    },
+    validBetAmountWidth() {
+      return this.calculateWidth(this.$t('__validBetAmount'), 'valid_bet_amount', 9) + 'px'
+    },
+    deviceWidth() {
+      return this.calculateWidth(this.$t('__device'), 'device', 9) + 'px'
+    }
   },
   created() {
+    this.$store.dispatch('memberBet/setMemberBetTimeType')
     this.setHeight()
     this.handleCurrentChange(1)
   },
   methods: {
+    calculateWidth(defaultText, key, charWidth) {
+      let width = defaultText.length * 24.5
+      this.tableData.forEach(element => {
+        const str = element[key].toString()
+        const fontWidth = str.length * charWidth
+        if (width < fontWidth) {
+          width = fontWidth
+        }
+      })
+      return width
+    },
     onReset() {
-      this.searchForm = JSON.parse(JSON.stringify(defaultForm))
+      this.searchForm = {}
+      this.searchTimeType = defaultSearchTimeType
+      this.searchTime = defaultSearchTime
     },
     handleRequest(data) {
       this.selectLoading = true
       this.dataLoading = true
-      data.page = this.currentPage
-      data.rowsCount = this.pageSize
-      if (!data.betTime) {
-        data.betTime = JSON.parse(JSON.stringify(defaultForm)).betTime
+      const searchTime = []
+      if (!this.searchTime) {
+        this.searchTime = defaultSearchTime
       }
-      for (let i = 0, max = data.betTime.length; i < max; i++) {
-        data.betTime[i] = getFullDate(data.betTime[i])
-      }
-      if (!data.payoutTime) {
-        data.payoutTime = JSON.parse(JSON.stringify(defaultForm)).payoutTime
-      }
-      for (let i = 0, max = data.payoutTime.length; i < max; i++) {
-        data.payoutTime[i] = getFullDate(data.payoutTime[i])
-      }
+      this.searchTime.forEach(element => {
+        searchTime.push(getFullDate(element))
+      })
+      data[this.searchTimeType] = searchTime
     },
     handleRespone(res) {
+      this.searchForm[this.searchTimeType] = undefined
+      this.totalInfo = res.totalInfo
+      this.subtotalInfo = res.subtotalInfo
+      this.searchItems = res.searchItems
       this.tableData = res.rows
+      this.tableData.forEach(element => {
+        const winner = this.searchItems.gameResult.find(item => item.key === element.gameResult.result).nickname
+        const player = this.searchItems.gameResult.find(item => item.key === 1).nickname
+        const playerPoint = element.gameResult.player_point
+        const banker = this.searchItems.gameResult.find(item => item.key === 0).nickname
+        const bankerPoint = element.gameResult.banker_point
+        const pointResult = player + playerPoint + ' ' + banker + bankerPoint
+        element.gameResultLabel = winner + '(' + pointResult + ')'
+        element.gamePlayLabel = element.game_play.nickname
+        element.bet_amount = formatNumber(element.bet_amount)
+        element.payout = formatNumber(element.payout)
+        element.valid_bet_amount = formatNumber(element.valid_bet_amount)
+      })
       this.currentPage = res.currentPage
       this.totalCount = res.totalCount
       this.selectLoading = false
       this.dataLoading = false
     },
     onSubmit() {
-      this.onShowAllBtnClick(this.searchForm)
-    },
-    onShowAllBtnClick(data) {
-      this.handleRequest(data)
-      memberBetSearch(data).then((res) => {
+      this.searchForm.page = this.currentPage
+      this.searchForm.rowsCount = this.pageSize
+      this.handleRequest(this.searchForm)
+      memberBetSearch(this.searchForm).then((res) => {
         this.handleRespone(res)
       })
     },
     onExportBtnClick() {
-      this.selectLoading = true
-      this.dataLoading = true
-      const data = JSON.parse(JSON.stringify(this.searchForm))
-      if (data.searchTime) {
-        for (let i = 0, max = data.searchTime.length; i < max; i++) {
-          data.searchTime[i] = getFullDate(data.searchTime[i])
-        }
-      }
-      // operationLogExport(data).then((res) => {
-      //   this.onDataOut(res.rows)
-      //   this.selectLoading = false
-      //   this.dataLoading = false
-      // })
+      this.handleRequest(this.searchForm)
+      memberBetExport(this.searchForm).then((res) => {
+        this.searchForm[this.searchTimeType] = undefined
+        this.onDataOut(res.rows)
+        this.selectLoading = false
+        this.dataLoading = false
+      })
     },
     onDataOut(tableData) {
       require.ensure([], () => {
@@ -174,7 +302,7 @@ export default {
         tableData.splice(0, 1)
         const list = JSON.parse(JSON.stringify(tableData))
         const data = this.formatJson(filterVal, list)
-        export_json_to_excel({ header: tHeader, data: data, filename: 'OperationLog_' + getFullDateString(new Date()) })
+        export_json_to_excel({ header: tHeader, data: data, filename: 'MemberBet_' + getFullDateString(new Date()) })
       })
     },
     formatJson(filterVal, jsonData) {
