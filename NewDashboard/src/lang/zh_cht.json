@@ -98,5 +98,7 @@
     "__payout": "輸贏",
     "__validBetAmount": "有效投注",
     "__device": "裝置",
-    "__tableId": "台號"
+    "__tableId": "台號",
+    "__subtotal": "小計",
+    "__total": "總計"
 }

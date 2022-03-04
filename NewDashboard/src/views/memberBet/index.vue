@@ -87,29 +87,34 @@
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight" style="width=100%">
-      <el-table-column prop="agent" :width="agentWidth" :label="$t('__agent')" align="center" />
-      <el-table-column prop="member" :width="memberWidth" :label="$t('__player')" align="center" />
-      <el-table-column prop="order_number" :width="orderNumberWidth" :label="$t('__orderNumber')" align="center" />
-      <el-table-column prop="bet_time" :width="betTimeWidth" :label="$t('__betTime')" align="center" />
-      <el-table-column prop="payout_time" :width="payoutTimeWidth" :label="$t('__payoutTime')" align="center" />
-      <el-table-column prop="game_type" :width="gameTypeWidth" :label="$t('__gameType')" align="center" />
-      <el-table-column prop="round_id" :width="roundIdWidth" :label="$t('__roundId')" align="center" />
-      <el-table-column prop="gameResultLabel" :width="gameResultWidth" :label="$t('__gameResult')" align="center" />
-      <el-table-column prop="status" :width="statusWidth" :label="$t('__status')" align="center" />
-      <el-table-column prop="gamePlayLabel" :width="gamePlayWidth" :label="$t('__gamePlay')" align="center" />
-      <el-table-column prop="bet_amount" :width="betAmountWidth" :label="$t('__betAmount')" align="center" />
-      <el-table-column prop="payout" :width="payoutWidth" :label="$t('__payout')" align="center" />
-      <el-table-column prop="valid_bet_amount" :width="validBetAmountWidth" :label="$t('__validBetAmount')" align="center" />
-      <el-table-column prop="device" :width="deviceWidth" :label="$t('__device')" align="center" />
-      <el-table-column prop="ip" width="auto" label="IP" align="center" />
-      <!-- <template slot="append">
-        <el-table :data="subtotalInfo" :max-height="viewHeight">
-          <el-table-column prop="bet_amount" align="center" />
-          <el-table-column prop="payout" align="center" />
-          <el-table-column prop="valid_bet_amount" align="center" />
-          <el-table-column prop="count" align="center" />
-        </el-table>
-      </template> -->
+      <el-table-column :label="$t('__total')" align="right">
+        <el-table-column prop="agent" :width="agentWidth" :label="$t('__agent')" align="center" />
+        <el-table-column prop="member" :width="memberWidth" :label="$t('__player')" align="center" />
+        <el-table-column prop="order_number" :width="orderNumberWidth" :label="$t('__orderNumber')" align="center" />
+        <el-table-column prop="bet_time" :width="betTimeWidth" :label="$t('__betTime')" align="center" />
+        <el-table-column prop="payout_time" :width="payoutTimeWidth" :label="$t('__payoutTime')" align="center" />
+        <el-table-column prop="game_type" :width="gameTypeWidth" :label="$t('__gameType')" align="center" />
+        <el-table-column prop="round_id" :width="roundIdWidth" :label="$t('__roundId')" align="center" />
+        <el-table-column prop="gameResultLabel" :width="gameResultWidth" :label="$t('__gameResult')" align="center" />
+        <el-table-column prop="status" :width="statusWidth" :label="$t('__status')" align="center" />
+        <el-table-column prop="gamePlayLabel" :width="gamePlayWidth" :label="$t('__gamePlay')" align="center" />
+      </el-table-column>
+      <el-table-column :label="totalInfo.bet_amount" align="center">
+        <el-table-column prop="bet_amount" :width="betAmountWidth" :label="$t('__betAmount')" align="center" />
+      </el-table-column>
+      <el-table-column :label="totalInfo.payout" align="center">
+        <el-table-column prop="payout" :width="payoutWidth" :label="$t('__payout')" align="center" />
+      </el-table-column>
+      <el-table-column :label="totalInfo.valid_bet_amount" align="center">
+        <el-table-column prop="valid_bet_amount" :width="validBetAmountWidth" :label="$t('__validBetAmount')" align="center" />
+      </el-table-column>
+      <el-table-column :label="$t('__total') + ' ' + totalInfo.count" align="center">
+        <el-table-column prop="device" :width="deviceWidth" :label="$t('__device')" align="center" />
+        <el-table-column prop="ip" width="auto" label="IP" align="center" />
+      </el-table-column>
+      <template slot="append">
+        <span>123</span>
+      </template>
     </el-table>
 
     <el-pagination
@@ -131,7 +136,6 @@ import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import { getFullDate, getFullDateString, getLastDate, getLastDateClearTime } from '@/utils/transDate'
-import { formatNumber } from '@/utils/numberFormat'
 import { mapGetters } from 'vuex'
 
 const defaultSearchTimeType = 'betTime'
@@ -164,7 +168,12 @@ export default {
       searchTime: defaultSearchTime,
       searchForm: {},
       searchItems: {},
-      totalInfo: {},
+      totalInfo: {
+        count: 0,
+        bet_amount: '',
+        payout: '',
+        valid_bet_amount: ''
+      },
       subtotalInfo: {}
     }
   },
@@ -203,13 +212,13 @@ export default {
       return this.calculateWidth(this.$t('__gamePlay'), 'gamePlayLabel', 10) + 'px'
     },
     betAmountWidth() {
-      return this.calculateWidth(this.$t('__betAmount'), 'bet_amount', 9) + 'px'
+      return this.calculateHeaderWidth(this.$t('__betAmount'), 'bet_amount', 8) + 'px'
     },
     payoutWidth() {
-      return this.calculateWidth(this.$t('__payout'), 'payout', 9) + 'px'
+      return this.calculateHeaderWidth(this.$t('__payout'), 'payout', 9.5) + 'px'
     },
     validBetAmountWidth() {
-      return this.calculateWidth(this.$t('__validBetAmount'), 'valid_bet_amount', 9) + 'px'
+      return this.calculateHeaderWidth(this.$t('__validBetAmount'), 'valid_bet_amount', 8) + 'px'
     },
     deviceWidth() {
       return this.calculateWidth(this.$t('__device'), 'device', 9) + 'px'
@@ -230,6 +239,17 @@ export default {
           width = fontWidth
         }
       })
+      return width
+    },
+    calculateHeaderWidth(defaultText, key, charWidth) {
+      let width = defaultText.length * 24.5
+      if (this.totalInfo[key]) {
+        const str = this.totalInfo[key].toString()
+        const fontWidth = str.length * charWidth
+        if (width < fontWidth) {
+          width = fontWidth
+        }
+      }
       return width
     },
     onReset() {
@@ -264,9 +284,6 @@ export default {
         const pointResult = player + playerPoint + ' ' + banker + bankerPoint
         element.gameResultLabel = winner + '(' + pointResult + ')'
         element.gamePlayLabel = element.game_play.nickname
-        element.bet_amount = formatNumber(element.bet_amount)
-        element.payout = formatNumber(element.payout)
-        element.valid_bet_amount = formatNumber(element.valid_bet_amount)
       })
       this.currentPage = res.currentPage
       this.totalCount = res.totalCount
