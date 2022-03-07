@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="20%" :before-close="onClose">
+  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
     <el-row>
       <el-col :span="24">
         <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'LimitManagementDialog',
   props: {
@@ -69,6 +71,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      'device'
+    ]),
+    formWidth() {
+      return this.device === 'mobile' ? '40%' : '20%'
+    }
   },
   watch: {
     visible() {

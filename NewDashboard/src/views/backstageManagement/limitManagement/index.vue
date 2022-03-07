@@ -2,7 +2,7 @@
   <div class="limitManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
       <el-form-item class="inputTitle" label="ID">
         <el-input v-model="searchForm.id" type="number" />
@@ -15,9 +15,9 @@
       </el-form-item>
       <el-form-item>
         <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
       </el-form-item>
 
     </el-form>
@@ -174,15 +174,23 @@ export default {
   padding-bottom: 0px;
 }
 
+.el-form {
+  width: 100%;
+}
+
 .el-form-item {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .inputTitle {
   padding: 0px 0px 0px 5px;
 }
 
+.el-table {
+  width: 100%;
+}
+
 .el-input {
-  width: 140px;
+  width: 80px;
 }
 </style>

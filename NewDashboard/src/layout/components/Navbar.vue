@@ -3,12 +3,9 @@
     <hamburger :is-active="!isCollapse" class="hamburger" @toggleClick="toggleSideBar" />
     <div>
       <el-col class="language-container" :span="12">
-        <span class="language-title">
-          {{ $t(getLang($i18n.locale)) }}
-        </span>
         <el-dropdown trigger="click">
           <span class="language-dropdown">
-            {{ $t('__laguage') }}<i class="el-icon-arrow-down el-icon--right" />
+            {{ $t(getLang($i18n.locale)) }}<i class="el-icon-arrow-down el-icon--right" />
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="changeLocale('zh_cht')">{{ $t(getLang('zh_cht')) }}</el-dropdown-item>
@@ -92,12 +89,6 @@ export default {
   &-container {
     height: 50px;
     line-height: 50px;
-  }
-  &-title {
-    color: #ffffff;
-    display: inline-block;
-    height: 50px;
-    padding-left: 15px;
   }
   &-dropdown {
     cursor: pointer;
