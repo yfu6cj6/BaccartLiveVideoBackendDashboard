@@ -1,5 +1,5 @@
 <template>
-  <div class="permissionManagement-container">
+  <div class="announcementManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
@@ -81,7 +81,7 @@
 
     <el-pagination
       layout="prev, pager, next, jumper"
-      class="permissionManagement-pagination"
+      class="announcementManagement-pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
@@ -279,7 +279,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.permissionManagement {
+.announcementManagement {
   &-container {
     margin: 5px;
   }

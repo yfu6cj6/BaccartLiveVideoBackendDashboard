@@ -1,20 +1,27 @@
 <template>
-  <div class="currencyManagement-container">
+  <div class="gameTableManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
-      <el-form-item class="inputTitle" label="ID">
-        <el-input v-model="searchForm.id" type="number" />
+      <el-form-item class="inputTitle" :label="$t('__tableId')">
+        <el-select v-model="searchForm.table_id" multiple>
+          <el-option v-for="item in searchItems.tables" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__name')">
-        <el-input v-model="searchForm.name" />
+      <el-form-item class="inputTitle" :label="$t('__liveBetAreaId')">
+        <el-select v-model="searchForm.live_bet_area_id" multiple>
+          <el-option v-for="item in searchItems.liveBetArea" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__code')">
-        <el-input v-model="searchForm.code" />
+      <el-form-item class="inputTitle" :label="$t('__betMin')">
+        <el-input v-model="searchForm.bet_min" type="number" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__symbol')">
-        <el-input v-model="searchForm.symbol" />
+      <el-form-item class="inputTitle" :label="$t('__betMax')">
+        <el-input v-model="searchForm.bet_max" type="number" />
+      </el-form-item>
+      <el-form-item class="inputTitle" :label="$t('__totalBetMax')">
+        <el-input v-model="searchForm.total_bet_max" type="number" />
       </el-form-item>
       <el-form-item>
         <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
@@ -26,10 +33,12 @@
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
-      <el-table-column prop="id" min-width="25px" label="ID" align="center" />
-      <el-table-column prop="name" min-width="80px" :label="$t('__name')" align="center" />
-      <el-table-column prop="code" min-width="80px" :label="$t('__code')" align="center" />
-      <el-table-column prop="symbol" min-width="80px" :label="$t('__symbol')" align="center" />
+      <el-table-column prop="id" label="ID" align="center" />
+      <el-table-column prop="table_id" :label="$t('__tableId')" align="center" />
+      <el-table-column prop="live_bet_area_id" :label="$t('__liveBetAreaId')" align="center" />
+      <el-table-column prop="bet_min" :label="$t('__betMin')" align="center" />
+      <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" />
+      <el-table-column prop="total_bet_max" :label="$t('__totalBetMax')" align="center" />
       <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
@@ -40,7 +49,7 @@
 
     <el-pagination
       layout="prev, pager, next, jumper"
-      class="currencyManagement-pagination"
+      class="gameTableManagement-pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
@@ -48,20 +57,26 @@
       @current-change="handlePageChangeByClient"
     />
 
-    <CurrencyManagementDialog
+    <GameTableManagementDialog
       :title="$t('__edit')"
       :visible="editDialogVisible"
       :confirm="$t('__revise')"
       :form="selectForm"
+      :tables="searchItems.tables"
+      :live-bet-area="searchItems.liveBetArea"
+      :is-edit="true"
       @close="closeDialogEven"
       @confirm="editDialogConfirmEven"
     />
 
-    <CurrencyManagementDialog
+    <GameTableManagementDialog
       :title="$t('__create')"
       :visible="createDialogVisible"
       :confirm="$t('__confirm')"
       :form="selectForm"
+      :tables="searchItems.tables"
+      :live-bet-area="searchItems.liveBetArea"
+      :is-edit="false"
       @close="closeDialogEven"
       @confirm="createDialogConfirmEven"
     />
@@ -69,20 +84,21 @@
 </template>
 
 <script>
-import { currencySearch, currencyCreate, currencyEdit, currencyDelete } from '@/api/backstageManagement/currencyManagement'
+import { gameTableSearch, gameTableCreate, gameTableEdit, gameTableDelete } from '@/api/backstageManagement/gameTableManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
-import CurrencyManagementDialog from './currencyManagementDialog'
+import GameTableManagementDialog from './gameTableManagementDialog'
 
 export default {
-  name: 'CurrencyManagement',
-  components: { CurrencyManagementDialog },
+  name: 'GameTableManagement',
+  components: { GameTableManagementDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
       searchForm: {},
       selectForm: {},
+      searchItems: {},
       editDialogVisible: false,
       createDialogVisible: false
     }
@@ -98,8 +114,9 @@ export default {
       this.searchForm = {}
     },
     handleRespone(res) {
-      this.allDataByClient = res
-      this.totalCount = res.length
+      this.searchItems = res.searchItems
+      this.allDataByClient = res.rows
+      this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
       this.selectLoading = false
       this.dataLoading = false
@@ -115,12 +132,14 @@ export default {
     onShowAllBtnClick(data) {
       this.selectLoading = true
       this.dataLoading = true
-      currencySearch(data).then((res) => {
+      gameTableSearch(data).then((res) => {
         this.handleRespone(res)
       })
     },
     onCreateBtnClick() {
       this.selectForm = {}
+      this.selectForm.table_id = this.searchItems.tables[0].key
+      this.selectForm.live_bet_area_id = this.searchItems.liveBetArea[0].key
       this.createDialogVisible = true
       this.editDialogVisible = false
     },
@@ -128,7 +147,7 @@ export default {
       this.createDialogVisible = false
       this.selectLoading = true
       this.dataLoading = true
-      currencyCreate(data).then((res) => {
+      gameTableCreate(data).then((res) => {
         this.handleRespone(res)
       }).catch(() => {
         this.handleResponeError()
@@ -144,7 +163,9 @@ export default {
         this.editDialogVisible = false
         this.selectLoading = true
         this.dataLoading = true
-        currencyEdit(data).then((res) => {
+        data.table_id = undefined
+        data.live_bet_area_id = undefined
+        gameTableEdit(data).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
           this.handleResponeError()
@@ -155,7 +176,7 @@ export default {
       this.$confirm(this.$t('__confirmDeletion')).then(_ => {
         this.selectLoading = true
         this.dataLoading = true
-        currencyDelete(item.id).then((res) => {
+        gameTableDelete(item.id).then((res) => {
           this.handleRespone(res)
         })
       }).catch(_ => {})
@@ -169,7 +190,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.currencyManagement {
+.gameTableManagement {
   &-container {
     margin: 5px;
   }
@@ -201,6 +222,6 @@ export default {
 }
 
 .el-select {
-  width: 110px;
+  width: 270px;
 }
 </style>

@@ -5,6 +5,7 @@
     "__homePage": "首頁",
     "__backstageManagement": "後臺管理",
     "__limitManagement": "限紅管理",
+    "__gameTableManagement": "遊戲桌管理",
     "__accountManagement": "帳號管理",
     "__roleManagement": "角色管理",
     "__permissionManagement": "權限管理",
@@ -107,5 +108,9 @@
     "__gameStartTime": "開局時間",
     "__gameEndTime": "結束時間",
     "__lowerLimit": "下限",
-    "__upperLimit": "上限"
+    "__upperLimit": "上限",
+    "__liveBetAreaId": "玩法",
+    "__betMin": "最小投注額",
+    "__betMax": "最大投注額",
+    "__totalBetMax": "單局最大總投注額"
 }

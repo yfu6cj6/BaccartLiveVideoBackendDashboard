@@ -185,8 +185,4 @@ export default {
 .el-input {
   width: 140px;
 }
-
-.el-select {
-  width: 110px;
-}
 </style>

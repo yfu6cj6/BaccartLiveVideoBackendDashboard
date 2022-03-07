@@ -85,6 +85,13 @@ export const asyncRoutes = [
         meta: { title: '__limitManagement', icon: 'el-icon-coin', permission: 'BackStageManage.CurrencyManage' }
       },
       {
+        // 遊戲桌管理
+        path: 'gameTableManagement',
+        name: 'GameTableManagement',
+        component: () => import('@/views/backstageManagement/gameTableManagement/index'),
+        meta: { title: '__gameTableManagement', icon: 'user', permission: 'BackStageManage.CurrencyManage' }
+      },
+      {
         // 帳號管理
         path: 'accountManagement',
         name: 'AccountManagement',
@@ -96,7 +103,7 @@ export const asyncRoutes = [
         path: 'roleManagement',
         name: 'RoleManagement',
         component: () => import('@/views/backstageManagement/roleManagement/index'),
-        meta: { title: '__roleManagement', icon: 'el-icon-s-custom', permission: 'BackStageManage.RoleManage' }
+        meta: { title: '__roleManagement', icon: 'people', permission: 'BackStageManage.RoleManage' }
       },
       {
         // 權限管理
@@ -110,14 +117,14 @@ export const asyncRoutes = [
         path: 'timeZoneManagement',
         name: 'TimeZoneManagement',
         component: () => import('@/views/backstageManagement/timeZoneManagement/index'),
-        meta: { title: '__timeZoneManagement', icon: 'el-icon-time', permission: 'BackStageManage.TimeZoneManage' }
+        meta: { title: '__timeZoneManagement', icon: 'international', permission: 'BackStageManage.TimeZoneManage' }
       },
       {
         // 幣別管理
         path: 'currencyManagement',
         name: 'CurrencyManagement',
         component: () => import('@/views/backstageManagement/currencyManagement/index'),
-        meta: { title: '__currencyManagement', icon: 'el-icon-coin', permission: 'BackStageManage.CurrencyManage' }
+        meta: { title: '__currencyManagement', icon: 'money', permission: 'BackStageManage.CurrencyManage' }
       },
       {
         // 公告管理
@@ -164,7 +171,7 @@ export const asyncRoutes = [
     path: '/gameResult',
     component: Layout,
     redirect: '/gameResult',
-    meta: { title: '__gameResult', icon: 'el-icon-tickets', permission: 'WhitelistManage' },
+    meta: { title: '__gameResult', icon: 'el-icon-c-scale-to-original', permission: 'WhitelistManage' },
     children: [{
       path: 'gameResult',
       name: 'GameResult',
@@ -178,7 +185,7 @@ export const asyncRoutes = [
     path: '/ipWhitelist',
     component: Layout,
     redirect: '/ipWhitelist',
-    meta: { title: '__ipWhitelist', icon: 'el-icon-user-solid', permission: 'WhitelistManage' },
+    meta: { title: '__ipWhitelist', icon: 'peoples', permission: 'WhitelistManage' },
     children: [{
       path: 'ipWhitelist',
       name: 'IpWhitelist',
@@ -192,7 +199,7 @@ export const asyncRoutes = [
     path: '/passwordReset',
     component: Layout,
     redirect: '/passwordReset',
-    meta: { title: '__modPassword', icon: 'el-icon-key', permission: 'ModPassword' },
+    meta: { title: '__modPassword', icon: 'password', permission: 'ModPassword' },
     children: [{
       path: 'modPassword',
       name: 'ModPassword',
