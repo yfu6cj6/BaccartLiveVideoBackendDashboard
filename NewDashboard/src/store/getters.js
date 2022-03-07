@@ -19,6 +19,7 @@ const getters = {
   announcementMarquee: state => state.backstageManagement.announcementMarquee,
   gameAnnouncements: state => state.backstageManagement.gameAnnouncements,
   agentAnnouncements: state => state.backstageManagement.agentAnnouncements,
-  memberBetTimeType: state => state.memberBet.memberBetTimeType
+  memberBetTimeType: state => state.memberBet.memberBetTimeType,
+  gameResultTimeType: state => state.gameResult.gameResultTimeType
 }
 export default getters

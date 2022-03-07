@@ -22,12 +22,12 @@
         />
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__agent')">
-        <el-select v-model="searchForm.agent_id" multiple style="width: 300px">
+        <el-select v-model="searchForm.agent_id" multiple>
           <el-option v-for="item in searchItems.agents" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__player')">
-        <el-select v-model="searchForm.member_id" multiple style="width: 300px">
+        <el-select v-model="searchForm.member_id" multiple>
           <el-option v-for="item in searchItems.members" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
@@ -35,7 +35,7 @@
         <el-input v-model="searchForm.order_number" type="number" />
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__gameType')">
-        <el-select v-model="searchForm.game_type" multiple style="width: 300px">
+        <el-select v-model="searchForm.game_type" multiple>
           <el-option v-for="item in searchItems.gameType" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
@@ -43,22 +43,22 @@
         <el-input v-model="searchForm.round_id" type="number" />
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__tableId')">
-        <el-select v-model="searchForm.table_id" multiple style="width: 300px">
+        <el-select v-model="searchForm.table_id" multiple>
           <el-option v-for="item in searchItems.tables" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__gameResult')">
-        <el-select v-model="searchForm.gameResult" multiple style="width: 300px">
+        <el-select v-model="searchForm.gameResult" multiple>
           <el-option v-for="item in searchItems.gameResult" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__status')">
-        <el-select v-model="searchForm.status" multiple style="width: 300px">
+        <el-select v-model="searchForm.status" multiple>
           <el-option v-for="item in searchItems.orderStatus" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__gamePlay')">
-        <el-select v-model="searchForm.game_play" multiple style="width: 300px">
+        <el-select v-model="searchForm.game_play" multiple>
           <el-option v-for="item in searchItems.game_play" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
@@ -72,7 +72,7 @@
         <el-input v-model="searchForm.valid_bet_amount" type="number" />
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__device')">
-        <el-select v-model="searchForm.device" multiple style="width: 300px">
+        <el-select v-model="searchForm.device" multiple>
           <el-option v-for="item in searchItems.deviceType" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
@@ -93,7 +93,6 @@
       :max-height="viewHeight"
       :span-method="arraySpanMethod"
       :row-class-name="tableRowClassName"
-      style="width=100%"
     >
       <el-table-column :label="$t('__totalCount')" align="right">
         <el-table-column prop="agent" :width="agentWidth" :label="$t('__agent')" align="center" />
@@ -103,9 +102,16 @@
         <el-table-column prop="payout_time" :width="payoutTimeWidth" :label="$t('__payoutTime')" align="center" />
         <el-table-column prop="game_type" :width="gameTypeWidth" :label="$t('__gameType')" align="center" />
         <el-table-column prop="round_id" :width="roundIdWidth" :label="$t('__roundId')" align="center" />
-        <el-table-column prop="gameResultLabel" :width="gameResultWidth" :label="$t('__gameResult')" align="center" />
+        <el-table-column :width="gameResultWidth" :label="$t('__gameResult')" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.gameResult.resultLabel }}
+            <span class="test">
+              {{ scope.row.gameResultPoints }}
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="status" :width="statusWidth" :label="$t('__status')" align="center" />
-        <el-table-column prop="gamePlayLabel" :width="gamePlayWidth" :label="$t('__gamePlay')" align="center" />
+        <el-table-column prop="game_play" :width="gamePlayWidth" :label="$t('__gamePlay')" align="center" />
       </el-table-column>
       <el-table-column :label="totalInfo.bet_amount" align="center">
         <el-table-column prop="bet_amount" :width="betAmountWidth" :label="$t('__betAmount')" align="center" />
@@ -216,13 +222,13 @@ export default {
       return this.calculateWidth(this.$t('__roundId'), 'round_id', 11) + 'px'
     },
     gameResultWidth() {
-      return this.calculateWidth(this.$t('__gameResult'), 'gameResultLabel', 10) + 'px'
+      return this.calculateWidth(this.$t('__gameResult'), 'gameResultPoints', 10) + 'px'
     },
     statusWidth() {
       return this.calculateWidth(this.$t('__status'), 'status', 20) + 'px'
     },
     gamePlayWidth() {
-      return this.calculateWidth(this.$t('__gamePlay'), 'gamePlayLabel', 10) + 'px'
+      return this.calculateWidth(this.$t('__gamePlay'), 'game_play', 10) + 'px'
     },
     betAmountWidth() {
       return this.calculateHeaderWidth(this.$t('__betAmount'), 'bet_amount', 8) + 'px'
@@ -244,13 +250,19 @@ export default {
   },
   methods: {
     tableRowClassName({ row, rowIndex }) {
-      if (rowIndex >= this.pageSize) {
-        return 'warning-row'
+      if (row.gameResult.result === 0) {
+        return 'bankerWin-row'
+      } else if (row.gameResult.result === 1) {
+        return 'playerWin-row'
+      } else if (row.gameResult.result === 2) {
+        return 'tie-row'
+      } else if (rowIndex >= this.tableData.length - 2) {
+        return 'settlement-row'
       }
       return ''
     },
     arraySpanMethod({ row, column, rowIndex, columnIndex }) {
-      if (rowIndex >= this.pageSize) {
+      if (rowIndex >= this.tableData.length - 2) {
         if (columnIndex === 0) {
           return [1, 10]
         } else if (columnIndex < 10) {
@@ -265,7 +277,7 @@ export default {
     calculateWidth(defaultText, key, charWidth) {
       let width = defaultText.length * 24.5
       for (let i = 0, max = this.tableData.length; i < max; i++) {
-        if (i >= this.pageSize) {
+        if (i >= max - 2) {
           continue
         }
         const element = this.tableData[i]
@@ -312,18 +324,19 @@ export default {
       this.searchItems = res.searchItems
       this.tableData = res.rows
       for (let i = 0, max = this.tableData.length; i < max; i++) {
-        if (i >= this.pageSize) {
+        if (i >= max - 2) {
           continue
         }
         const element = this.tableData[i]
         const winner = this.searchItems.gameResult.find(item => item.key === element.gameResult.result).nickname
+        element.gameResult.resultLabel = winner
         const player = this.searchItems.gameResult.find(item => item.key === 1).nickname
         const playerPoint = element.gameResult.player_point
         const banker = this.searchItems.gameResult.find(item => item.key === 0).nickname
         const bankerPoint = element.gameResult.banker_point
         const pointResult = player + playerPoint + ' ' + banker + bankerPoint
-        element.gameResultLabel = winner + '(' + pointResult + ')'
-        element.gamePlayLabel = element.game_play.nickname
+        element.gameResultPoints = '[' + pointResult + ']'
+        element.game_play = element.game_play.nickname
       }
       this.currentPage = res.currentPage
       this.totalCount = res.totalCount
@@ -370,22 +383,50 @@ export default {
 </script>
 
 <style>
+.el-table {
+  width: 100%;
+}
+
+.el-select {
+  width: 270px;
+}
+
 .el-table tr:nth-child(1) th:nth-child(1) {
   padding-right: 25px !important;
 }
 
-.el-table .warning-row {
+.el-table .settlement-row {
   background: #f5f7fa;
-  border: 5px;
+  font-weight: bolder;
 }
 
-.el-table .warning-row td:nth-child(1) {
+.el-table .settlement-row td:nth-child(1) {
   text-align: right;
   padding-right: 35px !important;
+}
+
+.el-table td:nth-child(8) {
+  font-weight: bolder;
+}
+
+.el-table .bankerWin-row td:nth-child(8) {
+  color: red;
+}
+
+.el-table .playerWin-row td:nth-child(8) {
+  color: blue;
+}
+
+.el-table .tie-row td:nth-child(8) {
+  color: green;
 }
 </style>
 
 <style lang="scss" scoped>
+.test {
+  color: black;
+}
+
 .operationLog {
   &-container {
     margin: 5px;

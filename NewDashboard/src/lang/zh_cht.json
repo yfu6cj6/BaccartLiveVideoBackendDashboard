@@ -102,5 +102,7 @@
     "__subtotalCount": "小計",
     "__totalCount": "總計",
     "__total": "共",
-    "__count": "筆"
+    "__count": "筆",
+    "__gameStartTime": "開局時間",
+    "__gameEndTime": "結束時間"
 }

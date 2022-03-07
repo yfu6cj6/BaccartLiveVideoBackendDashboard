@@ -153,6 +153,20 @@ export const asyncRoutes = [
   },
 
   {
+    // 遊戲結果
+    path: '/gameResult',
+    component: Layout,
+    redirect: '/gameResult',
+    meta: { title: '__gameResult', icon: 'el-icon-tickets', permission: 'WhitelistManage' },
+    children: [{
+      path: 'gameResult',
+      name: 'GameResult',
+      component: () => import('@/views/gameResult/index'),
+      meta: { title: '__gameResult' }
+    }]
+  },
+
+  {
     // IP白名單
     path: '/ipWhitelist',
     component: Layout,

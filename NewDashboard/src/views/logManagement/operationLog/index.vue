@@ -96,9 +96,6 @@ export default {
         }]
       },
       searchForm: JSON.parse(JSON.stringify(defaultForm)),
-      selectForm: {},
-      editDialogVisible: false,
-      createDialogVisible: false,
       showDetail: false
     }
   },
