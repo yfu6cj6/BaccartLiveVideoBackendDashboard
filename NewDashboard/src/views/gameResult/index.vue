@@ -25,17 +25,17 @@
         <el-input v-model="searchForm.round_id" type="number" />
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__tableId')">
-        <el-select v-model="searchForm.table_id" multiple style="width: 300px">
+        <el-select v-model="searchForm.table_id" multiple>
           <el-option v-for="item in searchItems.tables" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__gameType')">
-        <el-select v-model="searchForm.gameType" multiple style="width: 300px">
+        <el-select v-model="searchForm.gameType" multiple>
           <el-option v-for="item in searchItems.gameType" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__status')">
-        <el-select v-model="searchForm.status" multiple style="width: 300px">
+        <el-select v-model="searchForm.status" multiple>
           <el-option v-for="item in searchItems.gamePaymentStatus" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
@@ -61,7 +61,7 @@
       <el-table-column :label="$t('__gameResult')" align="center">
         <template slot-scope="scope">
           {{ scope.row.gameResult.resultLabel }}
-          <span class="test">
+          <span class="gameResultPoints">
             {{ scope.row.gameResultPoints }}
           </span>
         </template>
@@ -133,6 +133,16 @@ export default {
     this.handleCurrentChange(1)
   },
   methods: {
+    tableRowClassName({ row, rowIndex }) {
+      if (row.gameResult.result === 0) {
+        return 'bankerWin-gameResult'
+      } else if (row.gameResult.result === 1) {
+        return 'playerWin-gameResult'
+      } else if (row.gameResult.result === 2) {
+        return 'tie-gameResult'
+      }
+      return ''
+    },
     onReset() {
       this.searchForm = {}
       this.searchTimeType = defaultSearchTimeType
@@ -181,6 +191,23 @@ export default {
 }
 </script>
 
+<style>
+.el-table .bankerWin-gameResult td:nth-child(6) {
+  color: red;
+  font-weight: bolder;
+}
+
+.el-table .playerWin-gameResult td:nth-child(6) {
+  color: blue;
+  font-weight: bolder;
+}
+
+.el-table .tie-gameResult td:nth-child(6) {
+  color: green;
+  font-weight: bolder;
+}
+</style>
+
 <style lang="scss" scoped>
 .operationLog {
   &-container {
@@ -202,7 +229,7 @@ export default {
 }
 
 .el-form-item {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .inputTitle {
@@ -211,5 +238,13 @@ export default {
 
 .el-input {
   width: 140px;
+}
+
+.el-select {
+  width: 270px;
+}
+
+.gameResultPoints {
+  color: black;
 }
 </style>

@@ -4,6 +4,7 @@
     "__simplifiedChinese": "簡體",
     "__homePage": "首頁",
     "__backstageManagement": "後臺管理",
+    "__limitManagement": "限紅管理",
     "__accountManagement": "帳號管理",
     "__roleManagement": "角色管理",
     "__permissionManagement": "權限管理",
@@ -104,5 +105,7 @@
     "__total": "共",
     "__count": "筆",
     "__gameStartTime": "開局時間",
-    "__gameEndTime": "結束時間"
+    "__gameEndTime": "結束時間",
+    "__lowerLimit": "下限",
+    "__upperLimit": "上限"
 }

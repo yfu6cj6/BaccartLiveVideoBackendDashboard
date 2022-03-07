@@ -78,6 +78,13 @@ export const asyncRoutes = [
     displayChildren: true,
     children: [
       {
+        // 限紅管理
+        path: 'limitManagement',
+        name: 'LimitManagement',
+        component: () => import('@/views/backstageManagement/limitManagement/index'),
+        meta: { title: '__limitManagement', icon: 'el-icon-coin', permission: 'BackStageManage.CurrencyManage' }
+      },
+      {
         // 帳號管理
         path: 'accountManagement',
         name: 'AccountManagement',

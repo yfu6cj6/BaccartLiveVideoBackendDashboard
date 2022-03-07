@@ -93,6 +93,7 @@
       :max-height="viewHeight"
       :span-method="arraySpanMethod"
       :row-class-name="tableRowClassName"
+      :header-row-class-name="headerRowClassName"
     >
       <el-table-column :label="$t('__totalCount')" align="right">
         <el-table-column prop="agent" :width="agentWidth" :label="$t('__agent')" align="center" />
@@ -105,7 +106,7 @@
         <el-table-column :width="gameResultWidth" :label="$t('__gameResult')" align="center">
           <template slot-scope="scope">
             {{ scope.row.gameResult.resultLabel }}
-            <span class="test">
+            <span class="gameResultPoints">
               {{ scope.row.gameResultPoints }}
             </span>
           </template>
@@ -251,13 +252,19 @@ export default {
   methods: {
     tableRowClassName({ row, rowIndex }) {
       if (row.gameResult.result === 0) {
-        return 'bankerWin-row'
+        return 'bankerWin-member'
       } else if (row.gameResult.result === 1) {
-        return 'playerWin-row'
+        return 'playerWin-member'
       } else if (row.gameResult.result === 2) {
-        return 'tie-row'
+        return 'tie-member'
       } else if (rowIndex >= this.tableData.length - 2) {
-        return 'settlement-row'
+        return 'settlement-member'
+      }
+      return ''
+    },
+    headerRowClassName({ row, rowIndex }) {
+      if (rowIndex === 0) {
+        return 'header-member'
       }
       return ''
     },
@@ -383,50 +390,37 @@ export default {
 </script>
 
 <style>
-.el-table {
-  width: 100%;
-}
-
-.el-select {
-  width: 270px;
-}
-
-.el-table tr:nth-child(1) th:nth-child(1) {
+.header-member th:nth-child(1){
   padding-right: 25px !important;
 }
 
-.el-table .settlement-row {
+.el-table .settlement-member {
   background: #f5f7fa;
   font-weight: bolder;
 }
 
-.el-table .settlement-row td:nth-child(1) {
+.el-table .settlement-member td:nth-child(1) {
   text-align: right;
   padding-right: 35px !important;
 }
 
-.el-table td:nth-child(8) {
+.el-table .bankerWin-member td:nth-child(8) {
+  color: red;
   font-weight: bolder;
 }
 
-.el-table .bankerWin-row td:nth-child(8) {
-  color: red;
-}
-
-.el-table .playerWin-row td:nth-child(8) {
+.el-table .playerWin-member td:nth-child(8) {
   color: blue;
+  font-weight: bolder;
 }
 
-.el-table .tie-row td:nth-child(8) {
+.el-table .tie-member td:nth-child(8) {
   color: green;
+  font-weight: bolder;
 }
 </style>
 
 <style lang="scss" scoped>
-.test {
-  color: black;
-}
-
 .operationLog {
   &-container {
     margin: 5px;
@@ -454,7 +448,19 @@ export default {
   padding: 0px 0px 0px 5px;
 }
 
+.el-table {
+  width: 100%;
+}
+
+.el-select {
+  width: 270px;
+}
+
 .el-input {
   width: 140px;
+}
+
+.gameResultPoints {
+  color: black;
 }
 </style>
