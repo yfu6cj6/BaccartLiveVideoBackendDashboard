@@ -99,6 +99,8 @@
     "__validBetAmount": "有效投注",
     "__device": "裝置",
     "__tableId": "台號",
-    "__subtotal": "小計",
-    "__total": "總計"
+    "__subtotalCount": "小計",
+    "__totalCount": "總計",
+    "__total": "共",
+    "__count": "筆"
 }

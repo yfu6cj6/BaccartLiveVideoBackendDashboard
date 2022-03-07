@@ -86,8 +86,16 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight" style="width=100%">
-      <el-table-column :label="$t('__total')" align="right">
+    <el-table
+      v-loading="dataLoading"
+      :data="tableData"
+      border
+      :max-height="viewHeight"
+      :span-method="arraySpanMethod"
+      :row-class-name="tableRowClassName"
+      style="width=100%"
+    >
+      <el-table-column :label="$t('__totalCount')" align="right">
         <el-table-column prop="agent" :width="agentWidth" :label="$t('__agent')" align="center" />
         <el-table-column prop="member" :width="memberWidth" :label="$t('__player')" align="center" />
         <el-table-column prop="order_number" :width="orderNumberWidth" :label="$t('__orderNumber')" align="center" />
@@ -108,13 +116,10 @@
       <el-table-column :label="totalInfo.valid_bet_amount" align="center">
         <el-table-column prop="valid_bet_amount" :width="validBetAmountWidth" :label="$t('__validBetAmount')" align="center" />
       </el-table-column>
-      <el-table-column :label="$t('__total') + ' ' + totalInfo.count" align="center">
+      <el-table-column :label="totalInfoCountString" align="center">
         <el-table-column prop="device" :width="deviceWidth" :label="$t('__device')" align="center" />
         <el-table-column prop="ip" width="auto" label="IP" align="center" />
       </el-table-column>
-      <template slot="append">
-        <span>123</span>
-      </template>
     </el-table>
 
     <el-pagination
@@ -181,6 +186,14 @@ export default {
     ...mapGetters([
       'memberBetTimeType'
     ]),
+    subtotalWidth() {
+      return 'width: ' + this.agentWidth + this.memberWidth + this.orderNumberWidth +
+      this.betTimeWidth + this.payoutTimeWidth + this.gameTypeWidth +
+      this.roundIdWidth + this.gameResultWidth + this.statusWidth + this.gamePlayWidth + 'px;'
+    },
+    totalInfoCountString() {
+      return this.$t('__total') + ' ' + this.totalInfo.count + ' ' + this.$t('__count')
+    },
     agentWidth() {
       return this.calculateWidth(this.$t('__agent'), 'agent', 10) + 'px'
     },
@@ -230,15 +243,38 @@ export default {
     this.handleCurrentChange(1)
   },
   methods: {
+    tableRowClassName({ row, rowIndex }) {
+      if (rowIndex >= this.pageSize) {
+        return 'warning-row'
+      }
+      return ''
+    },
+    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+      if (rowIndex >= this.pageSize) {
+        if (columnIndex === 0) {
+          return [1, 10]
+        } else if (columnIndex < 10) {
+          return [0, 0]
+        } else if (columnIndex === 13) {
+          return [1, 2]
+        } else if (columnIndex === 14) {
+          return [0, 0]
+        }
+      }
+    },
     calculateWidth(defaultText, key, charWidth) {
       let width = defaultText.length * 24.5
-      this.tableData.forEach(element => {
+      for (let i = 0, max = this.tableData.length; i < max; i++) {
+        if (i >= this.pageSize) {
+          continue
+        }
+        const element = this.tableData[i]
         const str = element[key].toString()
         const fontWidth = str.length * charWidth
         if (width < fontWidth) {
           width = fontWidth
         }
-      })
+      }
       return width
     },
     calculateHeaderWidth(defaultText, key, charWidth) {
@@ -275,7 +311,11 @@ export default {
       this.subtotalInfo = res.subtotalInfo
       this.searchItems = res.searchItems
       this.tableData = res.rows
-      this.tableData.forEach(element => {
+      for (let i = 0, max = this.tableData.length; i < max; i++) {
+        if (i >= this.pageSize) {
+          continue
+        }
+        const element = this.tableData[i]
         const winner = this.searchItems.gameResult.find(item => item.key === element.gameResult.result).nickname
         const player = this.searchItems.gameResult.find(item => item.key === 1).nickname
         const playerPoint = element.gameResult.player_point
@@ -284,7 +324,7 @@ export default {
         const pointResult = player + playerPoint + ' ' + banker + bankerPoint
         element.gameResultLabel = winner + '(' + pointResult + ')'
         element.gamePlayLabel = element.game_play.nickname
-      })
+      }
       this.currentPage = res.currentPage
       this.totalCount = res.totalCount
       this.selectLoading = false
@@ -328,6 +368,22 @@ export default {
   }
 }
 </script>
+
+<style>
+.el-table tr:nth-child(1) th:nth-child(1) {
+  padding-right: 25px !important;
+}
+
+.el-table .warning-row {
+  background: #f5f7fa;
+  border: 5px;
+}
+
+.el-table .warning-row td:nth-child(1) {
+  text-align: right;
+  padding-right: 35px !important;
+}
+</style>
 
 <style lang="scss" scoped>
 .operationLog {
