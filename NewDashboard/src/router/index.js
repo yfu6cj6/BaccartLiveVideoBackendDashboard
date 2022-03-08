@@ -153,6 +153,22 @@ export const asyncRoutes = [
   },
 
   {
+    // 代理管理
+    path: '/agentManagement',
+    component: Layout,
+    redirect: '/agentManagement',
+    meta: { title: '__agentManagement', icon: 'el-icon-notebook-2', permission: 'LogManage' },
+    displayChildren: true,
+    children: [{
+      // 代理列表
+      path: 'agentList',
+      name: 'AgentList',
+      component: () => import('@/views/agentManagement/agentList/index'),
+      meta: { title: '__agentList', icon: 'el-icon-document', permission: 'LogManage.OperationLog' }
+    }]
+  },
+
+  {
     // 投注紀錄
     path: '/memberBet',
     component: Layout,
