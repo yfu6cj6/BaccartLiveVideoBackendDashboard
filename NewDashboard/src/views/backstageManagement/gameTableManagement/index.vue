@@ -2,15 +2,15 @@
   <div class="gameTableManagement-container">
     <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__tableId')">
-        <el-select v-model="searchForm.table_id" multiple>
+        <el-select v-model="searchForm.table_id" multiple class="tableId-select">
           <el-option v-for="item in searchItems.tables" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__liveBetAreaId')">
-        <el-select v-model="searchForm.live_bet_area_id" multiple>
+        <el-select v-model="searchForm.live_bet_area_id" multiple class="liveBetAreaId-select">
           <el-option v-for="item in searchItems.liveBetArea" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
@@ -23,23 +23,23 @@
       <el-form-item class="inputTitle" :label="$t('__totalBetMax')">
         <el-input v-model="searchForm.total_bet_max" type="number" />
       </el-form-item>
-      <el-form-item>
-        <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+      <el-form-item class="formButton">
+        <el-button icon="el-icon-minus" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
       </el-form-item>
 
     </el-form>
 
     <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
-      <el-table-column prop="id" label="ID" align="center" />
-      <el-table-column prop="table_id" :label="$t('__tableId')" align="center" />
-      <el-table-column prop="live_bet_area_id" :label="$t('__liveBetAreaId')" align="center" />
-      <el-table-column prop="bet_min" :label="$t('__betMin')" align="center" />
-      <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" />
-      <el-table-column prop="total_bet_max" :label="$t('__totalBetMax')" align="center" />
-      <el-table-column min-width="100px" :label="$t('__operate')" align="center">
+      <el-table-column prop="id" label="ID" align="center" width="auto" :min-width="idWidth" />
+      <el-table-column prop="table_id" :label="$t('__tableId')" align="center" width="auto" :min-width="tableIdWidth" />
+      <el-table-column prop="live_bet_area_id" :label="$t('__liveBetAreaId')" width="auto" align="center" :min-width="liveBetAreaIdWidth" />
+      <el-table-column prop="bet_min" :label="$t('__betMin')" align="center" width="auto" :min-width="betMinWidth" />
+      <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" width="auto" :min-width="betMaxWidth" />
+      <el-table-column prop="total_bet_max" :label="$t('__totalBetMax')" align="center" width="auto" :min-width="totalBetMaxWidth" />
+      <el-table-column :label="$t('__operate')" align="center" width="auto" min-width="200px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
@@ -88,12 +88,13 @@ import { gameTableSearch, gameTableCreate, gameTableEdit, gameTableDelete } from
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
+import handleTableWidth from '@/layout/mixin/handleTableWidth'
 import GameTableManagementDialog from './gameTableManagementDialog'
 
 export default {
   name: 'GameTableManagement',
   components: { GameTableManagementDialog },
-  mixins: [handlePageChange, shared, handleViewResize],
+  mixins: [handlePageChange, shared, handleViewResize, handleTableWidth],
   data() {
     return {
       searchForm: {},
@@ -104,6 +105,24 @@ export default {
     }
   },
   computed: {
+    idWidth() {
+      return this.calculateWidth('ID', 'id', 10) + 'px'
+    },
+    tableIdWidth() {
+      return this.calculateWidth(this.$t('__tableId'), 'table_id', 10) + 'px'
+    },
+    liveBetAreaIdWidth() {
+      return this.calculateWidth(this.$t('__liveBetAreaId'), 'live_bet_area_id', 14) + 'px'
+    },
+    betMinWidth() {
+      return this.calculateWidth(this.$t('__betMin'), 'bet_min', 10) + 'px'
+    },
+    betMaxWidth() {
+      return this.calculateWidth(this.$t('__betMax'), 'bet_max', 10) + 'px'
+    },
+    totalBetMaxWidth() {
+      return this.calculateWidth(this.$t('__totalBetMax'), 'total_bet_max', 10) + 'px'
+    }
   },
   created() {
     this.setHeight()
@@ -210,7 +229,7 @@ export default {
 }
 
 .el-form-item {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .inputTitle {
@@ -218,10 +237,18 @@ export default {
 }
 
 .el-input {
-  width: 140px;
+  width: 80px;
 }
 
-.el-select {
-  width: 270px;
+.tableId-select {
+  width: 150px;
+}
+
+.liveBetAreaId-select {
+  width: 180px;
+}
+
+.formButton {
+  margin-left: 15px;
 }
 </style>

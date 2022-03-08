@@ -193,11 +193,6 @@ export default {
     ...mapGetters([
       'memberBetTimeType'
     ]),
-    subtotalWidth() {
-      return 'width: ' + this.agentWidth + this.memberWidth + this.orderNumberWidth +
-      this.betTimeWidth + this.payoutTimeWidth + this.gameTypeWidth +
-      this.roundIdWidth + this.gameResultWidth + this.statusWidth + this.gamePlayWidth + 'px;'
-    },
     totalInfoCountString() {
       return this.$t('__total') + ' ' + this.totalInfo.count + ' ' + this.$t('__count')
     },
@@ -441,7 +436,7 @@ export default {
 }
 
 .el-form-item {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .inputTitle {

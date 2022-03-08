@@ -20,9 +20,15 @@
     & + div 
       display: flex !important
 
+.el-table__header
+  border: solid
+  border-width: thin
+
+.el-table--border th
+  color: black
 
 .el-table td, .el-table th
-  padding: 8px 0 !important
+  padding: 0px 0 !important
 
 .el-table td .cell
   line-height: 2.5em
@@ -42,6 +48,13 @@
 .el-date-editor .el-range-separator,.el-date-editor .el-range__icon,.el-date-editor .el-range__close-icon
   line-height: 1.5em
 
+.el-form--inline .el-form-item
+  margin: 0
+
+.el-form-item__label
+  padding: 0 5px 0 0
+  font-size: 12px
+
 .el-form-item__content
   .el-button
     padding: .5em 1em
@@ -52,7 +65,6 @@
 
 .el-pagination
   padding: 1em
-
 
 .el-pagination
   .el-button

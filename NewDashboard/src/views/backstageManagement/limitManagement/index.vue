@@ -13,8 +13,8 @@
       <el-form-item class="inputTitle" :label="$t('__upperLimit')">
         <el-input v-model="searchForm.upper_limit" type="number" />
       </el-form-item>
-      <el-form-item>
-        <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
+      <el-form-item class="formButton">
+        <el-button icon="el-icon-minus" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
         <el-button type="primary" size="mini" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
         <el-button type="primary" size="mini" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
         <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
@@ -178,19 +178,19 @@ export default {
   width: 100%;
 }
 
-.el-form-item {
-  margin-bottom: 0px;
+.formButton {
+  margin-left: 15px;
 }
 
 .inputTitle {
   padding: 0px 0px 0px 5px;
 }
 
-.el-table {
-  width: 100%;
+.el-input {
+  width: 80px
 }
 
-.el-input {
-  width: 80px;
+.el-table {
+  width: 100%;
 }
 </style>

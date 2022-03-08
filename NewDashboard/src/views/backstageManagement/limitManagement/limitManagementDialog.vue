@@ -23,10 +23,11 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
 
 export default {
   name: 'LimitManagementDialog',
+  mixins: [handleDialogWidth],
   props: {
     'title': {
       type: String,
@@ -71,12 +72,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'device'
-    ]),
-    formWidth() {
-      return this.device === 'mobile' ? '40%' : '20%'
-    }
   },
   watch: {
     visible() {
@@ -105,5 +100,8 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.el-input {
+  width: auto;
+}
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="25%" :before-close="onClose">
+  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
     <el-row>
       <el-col :span="24">
         <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
@@ -36,8 +36,11 @@
 </template>
 
 <script>
+import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
+
 export default {
   name: 'GameTableManagementDialog',
+  mixins: [handleDialogWidth],
   props: {
     'title': {
       type: String,
@@ -110,6 +113,9 @@ export default {
         this.$refs.editForm.clearValidate()
       }
     }
+  },
+  created() {
+    this.pc_Width = '25%'
   },
   methods: {
     onSubmit() {

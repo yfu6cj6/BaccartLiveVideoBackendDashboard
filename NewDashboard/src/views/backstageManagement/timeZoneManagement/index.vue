@@ -185,7 +185,7 @@ export default {
 }
 
 .el-form-item {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .inputTitle {
