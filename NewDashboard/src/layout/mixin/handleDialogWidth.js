@@ -1,34 +1,32 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  props: {
+    'pcWidth': {
+      type: String,
+      require: true,
+      default() {
+        return '20%'
+      }
+    },
+    'mobileWidth': {
+      type: String,
+      require: true,
+      default() {
+        return '40%'
+      }
+    }
+  },
   data() {
     return {
-      mobileWidth: '40%',
-      pcWidth: '20%'
     }
   },
   computed: {
     ...mapGetters([
       'device'
     ]),
-    pc_Width: {
-      get() {
-        return this.pcWidth
-      },
-      set(val) {
-        this.pcWidth = val
-      }
-    },
-    mobile_Width: {
-      get() {
-        return this.mobileWidth
-      },
-      set(val) {
-        this.mobileWidth = val
-      }
-    },
     formWidth() {
-      return this.device === 'mobile' ? this.mobile_Width : this.pc_Width
+      return this.device === 'mobile' ? this.mobileWidth : this.pcWidth
     }
   },
   methods: {

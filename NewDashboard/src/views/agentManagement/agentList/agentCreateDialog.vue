@@ -8,7 +8,7 @@
       <el-step :description="$t('__quotaConfiguration')" />
       <el-step :description="$t('__confirm')" />
     </el-steps>
-    <el-form v-if="curIndex === 0" ref="form0" class="row" label-width="auto" :model="form0" :rules="form0Rules">
+    <el-form v-show="curIndex === 0" ref="form0" class="row" label-width="auto" :model="form0" :rules="form0Rules">
       <el-form-item :label="$t('__accountGenerateMode')">
         <el-switch
           v-model="autoGenerateAccount"
@@ -34,7 +34,7 @@
         <el-input v-model="form0.remark" />
       </el-form-item>
     </el-form>
-    <el-form v-if="curIndex === 1" ref="form1" class="row" label-width="auto" :model="form1" :rules="form1Rules">
+    <el-form v-show="curIndex === 1" ref="form1" class="row" label-width="auto" :model="form1" :rules="form1Rules">
       <el-form-item :label="$t('__commissionRate')" prop="commission_rate">
         <el-input v-model="form1.commission_rate" type="number" :disabled="commissionRate === 0" />
         <span class="form1Tip">{{ commissionRateTip }}</span>
@@ -44,7 +44,7 @@
         <span class="form1Tip">{{ rollingRateTip }}</span>
       </el-form-item>
     </el-form>
-    <el-form v-if="curIndex === 2" ref="form2" class="row" label-width="auto" :model="form2" :rules="form2Rules">
+    <el-form v-show="curIndex === 2" ref="form2" class="row" label-width="auto" :model="form2" :rules="form2Rules">
       <el-form-item :label="$t('__commissionRate')" prop="commission_rate">
         <el-input v-model="form2.commission_rate" type="number" :disabled="commissionRate === 0" />
         <span class="form2Tip">{{ commissionRateTip }}</span>
@@ -55,9 +55,9 @@
       </el-form-item>
     </el-form>
     <span slot="footer">
-      <el-button v-if="curIndex > 0" @click="onPrevious">{{ $t("__previous") }}</el-button>
-      <el-button v-if="curIndex < 4" type="primary" @click="onNextStep">{{ $t("__nextStep") }}</el-button>
-      <el-button v-if="curIndex >= 4" type="primary" @click="onSubmit">{{ $t("__confirm") }}</el-button>
+      <el-button v-show="curIndex > 0" @click="onPrevious">{{ $t("__previous") }}</el-button>
+      <el-button v-show="curIndex < 4" type="primary" @click="onNextStep">{{ $t("__nextStep") }}</el-button>
+      <el-button v-show="curIndex >= 4" type="primary" @click="onSubmit">{{ $t("__confirm") }}</el-button>
     </span>
   </el-dialog>
 </template>
@@ -84,7 +84,7 @@ const defaultForm2 = {
 }
 
 export default {
-  name: 'AgentListDialog',
+  name: 'AgentCreateDialog',
   mixins: [handleDialogWidth],
   props: {
     'title': {
@@ -195,10 +195,6 @@ export default {
         })
       }
     }
-  },
-  created() {
-    this.pc_Width = '30%'
-    this.mobile_Width = '40%'
   },
   methods: {
     onNextStep() {

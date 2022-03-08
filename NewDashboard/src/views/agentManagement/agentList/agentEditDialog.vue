@@ -6,24 +6,14 @@
           <el-form-item label="ID" prop="id">
             <el-input v-model="editForm.id" :disabled="true" />
           </el-form-item>
-          <el-form-item v-if="!isEdit" :label="$t('__tableId')" prop="table_id">
-            <el-select v-model="editForm.table_id">
-              <el-option v-for="item in tables" :key="item.key" :label="item.nickname" :value="item.key" />
-            </el-select>
+          <el-form-item :label="$t('__name')" prop="name">
+            <el-input v-model="editForm.name" />
           </el-form-item>
-          <el-form-item v-if="!isEdit" :label="$t('__liveBetAreaId')" prop="live_bet_area_id">
-            <el-select v-model="editForm.live_bet_area_id">
-              <el-option v-for="item in liveBetArea" :key="item.key" :label="item.nickname" :value="item.key" />
-            </el-select>
+          <el-form-item :label="$t('__code')" prop="code">
+            <el-input v-model="editForm.code" />
           </el-form-item>
-          <el-form-item :label="$t('__betMin')" prop="bet_min">
-            <el-input v-model="editForm.bet_min" type="number" />
-          </el-form-item>
-          <el-form-item :label="$t('__betMax')" prop="bet_max">
-            <el-input v-model="editForm.bet_max" type="number" />
-          </el-form-item>
-          <el-form-item :label="$t('__totalBetMax')" prop="total_bet_max">
-            <el-input v-model="editForm.total_bet_max" type="number" />
+          <el-form-item :label="$t('__symbol')" prop="symbol">
+            <el-input v-model="editForm.symbol" />
           </el-form-item>
         </el-form>
       </el-col>
@@ -39,7 +29,7 @@
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
 
 export default {
-  name: 'GameTableManagementDialog',
+  name: 'AgentEditDialog',
   mixins: [handleDialogWidth],
   props: {
     'title': {
@@ -66,24 +56,6 @@ export default {
       default() {
         return {}
       }
-    },
-    'tables': {
-      type: Array,
-      require: true,
-      default() {
-        return []
-      }
-    },
-    'liveBetArea': {
-      type: Array,
-      require: true,
-      default() {
-        return []
-      }
-    },
-    'isEdit': {
-      type: Boolean,
-      require: true
     }
   },
   data: function() {
@@ -96,9 +68,9 @@ export default {
     }
     return {
       rules: {
-        bet_min: [{ required: true, trigger: 'blur', validator: validate }],
-        bet_max: [{ required: true, trigger: 'blur', validator: validate }],
-        total_bet_max: [{ required: true, trigger: 'blur', validator: validate }]
+        name: [{ required: true, trigger: 'blur', validator: validate }],
+        code: [{ required: true, trigger: 'blur', validator: validate }],
+        symbol: [{ required: true, trigger: 'blur', validator: validate }]
       },
       editForm: {}
     }

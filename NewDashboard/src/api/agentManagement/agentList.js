@@ -15,6 +15,14 @@ export function agentCreate(data) {
   })
 }
 
+export function agentEdit(data) {
+  return request({
+    url: '/agent/edit',
+    method: 'post',
+    data: data
+  })
+}
+
 export function agentCreateAccount() {
   return request({
     url: '/agent/createAccount',

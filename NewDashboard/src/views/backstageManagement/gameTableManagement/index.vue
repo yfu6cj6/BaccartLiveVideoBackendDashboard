@@ -65,6 +65,7 @@
       :tables="searchItems.tables"
       :live-bet-area="searchItems.liveBetArea"
       :is-edit="true"
+      :pc-width="'25%'"
       @close="closeDialogEven"
       @confirm="editDialogConfirmEven"
     />
@@ -77,6 +78,7 @@
       :tables="searchItems.tables"
       :live-bet-area="searchItems.liveBetArea"
       :is-edit="false"
+      :pc-width="'25%'"
       @close="closeDialogEven"
       @confirm="createDialogConfirmEven"
     />

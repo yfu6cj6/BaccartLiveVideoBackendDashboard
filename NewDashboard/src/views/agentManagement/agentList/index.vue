@@ -29,6 +29,11 @@
           <el-table-column prop="commission_rate" :label="$t('__commissionRate')" align="center" />
           <el-table-column prop="rolling_rate" :label="$t('__rollingRate')" align="center" />
           <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
+          <el-table-column :label="$t('__operate')" align="center" width="auto" min-width="200px">
+            <template slot-scope="scope">
+              <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+            </template>
+          </el-table-column>
         </el-table>
 
         <el-pagination
@@ -42,25 +47,40 @@
         />
       </el-col>
     </el-row>
-    <AgentListDialog
+
+    <AgentEditDialog
+      :title="$t('__edit')"
+      :visible="editDialogVisible"
+      :confirm="$t('__revise')"
+      :form="selectForm"
+      :pc-width="'30%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @confirm="editDialogConfirmEven"
+    />
+
+    <AgentCreateDialog
       :title="$t('__create')"
       :visible="createDialogVisible"
       :agent-info="selectAgentInfo"
+      :pc-width="'30%'"
+      :mobile-width="'40%'"
       @close="closeDialogEven"
     />
   </div>
 </template>
 
 <script>
-import { agentSearch, agentCreate } from '@/api/agentManagement/agentList'
+import { agentSearch, agentCreate, agentEdit } from '@/api/agentManagement/agentList'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
-import AgentListDialog from './agentListDialog'
+import AgentCreateDialog from './agentCreateDialog'
+import AgentEditDialog from './agentEditDialog'
 
 export default {
   name: 'AgentList',
-  components: { AgentListDialog },
+  components: { AgentCreateDialog, AgentEditDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
@@ -70,7 +90,9 @@ export default {
       },
       agentLevel: [],
       selectAgentInfo: {},
-      createDialogVisible: false
+      selectForm: {},
+      createDialogVisible: false,
+      editDialogVisible: false
     }
   },
   computed: {
@@ -103,6 +125,7 @@ export default {
     },
     onCreateBtnClick() {
       this.createDialogVisible = true
+      this.editDialogVisible = false
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
@@ -113,7 +136,24 @@ export default {
         this.handleResponeError()
       })
     },
+    onEditBtnClick(item) {
+      this.selectForm = JSON.parse(JSON.stringify(item))
+      this.createDialogVisible = false
+      this.editDialogVisible = true
+    },
+    editDialogConfirmEven(data) {
+      this.$confirm(this.$t('__confirmChanges')).then(_ => {
+        this.editDialogVisible = false
+        this.dataLoading = true
+        agentEdit(data).then((res) => {
+          this.handleRespone(res)
+        }).catch(() => {
+          this.handleResponeError()
+        })
+      }).catch(_ => {})
+    },
     closeDialogEven() {
+      this.editDialogVisible = false
       this.createDialogVisible = false
     },
     renderContent(h, { node, data, store }) {
