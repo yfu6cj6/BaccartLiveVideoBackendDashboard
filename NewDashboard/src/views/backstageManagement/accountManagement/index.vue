@@ -1,6 +1,6 @@
 <template>
   <div class="accountManagement-container">
-    <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
@@ -173,11 +173,9 @@ export default {
       })
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
-      this.selectLoading = false
       this.dataLoading = false
     },
     handleResponeError() {
-      this.selectLoading = false
       this.dataLoading = false
     },
     onSubmit() {
@@ -185,7 +183,6 @@ export default {
       this.onShowAllBtnClick(this.searchForm)
     },
     onShowAllBtnClick(data) {
-      this.selectLoading = true
       this.dataLoading = true
       data = JSON.parse(JSON.stringify(data))
       if (data.status === 'All') {
@@ -205,7 +202,6 @@ export default {
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
-      this.selectLoading = true
       this.dataLoading = true
       accountCreate(data).then((res) => {
         this.handleRespone(res)
@@ -223,7 +219,6 @@ export default {
     editDialogConfirmEven(data) {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
-        this.selectLoading = true
         this.dataLoading = true
         accountEdit(data).then((res) => {
           this.handleRespone(res)
@@ -234,15 +229,12 @@ export default {
     },
     onPasswordResetBtnClick(item) {
       this.$confirm(this.$t('__confirmReset')).then(_ => {
-        this.selectLoading = true
         this.dataLoading = true
         resetPassword(item).then((res) => {
-          this.selectLoading = false
           this.dataLoading = false
           this.resetDialogVisible = true
           this.newPassword = this.$t('__newPassword') + ': ' + res.password
         }).catch(() => {
-          this.selectLoading = false
           this.dataLoading = false
           this.$message({
             message: 'Reset failed',

@@ -1,6 +1,6 @@
 <template>
   <div class="limitManagement-container">
-    <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
         <el-button type="primary" size="mini" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
@@ -96,11 +96,9 @@ export default {
       this.allDataByClient = res.rows
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
-      this.selectLoading = false
       this.dataLoading = false
     },
     handleResponeError() {
-      this.selectLoading = false
       this.dataLoading = false
     },
     onSubmit() {
@@ -108,7 +106,6 @@ export default {
       this.onShowAllBtnClick(this.searchForm)
     },
     onShowAllBtnClick(data) {
-      this.selectLoading = true
       this.dataLoading = true
       tableLimitSearch(data).then((res) => {
         this.handleRespone(res)
@@ -121,7 +118,6 @@ export default {
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
-      this.selectLoading = true
       this.dataLoading = true
       tableLimitCreate(data).then((res) => {
         this.handleRespone(res)
@@ -137,7 +133,6 @@ export default {
     editDialogConfirmEven(data) {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
-        this.selectLoading = true
         this.dataLoading = true
         tableLimitEdit(data).then((res) => {
           this.handleRespone(res)

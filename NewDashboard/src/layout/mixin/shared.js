@@ -4,7 +4,6 @@ export default {
     return {
       allData: [],
       allDataByClient: [],
-      selectLoading: false,
       dataLoading: false
     }
   }

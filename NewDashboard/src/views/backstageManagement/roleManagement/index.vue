@@ -1,6 +1,6 @@
 <template>
   <div class="roleManagement-container">
-    <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
@@ -129,11 +129,9 @@ export default {
       this.searchTypes = this.searchTypes.concat(res.types)
       this.types = res.types
       this.handlePageChangeByClient(this.currentPage)
-      this.selectLoading = false
       this.dataLoading = false
     },
     handleResponeError() {
-      this.selectLoading = false
       this.dataLoading = false
     },
     onSubmit() {
@@ -141,7 +139,6 @@ export default {
       this.onShowAllBtnClick(this.searchForm)
     },
     onShowAllBtnClick(data) {
-      this.selectLoading = true
       this.dataLoading = true
       data = JSON.parse(JSON.stringify(data))
       if (data.type === 'All') {
@@ -158,7 +155,6 @@ export default {
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
-      this.selectLoading = true
       this.dataLoading = true
       roleCreate(data).then((res) => {
         this.handleRespone(res)
@@ -177,7 +173,6 @@ export default {
     },
     permissionDialogConfirmEven(selection) {
       this.permissionDialogVisible = false
-      this.selectLoading = true
       this.dataLoading = true
       const requestData = { id: this.selectForm.id, permissions: selection.map(element => { return element.name }) }
       setPermissions(requestData).then((res) => {
@@ -193,7 +188,6 @@ export default {
     editDialogConfirmEven(data) {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
-        this.selectLoading = true
         this.dataLoading = true
         roleEdit(data).then((res) => {
           this.handleRespone(res)

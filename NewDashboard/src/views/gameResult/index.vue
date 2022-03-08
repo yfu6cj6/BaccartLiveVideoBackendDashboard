@@ -1,6 +1,6 @@
 <template>
   <div class="operationLog-container">
-    <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
@@ -149,7 +149,6 @@ export default {
       this.searchTime = defaultSearchTime
     },
     handleRequest(data) {
-      this.selectLoading = true
       this.dataLoading = true
       const searchTime = []
       if (!this.searchTime) {
@@ -176,7 +175,6 @@ export default {
       })
       this.currentPage = res.currentPage
       this.totalCount = res.totalCount
-      this.selectLoading = false
       this.dataLoading = false
     },
     onSubmit() {

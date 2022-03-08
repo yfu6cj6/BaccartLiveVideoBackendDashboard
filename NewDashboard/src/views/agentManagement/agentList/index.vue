@@ -5,6 +5,7 @@
         <el-card shadow="never">
           <el-scrollbar>
             <el-tree
+              v-loading="dataLoading"
               :data="agentLevel"
               :props="defaultProps"
               node-key="AgentId"
@@ -88,16 +89,13 @@ export default {
       this.handlePageChangeByClient(this.currentPage)
       this.agentLevel = res.agentLevel
       this.selectAgentInfo = JSON.parse(JSON.stringify(this.agentLevel[0]))
-      this.selectLoading = false
       this.dataLoading = false
     },
     handleResponeError() {
-      this.selectLoading = false
       this.dataLoading = false
     },
     onSubmit() {
       this.tableData = []
-      this.selectLoading = true
       this.dataLoading = true
       agentSearch().then((res) => {
         this.handleRespone(res)
@@ -108,7 +106,6 @@ export default {
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
-      this.selectLoading = true
       this.dataLoading = true
       agentCreate(data).then((res) => {
         this.handleRespone(res)

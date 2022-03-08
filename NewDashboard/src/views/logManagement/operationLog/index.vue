@@ -1,6 +1,6 @@
 <template>
   <div class="operationLog-container">
-    <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
@@ -109,7 +109,6 @@ export default {
       this.searchForm = JSON.parse(JSON.stringify(defaultForm))
     },
     handleRequest(data) {
-      this.selectLoading = true
       this.dataLoading = true
       if (!data.searchTime) {
         data.searchTime = JSON.parse(JSON.stringify(defaultForm)).searchTime
@@ -123,7 +122,6 @@ export default {
       this.showDetail = res.showDetail
       this.currentPage = res.currentPage
       this.totalCount = res.totalCount
-      this.selectLoading = false
       this.dataLoading = false
     },
     onSubmit() {
@@ -135,12 +133,10 @@ export default {
       })
     },
     onExportBtnClick() {
-      this.selectLoading = true
       this.dataLoading = true
       this.handleRequest(this.searchForm)
       operationLogExport(this.searchForm).then((res) => {
         this.onDataOut(res.rows)
-        this.selectLoading = false
         this.dataLoading = false
       })
     },

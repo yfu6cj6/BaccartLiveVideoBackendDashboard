@@ -1,6 +1,6 @@
 <template>
   <div class="permissionManagement-container">
-    <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
@@ -127,11 +127,9 @@ export default {
       this.methodType.push('None')
       this.methodType = this.methodType.concat(res.methodType)
       this.handlePageChangeByClient(this.currentPage)
-      this.selectLoading = false
       this.dataLoading = false
     },
     handleResponeError() {
-      this.selectLoading = false
       this.dataLoading = false
     },
     onSubmit() {
@@ -139,7 +137,6 @@ export default {
       this.onShowAllBtnClick(this.searchForm)
     },
     onShowAllBtnClick(data) {
-      this.selectLoading = true
       this.dataLoading = true
       data = JSON.parse(JSON.stringify(data))
       if (data.methodType === 'All') {
@@ -157,7 +154,6 @@ export default {
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
-      this.selectLoading = true
       this.dataLoading = true
       if (data.method !== 'None') {
         data.methodType = data.method
@@ -179,7 +175,6 @@ export default {
     editDialogConfirmEven(data) {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
-        this.selectLoading = true
         this.dataLoading = true
         if (data.method !== 'None') {
           data.methodType = data.method
@@ -193,7 +188,6 @@ export default {
     },
     onDeleteBtnClick(item) {
       this.$confirm(this.$t('__confirmDeletion')).then(_ => {
-        this.selectLoading = true
         this.dataLoading = true
         permissionDelete(item.id).then((res) => {
           this.handleRespone(res)

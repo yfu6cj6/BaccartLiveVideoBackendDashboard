@@ -1,6 +1,6 @@
 <template>
   <div class="currencyManagement-container">
-    <el-form v-loading="selectLoading" class="filterForm" :inline="true" :model="searchForm">
+    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
       <el-form-item>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
@@ -101,11 +101,9 @@ export default {
       this.allDataByClient = res
       this.totalCount = res.length
       this.handlePageChangeByClient(this.currentPage)
-      this.selectLoading = false
       this.dataLoading = false
     },
     handleResponeError() {
-      this.selectLoading = false
       this.dataLoading = false
     },
     onSubmit() {
@@ -113,7 +111,6 @@ export default {
       this.onShowAllBtnClick(this.searchForm)
     },
     onShowAllBtnClick(data) {
-      this.selectLoading = true
       this.dataLoading = true
       currencySearch(data).then((res) => {
         this.handleRespone(res)
@@ -126,7 +123,6 @@ export default {
     },
     createDialogConfirmEven(data) {
       this.createDialogVisible = false
-      this.selectLoading = true
       this.dataLoading = true
       currencyCreate(data).then((res) => {
         this.handleRespone(res)
@@ -142,7 +138,6 @@ export default {
     editDialogConfirmEven(data) {
       this.$confirm(this.$t('__confirmChanges')).then(_ => {
         this.editDialogVisible = false
-        this.selectLoading = true
         this.dataLoading = true
         currencyEdit(data).then((res) => {
           this.handleRespone(res)
@@ -153,7 +148,6 @@ export default {
     },
     onDeleteBtnClick(item) {
       this.$confirm(this.$t('__confirmDeletion')).then(_ => {
-        this.selectLoading = true
         this.dataLoading = true
         currencyDelete(item.id).then((res) => {
           this.handleRespone(res)
