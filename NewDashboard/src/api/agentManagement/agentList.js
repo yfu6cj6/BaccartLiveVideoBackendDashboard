@@ -1,9 +1,10 @@
 import request from '@/utils/request'
 
-export function agentSearch() {
+export function agentSearch(data) {
   return request({
     url: '/agent/search',
-    method: 'post'
+    method: 'post',
+    data: data
   })
 }
 
@@ -30,9 +31,42 @@ export function agentCreateAccount() {
   })
 }
 
+// 取得盤口
 export function agentHandicap(data) {
   return request({
     url: '/agent/handicap',
+    method: 'post',
+    data: data
+  })
+}
+
+export function agentModPassword(data) {
+  return request({
+    url: '/agent/modPassword',
+    method: 'post',
+    data: data
+  })
+}
+
+export function agentTotalPlayerCount(data) {
+  return request({
+    url: '/agent/totalPlayerCount',
+    method: 'post',
+    data: data
+  })
+}
+
+export function agentCommissionRateLog(data) {
+  return request({
+    url: '/agent/commissionRateLog',
+    method: 'post',
+    data: data
+  })
+}
+
+export function agentRollingRateLog(data) {
+  return request({
+    url: '/agent/rollingRateLog',
     method: 'post',
     data: data
   })

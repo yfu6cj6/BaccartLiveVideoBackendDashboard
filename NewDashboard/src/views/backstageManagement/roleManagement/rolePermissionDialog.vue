@@ -2,7 +2,7 @@
   <el-dialog :title="title" :visible.sync="visible" width="40%" :before-close="onClose">
     <el-row>
       <el-col :span="24">
-        <el-table ref="multipleTable" v-loading="dataLoading" :data="serverData.allPermissions" tooltip-effect="dark" height="300" @selection-change="handleSelectionChange">
+        <el-table ref="multipleTable" :data="serverData.allPermissions" tooltip-effect="dark" height="300" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column prop="name" :label="$t('__name')" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="nickname" :label="$t('__nickname')" width="150" align="center" :show-overflow-tooltip="true" />
@@ -37,20 +37,12 @@ export default {
       default() {
         return ''
       }
-    },
-    'dataLoading': {
-      type: Boolean,
-      require: true,
-      default() {
-        return false
-      }
     }
   },
   data: function() {
     return {
       multipleSelection: [],
-      serverData: {},
-      test: false
+      serverData: {}
     }
   },
   methods: {

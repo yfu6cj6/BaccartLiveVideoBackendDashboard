@@ -76,7 +76,6 @@
       :title="$t('__setPermission')"
       :visible="permissionDialogVisible"
       :confirm="$t('__confirm')"
-      :data-loading="permissionDataLoading"
       @close="closeDialogEven"
       @confirm="permissionDialogConfirmEven"
     />
@@ -107,8 +106,7 @@ export default {
       types: [],
       editDialogVisible: false,
       createDialogVisible: false,
-      permissionDialogVisible: false,
-      permissionDataLoading: false
+      permissionDialogVisible: false
     }
   },
   computed: {
@@ -164,11 +162,11 @@ export default {
     },
     onPermissionBtnClick(item) {
       this.selectForm = JSON.parse(JSON.stringify(item))
-      this.permissionDialogVisible = true
-      this.permissionDataLoading = true
+      this.dataLoading = true
       getPermissions(item).then((res) => {
+        this.permissionDialogVisible = true
+        this.dataLoading = false
         this.$refs.rolePermissionDialog.setData(res)
-        this.permissionDataLoading = false
       })
     },
     permissionDialogConfirmEven(selection) {
