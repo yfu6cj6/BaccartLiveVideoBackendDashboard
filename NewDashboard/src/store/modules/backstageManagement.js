@@ -1,11 +1,14 @@
+import { announcementSearch } from '@/api/backstageManagement/announcementManagement'
+
 const state = {
-  accountStatus: status,
-  announcementMarquee: marquee,
+  accountStatusType: accountStatusType,
+  announcementMarqueeStatusType: announcementMarqueeStatusType,
   gameAnnouncements: [],
-  agentAnnouncements: []
+  agentAnnouncements: [],
+  marqueeMsg: []
 }
 
-const status = [{
+const accountStatusType = [{
   key: '0',
   nickname: '__close'
 },
@@ -14,7 +17,7 @@ const status = [{
   nickname: '__open'
 }]
 
-const marquee = [{
+const announcementMarqueeStatusType = [{
   key: '0',
   nickname: '__close'
 },
@@ -24,26 +27,53 @@ const marquee = [{
 }]
 
 const mutations = {
-  SET_ACCOUNT_STATUS(state) {
-    state.accountStatus = status
+  SET_ACCOUNT_STATUSTYPE(state) {
+    state.accountStatusType = accountStatusType
   },
-  SET_ANNOUNCEMENT_MARQUEE(state) {
-    state.announcementMarquee = marquee
+  SET_ANNOUNCEMENT_MARQUEE_STATUSTYPE(state) {
+    state.announcementMarqueeStatusType = announcementMarqueeStatusType
   },
   SET_ANNOUNCEMENTS(state, { gameAnnouncements, agentAnnouncements }) {
     state.gameAnnouncements = gameAnnouncements
     state.agentAnnouncements = agentAnnouncements
+  },
+  SET_MARQUEE_MESSAGE(state, marqueeMsg) {
+    state.marqueeMsg = marqueeMsg
   }
 }
 const actions = {
-  setAccountStatus({ commit }) {
-    commit('SET_ACCOUNT_STATUS')
+  setAccountStatusType({ commit }) {
+    commit('SET_ACCOUNT_STATUSTYPE')
   },
-  setAnnouncementMarquee({ commit }) {
-    commit('SET_ANNOUNCEMENT_MARQUEE')
+  setAnnouncementMarqueeStatusType({ commit }) {
+    commit('SET_ANNOUNCEMENT_MARQUEE_STATUSTYPE')
   },
-  setAnnouncements({ commit }, { gameAnnouncements, agentAnnouncements }) {
-    commit('SET_ANNOUNCEMENTS', { gameAnnouncements, agentAnnouncements })
+  setAnnouncement({ commit }, respone) {
+    const gameAnnouncements = []
+    const agentAnnouncements = []
+    const bulletinMsg = []
+    respone.rows.forEach(element => {
+      if (element.is_marquee === '1') {
+        bulletinMsg.push(element.content)
+      }
+      if (element.type === 'game') {
+        gameAnnouncements.push(element)
+      } else if (element.type === 'agent') {
+        agentAnnouncements.push(element)
+      }
+    })
+    commit('SET_MARQUEE_MESSAGE', bulletinMsg)
+    commit('SET_ANNOUNCEMENTS', { gameAnnouncements: gameAnnouncements, agentAnnouncements: agentAnnouncements })
+  },
+  getAnnouncement({ dispatch, commit }) {
+    return new Promise((resolve, reject) => {
+      announcementSearch({}).then(res => {
+        dispatch('setAnnouncement', res)
+        resolve(res)
+      }).catch(error => {
+        reject(error)
+      })
+    })
   }
 }
 

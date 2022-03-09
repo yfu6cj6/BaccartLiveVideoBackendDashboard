@@ -32,7 +32,7 @@
           </el-form-item>
           <el-form-item :label="$t('__status')" prop="status">
             <el-select v-model="editForm.status">
-              <el-option v-for="item in accountStatus" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+              <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('__remark')" prop="remark">
@@ -98,7 +98,7 @@ export default {
         return []
       }
     },
-    'accountStatus': {
+    'accountStatusType': {
       type: Array,
       require: true,
       default() {

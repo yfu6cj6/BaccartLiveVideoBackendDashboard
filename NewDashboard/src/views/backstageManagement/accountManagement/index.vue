@@ -75,7 +75,7 @@
       :form="selectForm"
       :roles="roles"
       :agents="agents"
-      :account-status="accountStatus"
+      :account-status-type="accountStatusType"
       :time-zones="timeZones"
       :has-password="false"
       @close="closeDialogEven"
@@ -89,7 +89,7 @@
       :form="selectForm"
       :roles="roles"
       :agents="agents"
-      :account-status="accountStatus"
+      :account-status-type="accountStatusType"
       :time-zones="timeZones"
       :has-password="true"
       @close="closeDialogEven"
@@ -139,13 +139,13 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'accountStatus'
+      'accountStatusType'
     ])
   },
   created() {
-    this.$store.dispatch('backstageManagement/setAccountStatus')
+    this.$store.dispatch('backstageManagement/setAccountStatusType')
     this.status.push({ key: 'All', nickname: '__all' })
-    this.status = this.status.concat(this.accountStatus)
+    this.status = this.status.concat(this.accountStatusType)
     this.setHeight()
     this.handleCurrentChange(1)
   },
@@ -195,7 +195,7 @@ export default {
     onCreateBtnClick() {
       this.selectForm = JSON.parse(JSON.stringify(defaultForm))
       this.selectForm.agentId = this.agents[0].key
-      this.selectForm.status = this.accountStatus[1].key
+      this.selectForm.status = this.accountStatusType[1].key
       this.selectForm.timeZone = this.timeZones[0].key
       this.createDialogVisible = true
       this.editDialogVisible = false

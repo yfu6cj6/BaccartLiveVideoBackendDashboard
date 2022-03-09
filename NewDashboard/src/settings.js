@@ -18,11 +18,5 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether need tagsView
    */
-  tagsView: true,
-
-  /**
-   * @type {Array}
-   * @description marqueeMsg
-   */
-  marqueeMsg: []
+  tagsView: true
 }

@@ -17,7 +17,7 @@
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__marquee')">
         <el-select v-model="searchForm.is_marquee" multiple>
-          <el-option v-for="item in announcementMarquee" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+          <el-option v-for="item in announcementMarqueeStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
         </el-select>
       </el-form-item>
       <el-form-item class="inputTitle" :label="$t('__announcementDate')">
@@ -96,7 +96,7 @@
       :picker-options="pickerOptions"
       :form="selectForm"
       :method-type="methodType"
-      :announcement-marquee="announcementMarquee"
+      :announcement-marquee-status-type="announcementMarqueeStatusType"
       @close="closeDialogEven"
       @confirm="editDialogConfirmEven"
     />
@@ -108,7 +108,7 @@
       :form="selectForm"
       :picker-options="pickerOptions"
       :method-type="methodType"
-      :announcement-marquee="announcementMarquee"
+      :announcement-marquee-status-type="announcementMarqueeStatusType"
       @close="closeDialogEven"
       @confirm="createDialogConfirmEven"
     />
@@ -157,11 +157,11 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'announcementMarquee'
+      'announcementMarqueeStatusType'
     ])
   },
   created() {
-    this.$store.dispatch('backstageManagement/setAnnouncementMarquee')
+    this.$store.dispatch('backstageManagement/setAnnouncementMarqueeStatusType')
     this.setHeight()
     this.handleCurrentChange(1)
   },
@@ -188,24 +188,9 @@ export default {
     },
     handleRespone(res) {
       this.methodType = res.methodType
-      const gameAnnouncements = []
-      const agentAnnouncements = []
-      const bulletinMsg = []
       res.rows.forEach(element => {
-        if (element.is_marquee === '1') {
-          bulletinMsg.push(element.content)
-          element.marquee = 'V'
-        } else {
-          element.marquee = ''
-        }
-        if (element.type === 'game') {
-          gameAnnouncements.push(element)
-        } else if (element.type === 'agent') {
-          agentAnnouncements.push(element)
-        }
+        element.marquee = element.is_marquee === '1' ? 'V' : ''
       })
-      this.$store.dispatch('settings/changeSetting', { marqueeMsg: bulletinMsg })
-      this.$store.dispatch('backstageManagement/setAnnouncements', { gameAnnouncements: gameAnnouncements, agentAnnouncements: agentAnnouncements })
       this.allDataByClient = res.rows
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
@@ -226,7 +211,7 @@ export default {
     },
     onCreateBtnClick() {
       this.selectForm = {}
-      this.selectForm.is_marquee = this.announcementMarquee[1].key
+      this.selectForm.is_marquee = this.announcementMarqueeStatusType[1].key
       this.selectForm.type = this.methodType[0].key
       this.createDialogVisible = true
       this.editDialogVisible = false
@@ -236,6 +221,7 @@ export default {
       this.handleRequest(data)
       announcementCreate(data).then((res) => {
         this.handleRespone(res)
+        this.$store.dispatch('backstageManagement/setAnnouncement', res)
       }).catch(() => {
         this.handleResponeError()
       })
@@ -253,6 +239,7 @@ export default {
         this.handleRequest(data)
         announcementEdit(data).then((res) => {
           this.handleRespone(res)
+          this.$store.dispatch('backstageManagement/setAnnouncement', res)
         }).catch(() => {
           this.handleResponeError()
         })
@@ -263,6 +250,7 @@ export default {
         this.dataLoading = true
         announcementDelete(item.id).then((res) => {
           this.handleRespone(res)
+          this.$store.dispatch('backstageManagement/setAnnouncement', res)
         })
       }).catch(_ => {})
     },

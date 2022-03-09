@@ -31,7 +31,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { announcementSearch } from '@/api/backstageManagement/announcementManagement'
 
 export default {
   name: 'Home',
@@ -52,23 +51,6 @@ export default {
     }
   },
   created() {
-    announcementSearch({}).then((res) => {
-      const gameAnnouncements = []
-      const agentAnnouncements = []
-      const bulletinMsg = []
-      res.rows.forEach(element => {
-        if (element.is_marquee === '1') {
-          bulletinMsg.push(element.content)
-        }
-        if (element.type === 'game') {
-          gameAnnouncements.push(element)
-        } else if (element.type === 'agent') {
-          agentAnnouncements.push(element)
-        }
-      })
-      this.$store.dispatch('settings/changeSetting', { marqueeMsg: bulletinMsg })
-      this.$store.dispatch('backstageManagement/setAnnouncements', { gameAnnouncements: gameAnnouncements, agentAnnouncements: agentAnnouncements })
-    })
   },
   methods: {
   }

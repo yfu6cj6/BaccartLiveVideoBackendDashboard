@@ -39,6 +39,8 @@ router.beforeEach(async(to, from, next) => {
           const accessRoutes = await store.dispatch('permission/generateRoutes', permissions)
           router.addRoutes(accessRoutes)
 
+          await store.dispatch('backstageManagement/getAnnouncement')
+
           next({ ...to, replace: true })
         } catch (error) {
           // remove token and go to login page to re-login

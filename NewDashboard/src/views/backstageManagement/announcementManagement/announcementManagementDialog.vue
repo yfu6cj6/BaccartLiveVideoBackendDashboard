@@ -8,7 +8,7 @@
           </el-form-item>
           <el-form-item class="inputTitle" :label="$t('__marquee')" prop="is_marquee">
             <el-select v-model="editForm.is_marquee">
-              <el-option v-for="item in announcementMarquee" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+              <el-option v-for="item in announcementMarqueeStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('__announcementTitle')" prop="title">
@@ -99,7 +99,7 @@ export default {
         return []
       }
     },
-    'announcementMarquee': {
+    'announcementMarqueeStatusType': {
       type: Array,
       require: true,
       default() {

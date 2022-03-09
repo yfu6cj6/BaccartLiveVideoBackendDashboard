@@ -6,14 +6,17 @@
           <el-form-item label="ID" prop="id">
             <el-input v-model="editForm.id" :disabled="true" />
           </el-form-item>
-          <el-form-item :label="$t('__name')" prop="name">
-            <el-input v-model="editForm.name" />
+          <el-form-item :label="$t('__agentNickname')" prop="nickname">
+            <el-input v-model="editForm.nickname" />
           </el-form-item>
-          <el-form-item :label="$t('__code')" prop="code">
-            <el-input v-model="editForm.code" />
+          <el-form-item :label="$t('__timeZone')" prop="timeZone">
+            <el-input v-model="editForm.timeZone" />
           </el-form-item>
-          <el-form-item :label="$t('__symbol')" prop="symbol">
-            <el-input v-model="editForm.symbol" />
+          <el-form-item :label="$t('__commissionRate')" prop="commission_rate">
+            <el-input v-model="editForm.commission_rate" />
+          </el-form-item>
+          <el-form-item :label="$t('__rollingRate')" prop="rolling_rate">
+            <el-input v-model="editForm.rolling_rate" />
           </el-form-item>
         </el-form>
       </el-col>
