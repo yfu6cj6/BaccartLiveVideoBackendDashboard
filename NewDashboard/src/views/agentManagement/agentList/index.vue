@@ -143,6 +143,8 @@
       :title="$t('__create')"
       :visible="createDialogVisible"
       :agent-info="agentInfo"
+      :form0="form0"
+      :form1="form1"
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
@@ -162,6 +164,20 @@ import AgentEditDialog from './agentEditDialog'
 import AgentLimitDialog from './agentLimitDialog'
 import { mapGetters } from 'vuex'
 
+const defaultForm0 = {
+  account: '',
+  nickname: '',
+  password: '',
+  confirmPassword: '',
+  time_zone: 1,
+  currency: 1
+}
+
+const defaultForm1 = {
+  commission_rate: '0',
+  rolling_rate: '0'
+}
+
 export default {
   name: 'AgentList',
   components: { AgentCreateDialog, AgentEditDialog, AgentLimitDialog },
@@ -176,6 +192,8 @@ export default {
       agentInfo: {},
       selectForm: {},
       handicaps: [],
+      form0: JSON.parse(JSON.stringify(defaultForm0)),
+      form1: JSON.parse(JSON.stringify(defaultForm1)),
       createDialogVisible: false,
       editDialogVisible: false,
       limitDialogVisible: false,
@@ -262,6 +280,8 @@ export default {
         const currency = await currencySearch({})
         this.$refs.agentCreateDialog.setCurrency(currency)
       }
+      this.form0 = JSON.parse(JSON.stringify(defaultForm0))
+      this.form1 = JSON.parse(JSON.stringify(defaultForm1))
       this.dataLoading = false
       this.createDialogVisible = true
     },

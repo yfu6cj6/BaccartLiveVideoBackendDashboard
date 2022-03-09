@@ -54,7 +54,7 @@
         <span class="form1Tip">{{ rollingRateTip }}</span>
       </el-form-item>
     </el-form>
-    <el-table v-show="curIndex === 2" ref="form2" :data="agentInfo.handicaps" tooltip-effect="dark" @selection-change="handleSelectionHandicaps">
+    <el-table v-show="curIndex === 2" :data="agentInfo.handicaps" tooltip-effect="dark" @selection-change="handleSelectionHandicaps">
       <el-table-column type="selection" align="center" />
       <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
@@ -72,26 +72,7 @@
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
-import { agentCreateAccount } from '@/api/agentManagement/agentList'
-
-const defaultForm0 = {
-  account: '',
-  nickname: '',
-  password: '',
-  confirmPassword: '',
-  time_zone: 1,
-  currency: 1
-}
-
-const defaultForm1 = {
-  commission_rate: '0',
-  rolling_rate: '0'
-}
-
-const defaultForm2 = {
-  commission_rate: '0',
-  rolling_rate: '0'
-}
+import { agentCreateAccount, agentGetSetBalanceInfo } from '@/api/agentManagement/agentList'
 
 export default {
   name: 'AgentCreateDialog',
@@ -115,11 +96,18 @@ export default {
         return {}
       }
     },
-    'rollingRate': {
-      type: Number,
+    'form0': {
+      type: Object,
       require: true,
       default() {
-        return 0
+        return {}
+      }
+    },
+    'form1': {
+      type: Object,
+      require: true,
+      default() {
+        return {}
       }
     }
   },
@@ -182,14 +170,7 @@ export default {
         commission_rate: [{ required: true, trigger: 'blur', validator: validateCommissionRate }],
         rolling_rate: [{ required: true, trigger: 'blur', validator: validateRollingRate }]
       },
-      form2Rules: {
-        commission_rate: [{ required: true, trigger: 'blur', validator: validate }],
-        rolling_rate: [{ required: true, trigger: 'blur', validator: validate }]
-      },
       autoGenerateAccount: false,
-      form0: JSON.parse(JSON.stringify(defaultForm0)),
-      form1: JSON.parse(JSON.stringify(defaultForm1)),
-      form2: JSON.parse(JSON.stringify(defaultForm2)),
       curIndex: 0,
       time_zone: [],
       currency: [],
@@ -220,8 +201,6 @@ export default {
     visible() {
       if (this.visible) {
         this.curIndex = 0
-        this.form0 = JSON.parse(JSON.stringify(defaultForm0))
-        this.form1 = JSON.parse(JSON.stringify(defaultForm1))
       } else {
         this.$refs.form0.clearValidate()
         this.$refs.form1.clearValidate()
@@ -232,6 +211,13 @@ export default {
         agentCreateAccount().then((res) => {
           this.form0.account = res.account
           this.$refs.form0.clearValidate()
+        })
+      }
+    },
+    curIndex() {
+      if (this.curIndex === 3) {
+        agentGetSetBalanceInfo({ agentId: this.agentInfo.id }).then((res) => {
+          console.log(res)
         })
       }
     }

@@ -71,3 +71,11 @@ export function agentRollingRateLog(data) {
     data: data
   })
 }
+
+export function agentGetSetBalanceInfo(data) {
+  return request({
+    url: '/agent/getSetBalanceInfo',
+    method: 'post',
+    data: data
+  })
+}
