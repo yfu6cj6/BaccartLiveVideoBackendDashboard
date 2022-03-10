@@ -157,14 +157,12 @@ export const asyncRoutes = [
     path: '/agentManagement',
     component: Layout,
     redirect: '/agentManagement',
-    meta: { title: '__agentManagement', icon: 'el-icon-notebook-2', permission: 'LogManage' },
-    displayChildren: true,
+    meta: { title: '__agentManagement', icon: 'tree', permission: 'LogManage' },
     children: [{
-      // 代理列表
-      path: 'agentList',
-      name: 'AgentList',
-      component: () => import('@/views/agentManagement/agentList/index'),
-      meta: { title: '__agentList', icon: 'el-icon-document', permission: 'LogManage.OperationLog' }
+      path: 'agentManagement',
+      name: 'AgentManagement',
+      component: () => import('@/views/agentManagement/index'),
+      meta: { title: '__agentManagement' }
     }]
   },
 

@@ -13,7 +13,6 @@
     "__logManagement": "日誌管理",
     "__announcementManagement": "公告管理",
     "__agentManagement": "代理管理",
-    "__agentList": "代理列表",
     "__modPassword": "修改密碼",
     "__timeZone": "時區",
     "__cityName": "時區城市",
@@ -139,5 +138,7 @@
     "__overMax": "超過最大值",
     "__lowerMin": "低於最小值",
     "__depositBalance": "存入額度",
-    "__userPassword": "操作者密碼"
+    "__userPassword": "操作者密碼",
+    "__subAccount": "子帳號",
+    "__addSubAgent": "新增下線代理"
 }

@@ -66,7 +66,10 @@
             <span class="labelContent">{{ agentInfo.lastLoginAt }}</span>
           </label>
         </el-row>
-        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onAddSubAgentBtnClick()">{{ $t("__agent") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onAddSubAgentBtnClick()">{{ $t("__player") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onAddSubAgentBtnClick()">{{ $t("__subAccount") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onAddSubAgentBtnClick()">{{ $t("__addSubAgent") }}</el-button>
         <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
           <el-table-column :label="$t('__agent')" align="center">
             <template slot-scope="scope">
@@ -180,7 +183,7 @@ const defaultForm = {
 }
 
 export default {
-  name: 'AgentList',
+  name: 'AgentManagement',
   components: { AgentEditDialog, AgentLimitDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
@@ -272,7 +275,7 @@ export default {
         this.dataLoading = false
       })
     },
-    async onCreateBtnClick() {
+    async onAddSubAgentBtnClick() {
       this.dataLoading = true
       const timezone = await timezoneSearch({})
       this.$refs.agentCreateDialog.setTimeZone(timezone)
