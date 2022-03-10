@@ -1,35 +1,139 @@
 <template>
   <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
-    <el-row>
-      <el-col :span="24">
-        <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
-          <el-form-item label="ID" prop="id">
-            <el-input v-model="editForm.id" :disabled="true" />
-          </el-form-item>
-          <el-form-item :label="$t('__agentNickname')" prop="nickname">
-            <el-input v-model="editForm.nickname" />
-          </el-form-item>
-          <el-form-item :label="$t('__timeZone')" prop="timeZone">
-            <el-input v-model="editForm.timeZone" />
-          </el-form-item>
-          <el-form-item :label="$t('__commissionRate')" prop="commission_rate">
-            <el-input v-model="editForm.commission_rate" />
-          </el-form-item>
-          <el-form-item :label="$t('__rollingRate')" prop="rolling_rate">
-            <el-input v-model="editForm.rolling_rate" />
-          </el-form-item>
-        </el-form>
-      </el-col>
-    </el-row>
+    <label class="agentName">{{ $t('__superiorAgent') + ': ' }}
+      <span>{{ agentInfo.fullName }}</span>
+    </label>
+    <el-steps :active="curIndex" align-center finish-status="success">
+      <el-step :description="$t('__agentInfo')" />
+      <el-step :description="$t('__rate')" />
+      <el-step :description="$t('__limit')" />
+      <el-step :description="$t('__quotaConfiguration')" />
+      <el-step :description="$t('__confirm')" />
+    </el-steps>
+    <el-form v-show="curIndex === 0" ref="step1" :model="form" :rules="step1Rules">
+      <el-form-item :label="$t('__accountGenerateMode')">
+        <el-switch
+          v-model="autoGenerateAccount"
+          active-color="blue"
+          inactive-color="blue"
+          :active-text="$t('__auto')"
+          :inactive-text="$t('__manual')"
+        />
+      </el-form-item>
+      <el-form-item :label="$t('__agentAccount')" prop="account">
+        <el-input v-model="form.account" />
+      </el-form-item>
+      <el-form-item :label="$t('__agentNickname')" prop="nickname">
+        <el-input v-model="form.nickname" />
+      </el-form-item>
+      <el-form-item v-if="isCreate" :label="$t('__password')" prop="password">
+        <el-input v-model="form.password" show-password />
+      </el-form-item>
+      <el-form-item v-if="isCreate" :label="$t('__confirmPassword')" prop="confirmPassword">
+        <el-input v-model="form.confirmPassword" show-password />
+      </el-form-item>
+      <el-form-item :label="$t('__timeZone')" prop="time_zone">
+        <el-select v-model="form.time_zone">
+          <el-option v-for="item in time_zone" :key="item.id" :label="item.city_name" :value="item.id" />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="showCurrency" :label="$t('__currency')" prop="currency">
+        <el-select v-model="form.currency">
+          <el-option v-for="item in currency" :key="item.id" :label="item.name" :value="item.id" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('__remark')" prop="remark">
+        <el-input v-model="form.remark" type="textarea" :rows="2" />
+      </el-form-item>
+    </el-form>
+    <el-form v-show="curIndex === 1" ref="step2" :model="form" :rules="step2Rules">
+      <el-form-item :label="$t('__commissionRate')" prop="commission_rate">
+        <el-input v-model="form.commission_rate" type="number" :disabled="agentInfo.commission_rate === 0" min="0" :max="agentInfo.commission_rate" />
+        <span class="step2Tip">{{ commissionRateTip }}</span>
+      </el-form-item>
+      <el-form-item :label="$t('__rollingRate')" prop="rolling_rate">
+        <el-input v-model="form.rolling_rate" type="number" :disabled="agentInfo.rolling_rate === 0" min="0" :max="agentInfo.rolling_rate" />
+        <span class="step2Tip">{{ rollingRateTip }}</span>
+      </el-form-item>
+    </el-form>
+    <el-table v-show="curIndex === 2" ref="handicapsTable" :data="agentInfo.handicaps" tooltip-effect="dark" @selection-change="handleSelectionHandicaps">
+      <el-table-column type="selection" align="center" />
+      <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="bet_min" :label="$t('__betMin')" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="currency" :label="$t('__currency')" align="center" :show-overflow-tooltip="true" />
+    </el-table>
+    <el-form v-show="curIndex === 3" ref="step4" :model="form" :rules="step4Rules">
+      <label>{{ $t('__superiorAgent') + ': ' }}
+        <span>{{ agentBalanceInfo.parent }}</span>
+      </label>
+      <br>
+      <label>{{ $t('__balance') + ': ' }}
+        <span>{{ agentBalanceInfo.parentBalance }}</span>
+      </label>
+      <br>
+      <label>{{ $t('__agentAccount') + ': ' }}
+        <span>{{ agentBalanceInfo.agent }}</span>
+      </label>
+      <br>
+      <label>{{ $t('__balance') + ': ' }}
+        <span>{{ agentBalanceInfo.agentBalance }}</span>
+      </label>
+      <el-form-item :label="$t('__depositBalance')" prop="balance">
+        <el-input v-model="form.balance" type="number" :disabled="balanceDisable" min="0" :max="agentBalanceInfo.parentBalance" />
+      </el-form-item>
+    </el-form>
+    <el-form v-show="curIndex === 4" ref="step5" :model="form" :rules="step5Rules">
+      <el-row>
+        <el-col :span="12">
+          <label>{{ $t('__agentInfo') }}</label>
+          <br>
+          <label>{{ $t('__agentAccount') }}
+            <span>{{ form.account }}</span>
+          </label>
+          <br>
+          <label>{{ $t('__agentNickname') }}
+            <span>{{ form.nickname }}</span>
+          </label>
+          <br>
+          <label>{{ $t('__timeZone') }}
+            <span>{{ timeZoneCityName }}</span>
+          </label>
+          <br>
+          <template v-if="showCurrency">
+            <label>{{ $t('__currency') }}
+              <span>{{ currencyName }}</span>
+            </label>
+            <br>
+          </template>
+          <label>{{ $t('__balance') }}
+            <span>{{ form.balance }}</span>
+          </label>
+          <br>
+          <label>{{ $t('__remark') }}
+            <span>{{ form.remark }}</span>
+          </label>
+        </el-col>
+        <el-col :span="12">
+          <label>{{ $t('__rate') }}</label>
+        </el-col>
+      </el-row>
+      <el-form-item :label="$t('__userPassword')" prop="userPassword">
+        <el-input v-model="form.userPassword" show-password />
+      </el-form-item>
+    </el-form>
     <span slot="footer">
-      <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
-      <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
+      <el-button v-show="previousBtnVisible" @click="onPreviousBtnClick">{{ $t("__previous") }}</el-button>
+      <el-button v-show="nextBtnVisible" type="primary" @click="onNextBtnClick">{{ $t("__nextStep") }}</el-button>
+      <el-button v-show="confirmBtnVisible" type="primary" @click="onSubmit">{{ $t("__confirm") }}</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
+import { agentCreateAccount, agentGetSetBalanceInfo } from '@/api/agentManagement/agentList'
 
 export default {
   name: 'AgentEditDialog',
@@ -46,11 +150,15 @@ export default {
       type: Boolean,
       require: true
     },
-    'confirm': {
-      type: String,
+    'isCreate': {
+      type: Boolean,
+      require: true
+    },
+    'agentInfo': {
+      type: Object,
       require: true,
       default() {
-        return ''
+        return {}
       }
     },
     'form': {
@@ -69,43 +177,215 @@ export default {
         callback()
       }
     }
+    const validatePassword = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t('__requiredField')))
+      } else if (value.trim().length < 5) {
+        callback(new Error(this.$t('__lengthLess') + '5'))
+      } else {
+        callback()
+      }
+    }
+    const validateConfirmPassword = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t('__requiredField')))
+      } else if (this.form.password !== this.form.confirmPassword) {
+        callback(new Error(this.$t('__confirmPassword') + this.$t('__and') + this.$t('__password') + this.$t('__inconsistent')))
+      } else {
+        callback()
+      }
+    }
+    const validateCommissionRate = (rule, value, callback) => {
+      if (!value && value !== 0) {
+        callback(new Error(this.$t('__requiredField')))
+      } else if (this.form.commission_rate > this.agentInfo.commission_rate) {
+        callback(new Error(this.$t('__overMax')))
+      } else if (this.form.commission_rate < 0) {
+        callback(new Error(this.$t('__lowerMin')))
+      } else {
+        callback()
+      }
+    }
+    const validateRollingRate = (rule, value, callback) => {
+      if (!value && value !== 0) {
+        callback(new Error(this.$t('__requiredField')))
+      } else if (this.form.rolling_rate > this.agentInfo.rolling_rate) {
+        callback(new Error(this.$t('__overMax')))
+      } else if (this.form.rolling_rate < 0) {
+        callback(new Error(this.$t('__lowerMin')))
+      } else {
+        callback()
+      }
+    }
+    const validateBlance = (rule, value, callback) => {
+      if (!value && value !== 0) {
+        callback(new Error(this.$t('__requiredField')))
+      } else if (this.form.balance > this.agentBalanceInfo.parentBalance) {
+        callback(new Error(this.$t('__overMax')))
+      } else if (this.form.balance < 0) {
+        callback(new Error(this.$t('__lowerMin')))
+      } else {
+        callback()
+      }
+    }
     return {
-      rules: {
-        name: [{ required: true, trigger: 'blur', validator: validate }],
-        code: [{ required: true, trigger: 'blur', validator: validate }],
-        symbol: [{ required: true, trigger: 'blur', validator: validate }]
+      step1Rules: {
+        account: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        nickname: [{ required: true, trigger: 'blur', validator: validate }],
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        confirmPassword: [{ required: true, trigger: 'blur', validator: validateConfirmPassword }]
       },
-      editForm: {}
+      step2Rules: {
+        commission_rate: [{ required: true, trigger: 'blur', validator: validateCommissionRate }],
+        rolling_rate: [{ required: true, trigger: 'blur', validator: validateRollingRate }]
+      },
+      step4Rules: {
+        balance: [{ required: true, trigger: 'blur', validator: validateBlance }]
+      },
+      step5Rules: {
+        userPassword: [{ required: true, trigger: 'blur', validator: validatePassword }]
+      },
+      autoGenerateAccount: false,
+      curIndex: 0,
+      time_zone: [],
+      currency: [],
+      selectionHandicaps: [],
+      agentBalanceInfo: {}
     }
   },
   computed: {
+    commissionRateTip() {
+      return this.$t('__range') + '0%-' + this.agentInfo.commission_rate + '%'
+    },
+    rollingRateTip() {
+      return this.$t('__range') + '0%-' + this.agentInfo.rolling_rate + '%'
+    },
+    previousBtnVisible() {
+      return this.curIndex > 0
+    },
+    nextBtnVisible() {
+      if (this.curIndex === 2) {
+        return this.selectionHandicaps.length > 0
+      }
+      return this.curIndex < 4
+    },
+    confirmBtnVisible() {
+      return this.curIndex >= 4
+    },
+    showCurrency() {
+      return this.isCreate && this.agentInfo.id === 1
+    },
+    balanceDisable() {
+      return parseInt(this.agentBalanceInfo.parentBalance, 10) === 0
+    },
+    timeZoneCityName() {
+      const timeZoneData = this.time_zone.find(timezone => this.form.time_zone === timezone.id)
+      return timeZoneData ? timeZoneData.city_name : ''
+    },
+    currencyName() {
+      const currencyData = this.currency.find(currencyItem => this.form.currency === currencyItem.id)
+      return currencyData ? currencyData.name : ''
+    }
   },
   watch: {
     visible() {
       if (this.visible) {
-        this.editForm = JSON.parse(JSON.stringify(this.form))
+        this.curIndex = 0
       } else {
-        this.$refs.editForm.clearValidate()
+        this.autoGenerateAccount = false
+        this.$refs.step1.clearValidate()
+        this.$refs.step2.clearValidate()
+        this.$refs.step4.clearValidate()
+        this.$refs.step5.clearValidate()
+      }
+    },
+    autoGenerateAccount() {
+      if (this.autoGenerateAccount) {
+        agentCreateAccount().then((res) => {
+          this.form.account = res.account
+          this.$refs.step1.clearValidate()
+        })
+      }
+    },
+    curIndex() {
+      if (this.curIndex === 2) {
+        this.agentInfo.handicaps.forEach(handicap => {
+          if (this.form.handicaps.some(formHandicap => formHandicap.id === handicap.id)) {
+            this.$refs.handicapsTable.toggleRowSelection(handicap, true)
+          }
+        })
+      } else if (this.curIndex === 3) {
+        const agentId = this.isCreate ? this.agentInfo.id : this.form.id
+        agentGetSetBalanceInfo({ agentId: agentId }).then((res) => {
+          this.agentBalanceInfo = res.rows
+        })
       }
     }
   },
   methods: {
-    onSubmit() {
-      this.$refs.editForm.validate((valid) => {
-        if (valid) {
-          this.$emit('confirm', this.editForm)
-        }
-      })
+    handleSelectionHandicaps(val) {
+      this.selectionHandicaps = val
+    },
+    onNextBtnClick() {
+      let next = false
+      if (this.curIndex === 0) {
+        this.$refs.step1.validate((valid) => {
+          next = valid
+        })
+      } else if (this.curIndex === 1) {
+        this.$refs.step2.validate((valid) => {
+          next = valid
+        })
+      } else if (this.curIndex === 2) {
+        next = true
+      } else if (this.curIndex === 3) {
+        this.$refs.step4.validate((valid) => {
+          next = valid
+        })
+      } else if (this.curIndex === 4) {
+        this.$refs.step5.validate((valid) => {
+          next = valid
+        })
+      }
+
+      if (next) {
+        this.curIndex++
+      }
+    },
+    onPreviousBtnClick() {
+      this.curIndex--
     },
     onClose() {
       this.$emit('close')
     },
-    onReset() {
-      this.editForm = JSON.parse(JSON.stringify(this.form))
+    onSubmit() {
+    },
+    setTimeZone(data) {
+      this.time_zone = data
+    },
+    setCurrency(data) {
+      this.currency = data
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.agentName {
+  font-size: 10px;
+}
+
+.step2Tip {
+  line-height: 10px;
+  display: block;
+  font-size: 10px;
+}
+
+.el-input {
+  width: auto;
+}
+
+.el-steps--horizontal {
+  margin: 15px 0
+}
 </style>

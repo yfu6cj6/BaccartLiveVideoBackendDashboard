@@ -87,7 +87,7 @@
     "__description": "說明",
     "__createdAt": "創建時間",
     "__operationLog": "操作日誌",
-    "__creditlimit": "額度",
+    "__balance": "額度",
     "__export": "搜尋並匯出",
     "__player": "玩家",
     "__orderNumber": "注單編號",
@@ -137,5 +137,7 @@
     "__directPlayerCount": "直線玩家總數",
     "__totalPlayerCount": "總玩家數",
     "__overMax": "超過最大值",
-    "__lowerMin": "低於最小值"
+    "__lowerMin": "低於最小值",
+    "__depositBalance": "存入額度",
+    "__userPassword": "操作者密碼"
 }

@@ -26,7 +26,7 @@
           <label class="labelTitle">{{ $t('__currency') + ':' }}
             <span class="labelContent">{{ agentInfo.currency }}</span>
           </label>
-          <label class="labelTitle">{{ $t('__creditlimit') + ':' }}
+          <label class="labelTitle">{{ $t('__balance') + ':' }}
             <span class="labelContent">{{ agentInfo.balance }}</span>
           </label>
           <label>
@@ -76,7 +76,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="currency" :label="$t('__currency')" align="center" />
-          <el-table-column prop="balance" :label="$t('__creditlimit')" align="center" />
+          <el-table-column prop="balance" :label="$t('__balance')" align="center" />
           <el-table-column prop="timeZone.city_name" :label="$t('__timeZone')" align="center" />
           <el-table-column :label="$t('__limit')" align="center">
             <template slot-scope="scope">
@@ -128,23 +128,24 @@
     />
 
     <AgentEditDialog
+      ref="agentEditDialog"
       :title="$t('__edit')"
       :visible="editDialogVisible"
-      :confirm="$t('__revise')"
-      :form="selectForm"
+      :is-create="false"
+      :agent-info="agentInfo"
+      :form="form"
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
-      @confirm="editDialogConfirmEven"
     />
 
-    <AgentCreateDialog
+    <AgentEditDialog
       ref="agentCreateDialog"
       :title="$t('__create')"
       :visible="createDialogVisible"
+      :is-create="true"
       :agent-info="agentInfo"
-      :form0="form0"
-      :form1="form1"
+      :form="form"
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
@@ -159,28 +160,28 @@ import { currencySearch } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
-import AgentCreateDialog from './agentCreateDialog'
 import AgentEditDialog from './agentEditDialog'
 import AgentLimitDialog from './agentLimitDialog'
 import { mapGetters } from 'vuex'
 
-const defaultForm0 = {
+const defaultForm = {
   account: '',
   nickname: '',
   password: '',
   confirmPassword: '',
   time_zone: 1,
-  currency: 1
-}
-
-const defaultForm1 = {
-  commission_rate: '0',
-  rolling_rate: '0'
+  currency: 1,
+  remark: '',
+  commission_rate: 0,
+  rolling_rate: 0,
+  handicaps: [],
+  balance: 0,
+  userPassword: ''
 }
 
 export default {
   name: 'AgentList',
-  components: { AgentCreateDialog, AgentEditDialog, AgentLimitDialog },
+  components: { AgentEditDialog, AgentLimitDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
@@ -190,10 +191,8 @@ export default {
       },
       agentLevel: [],
       agentInfo: {},
-      selectForm: {},
       handicaps: [],
-      form0: JSON.parse(JSON.stringify(defaultForm0)),
-      form1: JSON.parse(JSON.stringify(defaultForm1)),
+      form: JSON.parse(JSON.stringify(defaultForm)),
       createDialogVisible: false,
       editDialogVisible: false,
       limitDialogVisible: false,
@@ -221,6 +220,7 @@ export default {
       this.allDataByClient.forEach(element => {
         element.fullName = element.nickname + '(' + element.account + ')'
         element.currency = element.currency.code
+        element.time_zone = element.timeZone.id
       })
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
@@ -280,8 +280,7 @@ export default {
         const currency = await currencySearch({})
         this.$refs.agentCreateDialog.setCurrency(currency)
       }
-      this.form0 = JSON.parse(JSON.stringify(defaultForm0))
-      this.form1 = JSON.parse(JSON.stringify(defaultForm1))
+      this.form = JSON.parse(JSON.stringify(defaultForm))
       this.dataLoading = false
       this.createDialogVisible = true
     },
@@ -294,8 +293,13 @@ export default {
         this.handleResponeError()
       })
     },
-    onEditBtnClick(item) {
-      this.selectForm = JSON.parse(JSON.stringify(item))
+    async onEditBtnClick(rowData) {
+      this.dataLoading = true
+      const timezone = await timezoneSearch({})
+      this.$refs.agentEditDialog.setTimeZone(timezone)
+
+      this.form = JSON.parse(JSON.stringify(rowData))
+      this.dataLoading = false
       this.editDialogVisible = true
     },
     editDialogConfirmEven(data) {

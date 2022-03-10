@@ -19,7 +19,7 @@
           {{ $t('__agent') }}: {{ agentName }}
         </span>
         <span class="language-item">
-          {{ $t('__creditlimit') }}: {{ credit_limit }}
+          {{ $t('__balance') }}: {{ balance }}
         </span>
         <span v-if="marqueeMsg.length > 0" class="marquee">
           <p>{{ marqueeMsg }}</p>
@@ -47,7 +47,7 @@ export default {
       'marqueeMsg',
       'agentName',
       'nickname',
-      'credit_limit'
+      'balance'
     ]),
     isCollapse() {
       return !this.sidebar.opened
