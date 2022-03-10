@@ -6,6 +6,9 @@ const getters = {
   tagsView: state => state.settings.tagsView,
   visitedViews: state => state.tagsView.visitedViews,
   cachedViews: state => state.tagsView.cachedViews,
+  accountStatusType: state => state.common.accountStatusType,
+  announcementMarqueeStatusType: state => state.common.announcementMarqueeStatusType,
+  agentAccountStatusType: state => state.common.agentAccountStatusType,
   account: state => state.user.account,
   agent_id: state => state.user.agent_id,
   agentName: state => state.user.agentName,
@@ -14,12 +17,9 @@ const getters = {
   balance: state => state.user.balance,
   permission_routes: state => state.permission.permission_routes,
   marqueeMsg: state => state.backstageManagement.marqueeMsg,
-  accountStatusType: state => state.backstageManagement.accountStatusType,
-  announcementMarqueeStatusType: state => state.backstageManagement.announcementMarqueeStatusType,
   gameAnnouncements: state => state.backstageManagement.gameAnnouncements,
   agentAnnouncements: state => state.backstageManagement.agentAnnouncements,
   memberBetTimeType: state => state.memberBet.memberBetTimeType,
-  gameResultTimeType: state => state.gameResult.gameResultTimeType,
-  agentAccountStatusType: state => state.agentManagement.agentAccountStatusType
+  gameResultTimeType: state => state.gameResult.gameResultTimeType
 }
 export default getters

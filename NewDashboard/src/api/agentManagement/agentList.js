@@ -31,23 +31,6 @@ export function agentCreateAccount() {
   })
 }
 
-// 取得盤口
-export function agentHandicap(data) {
-  return request({
-    url: '/agent/handicap',
-    method: 'post',
-    data: data
-  })
-}
-
-export function agentModPassword(data) {
-  return request({
-    url: '/agent/modPassword',
-    method: 'post',
-    data: data
-  })
-}
-
 export function agentTotalPlayerCount(data) {
   return request({
     url: '/agent/totalPlayerCount',
@@ -75,6 +58,23 @@ export function agentRollingRateLog(data) {
 export function agentGetSetBalanceInfo(data) {
   return request({
     url: '/agent/getSetBalanceInfo',
+    method: 'post',
+    data: data
+  })
+}
+
+export function agentModPassword(data) {
+  return request({
+    url: '/agent/modPassword',
+    method: 'post',
+    data: data
+  })
+}
+
+// 取得盤口
+export function agentHandicap(data) {
+  return request({
+    url: '/agent/handicap',
     method: 'post',
     data: data
   })

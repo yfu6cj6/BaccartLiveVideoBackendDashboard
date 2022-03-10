@@ -161,7 +161,6 @@ export default {
     ])
   },
   created() {
-    this.$store.dispatch('backstageManagement/setAnnouncementMarqueeStatusType')
     this.setHeight()
     this.handleCurrentChange(1)
   },

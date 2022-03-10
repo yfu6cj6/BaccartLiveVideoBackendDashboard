@@ -20,7 +20,7 @@
           <el-option v-for="item in agents" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__status')">
+      <el-form-item class="inputTitle" :label="$t('__accountStatus')">
         <el-select v-model="searchForm.status" style="width: 120px">
           <el-option v-for="item in status" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
         </el-select>
@@ -49,7 +49,7 @@
       <el-table-column prop="rolesNickname" min-width="80px" :label="$t('__role')" align="center" />
       <el-table-column prop="agentName" min-width="80px" :label="$t('__agentName')" align="center" />
       <el-table-column prop="time_zone.city_name" min-width="80px" :label="$t('__cityName')" align="center" />
-      <el-table-column prop="statusLabel" min-width="80px" :label="$t('__status')" align="center" />
+      <el-table-column prop="statusLabel" min-width="80px" :label="$t('__accountStatus')" align="center" />
       <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
@@ -143,7 +143,6 @@ export default {
     ])
   },
   created() {
-    this.$store.dispatch('backstageManagement/setAccountStatusType')
     this.status.push({ key: 'All', nickname: '__all' })
     this.status = this.status.concat(this.accountStatusType)
     this.setHeight()

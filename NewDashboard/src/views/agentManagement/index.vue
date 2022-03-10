@@ -136,10 +136,12 @@
       :visible="editDialogVisible"
       :is-create="false"
       :agent-info="agentInfo"
+      :confirm="$t('__revise')"
       :form="form"
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
+      @editSuccess="agentEditDialogEditSuccess"
     />
 
     <AgentEditDialog
@@ -148,16 +150,18 @@
       :visible="createDialogVisible"
       :is-create="true"
       :agent-info="agentInfo"
+      :confirm="$t('__confirm')"
       :form="form"
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
+      @editSuccess="agentEditDialogEditSuccess"
     />
   </div>
 </template>
 
 <script>
-import { agentSearch, agentCreate, agentEdit, agentTotalPlayerCount, agentCommissionRateLog, agentRollingRateLog } from '@/api/agentManagement/agentList'
+import { agentSearch, agentTotalPlayerCount, agentCommissionRateLog, agentRollingRateLog } from '@/api/agentManagement/agentList'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import { currencySearch } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
@@ -168,6 +172,7 @@ import AgentLimitDialog from './agentLimitDialog'
 import { mapGetters } from 'vuex'
 
 const defaultForm = {
+  parent: 0,
   account: '',
   nickname: '',
   password: '',
@@ -179,7 +184,10 @@ const defaultForm = {
   rolling_rate: 0,
   handicaps: [],
   balance: 0,
-  userPassword: ''
+  userPassword: '',
+  wallet_type: 1,
+  status: '1',
+  bet_status: '1'
 }
 
 export default {
@@ -213,7 +221,6 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('agentManagement/setAgentAccountStatusType')
     this.setHeight()
     this.handleCurrentChange(1)
   },
@@ -287,15 +294,6 @@ export default {
       this.dataLoading = false
       this.createDialogVisible = true
     },
-    createDialogConfirmEven(data) {
-      this.closeDialogEven()
-      this.dataLoading = true
-      agentCreate(data).then((res) => {
-        this.handleRespone(res)
-      }).catch(() => {
-        this.handleResponeError()
-      })
-    },
     async onEditBtnClick(rowData) {
       this.dataLoading = true
       const timezone = await timezoneSearch({})
@@ -305,16 +303,9 @@ export default {
       this.dataLoading = false
       this.editDialogVisible = true
     },
-    editDialogConfirmEven(data) {
-      this.$confirm(this.$t('__confirmChanges')).then(_ => {
-        this.closeDialogEven()
-        this.dataLoading = true
-        agentEdit(data).then((res) => {
-          this.handleRespone(res)
-        }).catch(() => {
-          this.handleResponeError()
-        })
-      }).catch(_ => {})
+    agentEditDialogEditSuccess(res) {
+      this.closeDialogEven()
+      this.handleRespone(res)
     },
     closeDialogEven() {
       this.createDialogVisible = false

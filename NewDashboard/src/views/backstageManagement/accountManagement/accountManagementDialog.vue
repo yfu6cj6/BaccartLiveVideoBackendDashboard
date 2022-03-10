@@ -30,7 +30,7 @@
               <el-option v-for="item in agents" :key="item.key" :label="item.nickname" :value="item.key" />
             </el-select>
           </el-form-item>
-          <el-form-item :label="$t('__status')" prop="status">
+          <el-form-item :label="$t('__accountStatus')" prop="status">
             <el-select v-model="editForm.status">
               <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
             </el-select>

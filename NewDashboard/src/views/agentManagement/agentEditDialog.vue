@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
     <label class="agentName">{{ $t('__superiorAgent') + ': ' }}
       <span>{{ agentInfo.fullName }}</span>
     </label>
@@ -31,6 +31,16 @@
       </el-form-item>
       <el-form-item v-if="isCreate" :label="$t('__confirmPassword')" prop="confirmPassword">
         <el-input v-model="form.confirmPassword" show-password />
+      </el-form-item>
+      <el-form-item :label="$t('__accountStatus')" prop="status">
+        <el-select v-model="form.status">
+          <el-option v-for="item in agentAccountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('__betStatus')" prop="bet_status">
+        <el-select v-model="form.bet_status">
+          <el-option v-for="item in agentAccountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+        </el-select>
       </el-form-item>
       <el-form-item :label="$t('__timeZone')" prop="time_zone">
         <el-select v-model="form.time_zone">
@@ -117,7 +127,25 @@
         </el-col>
         <el-col :span="12">
           <label>{{ $t('__rate') }}</label>
+          <br>
+          <label>{{ $t('__commissionRate') }}
+            <span>{{ form.commission_rate }}</span>
+          </label>
+          <br>
+          <label>{{ $t('__rollingRate') }}
+            <span>{{ form.rolling_rate }}</span>
+          </label>
         </el-col>
+      </el-row>
+      <el-row>
+        <label>{{ $t('__limit') }}</label>
+        <el-table :data="selectHandicaps" tooltip-effect="dark" max-height="200px">
+          <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
+          <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
+          <el-table-column prop="bet_min" :label="$t('__betMin')" align="center" :show-overflow-tooltip="true" />
+          <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" :show-overflow-tooltip="true" />
+          <el-table-column prop="currency" :label="$t('__currency')" align="center" :show-overflow-tooltip="true" />
+        </el-table>
       </el-row>
       <el-form-item :label="$t('__userPassword')" prop="userPassword">
         <el-input v-model="form.userPassword" show-password />
@@ -126,14 +154,15 @@
     <span slot="footer">
       <el-button v-show="previousBtnVisible" @click="onPreviousBtnClick">{{ $t("__previous") }}</el-button>
       <el-button v-show="nextBtnVisible" type="primary" @click="onNextBtnClick">{{ $t("__nextStep") }}</el-button>
-      <el-button v-show="confirmBtnVisible" type="primary" @click="onSubmit">{{ $t("__confirm") }}</el-button>
+      <el-button v-show="confirmBtnVisible" type="primary" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
-import { agentCreateAccount, agentGetSetBalanceInfo } from '@/api/agentManagement/agentList'
+import { agentCreateAccount, agentGetSetBalanceInfo, agentCreate, agentEdit } from '@/api/agentManagement/agentList'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'AgentEditDialog',
@@ -159,6 +188,13 @@ export default {
       require: true,
       default() {
         return {}
+      }
+    },
+    'confirm': {
+      type: String,
+      require: true,
+      default() {
+        return ''
       }
     },
     'form': {
@@ -249,11 +285,15 @@ export default {
       curIndex: 0,
       time_zone: [],
       currency: [],
-      selectionHandicaps: [],
-      agentBalanceInfo: {}
+      agentBalanceInfo: {},
+      dialogLoading: false,
+      selectHandicaps: []
     }
   },
   computed: {
+    ...mapGetters([
+      'agentAccountStatusType'
+    ]),
     commissionRateTip() {
       return this.$t('__range') + '0%-' + this.agentInfo.commission_rate + '%'
     },
@@ -265,7 +305,7 @@ export default {
     },
     nextBtnVisible() {
       if (this.curIndex === 2) {
-        return this.selectionHandicaps.length > 0
+        return this.selectHandicaps.length > 0
       }
       return this.curIndex < 4
     },
@@ -309,9 +349,9 @@ export default {
     },
     curIndex() {
       if (this.curIndex === 2) {
-        this.agentInfo.handicaps.forEach(handicap => {
-          if (this.form.handicaps.some(formHandicap => formHandicap.id === handicap.id)) {
-            this.$refs.handicapsTable.toggleRowSelection(handicap, true)
+        this.agentInfo.handicaps.forEach(agentInfoHandicap => {
+          if (this.form.handicaps.some(formHandicaps => formHandicaps.id === agentInfoHandicap.id)) {
+            this.$refs.handicapsTable.toggleRowSelection(agentInfoHandicap, true)
           }
         })
       } else if (this.curIndex === 3) {
@@ -324,7 +364,7 @@ export default {
   },
   methods: {
     handleSelectionHandicaps(val) {
-      this.selectionHandicaps = val
+      this.selectHandicaps = val
     },
     onNextBtnClick() {
       let next = false
@@ -342,10 +382,6 @@ export default {
         this.$refs.step4.validate((valid) => {
           next = valid
         })
-      } else if (this.curIndex === 4) {
-        this.$refs.step5.validate((valid) => {
-          next = valid
-        })
       }
 
       if (next) {
@@ -359,6 +395,35 @@ export default {
       this.$emit('close')
     },
     onSubmit() {
+      this.$refs.step5.validate((valid) => {
+        if (valid) {
+          this.dialogLoading = true
+          const data = JSON.parse(JSON.stringify(this.form))
+          data.handicaps = []
+          this.selectHandicaps.forEach(element => {
+            data.handicaps.push(element.id)
+          })
+          if (this.isCreate) {
+            data.parent = this.agentInfo.id
+            agentCreate(data).then((res) => {
+              this.$emit('editSuccess', res)
+              this.dialogLoading = false
+            }).catch(() => {
+              this.dialogLoading = false
+            })
+          } else {
+            this.$confirm(this.$t('__confirmChanges')).then(_ => {
+              data.parent = this.parent.id
+              agentEdit(data).then((res) => {
+                this.$emit('editSuccess', res)
+                this.dialogLoading = false
+              }).catch(() => {
+                this.dialogLoading = false
+              })
+            })
+          }
+        }
+      })
     },
     setTimeZone(data) {
       this.time_zone = data
