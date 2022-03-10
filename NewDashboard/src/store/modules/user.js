@@ -8,7 +8,8 @@ const getDefaultState = () => {
     agentName: '',
     nickname: '',
     permissions: [],
-    balance: ''
+    balance: '',
+    agentFullName: ''
   }
 }
 
@@ -22,6 +23,7 @@ const mutations = {
     state.nickname = data.user.nickname
     state.permissions = data.permissions
     state.balance = data.user.agent.balance
+    state.agentFullName = data.user.agentName + '(' + data.user.account + ')'
   },
   RESET_STATE: (state) => {
     Object.assign(state, getDefaultState())

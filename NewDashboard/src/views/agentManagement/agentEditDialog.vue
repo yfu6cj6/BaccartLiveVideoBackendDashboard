@@ -129,11 +129,11 @@
           <label>{{ $t('__rate') }}</label>
           <br>
           <label>{{ $t('__commissionRate') }}
-            <span>{{ form.commission_rate }}</span>
+            <span>{{ numberFormatStr(form.commission_rate) + '%' }}</span>
           </label>
           <br>
           <label>{{ $t('__rollingRate') }}
-            <span>{{ form.rolling_rate }}</span>
+            <span>{{ numberFormatStr(form.rolling_rate) + '%' }}</span>
           </label>
         </el-col>
       </el-row>
@@ -163,6 +163,7 @@
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
 import { agentCreateAccount, agentGetSetBalanceInfo, agentCreate, agentEdit } from '@/api/agentManagement/agentList'
 import { mapGetters } from 'vuex'
+import { numberFormat } from '@/utils/numberFormat'
 
 export default {
   name: 'AgentEditDialog',
@@ -363,6 +364,9 @@ export default {
     }
   },
   methods: {
+    numberFormatStr(number) {
+      return numberFormat(number)
+    },
     handleSelectionHandicaps(val) {
       this.selectHandicaps = val
     },

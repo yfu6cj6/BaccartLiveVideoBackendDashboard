@@ -15,6 +15,7 @@ const getters = {
   nickname: state => state.user.nickname,
   permissions: state => state.user.permissions,
   balance: state => state.user.balance,
+  agentFullName: state => state.user.agentFullName,
   permission_routes: state => state.permission.permission_routes,
   marqueeMsg: state => state.backstageManagement.marqueeMsg,
   gameAnnouncements: state => state.backstageManagement.gameAnnouncements,

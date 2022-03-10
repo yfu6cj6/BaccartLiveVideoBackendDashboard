@@ -71,6 +71,22 @@ export function agentModPassword(data) {
   })
 }
 
+export function agentDepositBalance(data) {
+  return request({
+    url: '/agent/depositBalance',
+    method: 'post',
+    data: data
+  })
+}
+
+export function agentWithdrawBalance(data) {
+  return request({
+    url: '/agent/withdrawBalance',
+    method: 'post',
+    data: data
+  })
+}
+
 // 取得盤口
 export function agentHandicap(data) {
   return request({

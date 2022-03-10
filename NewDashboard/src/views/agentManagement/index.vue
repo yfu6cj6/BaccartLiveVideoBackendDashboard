@@ -36,10 +36,10 @@
           </label>
           <br>
           <label class="labelTitle">{{ $t('__commissionRate') + ':' }}
-            <span class="labelContent">{{ agentInfo.commission_rate + '%' }}</span>
+            <span class="labelContent">{{ numberFormatStr(agentInfo.commission_rate) + '%' }}</span>
           </label>
           <label class="labelTitle">{{ $t('__rollingRate') + ':' }}
-            <span class="labelContent">{{ agentInfo.rolling_rate + '%' }}</span>
+            <span class="labelContent">{{ numberFormatStr(agentInfo.rolling_rate) + '%' }}</span>
           </label>
           <label class="labelTitle">{{ $t('__accountStatus') + ':' }}
             <span class="labelContent" :class="{'enable':accountStatusEnable, 'disEnable':!accountStatusEnable}">{{ $t(agentInfo.accountStatus) }}</span>
@@ -79,7 +79,13 @@
             </template>
           </el-table-column>
           <el-table-column prop="currency" :label="$t('__currency')" align="center" />
-          <el-table-column prop="balance" :label="$t('__balance')" align="center" />
+          <el-table-column :label="$t('__balance')" align="center">
+            <template slot-scope="scope">
+              <span class="scope-content">{{ scope.row.balance }}</span>
+              <el-button class="labelButton" type="primary" size="mini" @click="onDepositBtnClick(scope.row.id)">{{ $t("__deposit") }}</el-button>
+              <el-button class="labelButton labelWithdrawButton" type="primary" size="mini" @click="onWithdrawBtnClick(scope.row.id)">{{ $t("__withdraw") }}</el-button>
+            </template>
+          </el-table-column>
           <el-table-column prop="timeZone.city_name" :label="$t('__timeZone')" align="center" />
           <el-table-column :label="$t('__limit')" align="center">
             <template slot-scope="scope">
@@ -90,22 +96,20 @@
           <el-table-column prop="directPlayerCount" :label="$t('__directPlayerCount')" align="center" />
           <el-table-column :label="$t('__commissionRate')" align="center">
             <template slot-scope="scope">
-              <span class="scope-content">{{ scope.row.commission_rate }}</span>
+              <span class="scope-content">{{ numberFormatStr(scope.row.commission_rate) + '%' }}</span>
               <el-button class="iconButton" type="primary" size="mini" icon="el-icon-tickets" @click="onCommissionRateLogBtnClick(scope.row)" />
             </template>
           </el-table-column>
           <el-table-column :label="$t('__rollingRate')" align="center">
             <template slot-scope="scope">
-              <span class="scope-content">{{ scope.row.rolling_rate }}</span>
+              <span class="scope-content">{{ numberFormatStr(scope.row.rolling_rate) + '%' }}</span>
               <el-button class="iconButton" type="primary" size="mini" icon="el-icon-tickets" @click="onRollingRateLogBtnClick(scope.row)" />
             </template>
           </el-table-column>
           <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
           <el-table-column prop="lastLoginAt" :label="$t('__lastLoginAt')" align="center" />
           <el-table-column :label="$t('__operate')" align="center" width="auto">
-            <template slot-scope="scope">
-              <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
-            </template>
+            <span>123</span>
           </el-table-column>
         </el-table>
 
@@ -123,7 +127,7 @@
 
     <AgentModPasswordDialog
       :title="$t('__modPassword')"
-      :visible="modPasswordDialogVisible"
+      :visible="curDialogIndex === modPasswordDialog"
       :confirm="$t('__revise')"
       :form="editForm"
       :pc-width="'35%'"
@@ -132,9 +136,31 @@
       @editSuccess="agentEditDialogEditSuccess"
     />
 
+    <AgentRateLogDialog
+      :title="$t('__commissionRate')"
+      :visible="curDialogIndex === commissionRateDialog"
+      :list-data="rateData"
+      :rate-type="1"
+      :pc-width="'35%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @editSuccess="agentEditDialogEditSuccess"
+    />
+
+    <AgentRateLogDialog
+      :title="$t('__rollingRate')"
+      :visible="curDialogIndex === rollingRateDialog"
+      :list-data="rateData"
+      :rate-type="2"
+      :pc-width="'35%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @editSuccess="agentEditDialogEditSuccess"
+    />
+
     <AgentLimitDialog
       :title="$t('__limit')"
-      :visible="limitDialogVisible"
+      :visible="curDialogIndex === limitDialog"
       :handicaps="handicaps"
       :pc-width="'35%'"
       :mobile-width="'40%'"
@@ -144,7 +170,7 @@
     <AgentEditDialog
       ref="agentEditDialog"
       :title="$t('__edit')"
-      :visible="editDialogVisible"
+      :visible="curDialogIndex === editDialog"
       :is-create="false"
       :agent-info="agentInfo"
       :confirm="$t('__revise')"
@@ -158,7 +184,7 @@
     <AgentEditDialog
       ref="agentCreateDialog"
       :title="$t('__create')"
-      :visible="createDialogVisible"
+      :visible="curDialogIndex === createDialog"
       :is-create="true"
       :agent-info="agentInfo"
       :confirm="$t('__confirm')"
@@ -181,7 +207,9 @@ import handleViewResize from '@/layout/mixin/handleViewResize'
 import AgentEditDialog from './agentEditDialog'
 import AgentModPasswordDialog from './agentModPasswordDialog'
 import AgentLimitDialog from './agentLimitDialog'
+import AgentRateLogDialog from './agentRateLogDialog'
 import { mapGetters } from 'vuex'
+import { numberFormat } from '@/utils/numberFormat'
 
 const defaultForm = {
   parent: 0,
@@ -204,7 +232,7 @@ const defaultForm = {
 
 export default {
   name: 'AgentManagement',
-  components: { AgentEditDialog, AgentModPasswordDialog, AgentLimitDialog },
+  components: { AgentEditDialog, AgentModPasswordDialog, AgentLimitDialog, AgentRateLogDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
@@ -216,11 +244,8 @@ export default {
       agentInfo: {},
       handicaps: [],
       editForm: JSON.parse(JSON.stringify(defaultForm)),
-      createDialogVisible: false,
-      editDialogVisible: false,
-      modPasswordDialogVisible: false,
-      limitDialogVisible: false,
-      rateLogDialogVisible: false,
+      rateData: [],
+      curDialogIndex: 0,
       accountStatusEnable: false,
       betStatusEnable: false
     }
@@ -231,6 +256,24 @@ export default {
     ]),
     treeDefaultExpandedKeys() {
       return this.agentLevel.length === 0 ? [] : [this.agentLevel[0].AgentId]
+    },
+    createDialog() {
+      return 1
+    },
+    editDialog() {
+      return 2
+    },
+    modPasswordDialog() {
+      return 3
+    },
+    limitDialog() {
+      return 4
+    },
+    commissionRateDialog() {
+      return 5
+    },
+    rollingRateDialog() {
+      return 6
     }
   },
   created() {
@@ -238,6 +281,9 @@ export default {
     this.handleCurrentChange(1)
   },
   methods: {
+    numberFormatStr(number) {
+      return numberFormat(number)
+    },
     handleRespone(res) {
       this.allDataByClient = res.rows
       this.allDataByClient.forEach(element => {
@@ -274,18 +320,22 @@ export default {
     },
     onLimitBtnClick(handicaps) {
       this.handicaps = JSON.parse(JSON.stringify(handicaps))
-      this.limitDialogVisible = true
+      this.curDialogIndex = this.limitDialog
     },
-    onCommissionRateLogBtnClick(handicaps) {
-      this.rateLogDialogVisible = true
-      agentCommissionRateLog({ agentId: this.agentInfo.id }).then((res) => {
-        console.log(res)
+    onCommissionRateLogBtnClick(rowData) {
+      this.dataLoading = true
+      agentCommissionRateLog({ agentId: rowData.id }).then((res) => {
+        this.curDialogIndex = this.commissionRateDialog
+        this.rateData = res.rows
+        this.dataLoading = false
       })
     },
-    onRollingRateLogBtnClick(handicaps) {
-      this.rateLogDialogVisible = true
-      agentRollingRateLog({ agentId: this.agentInfo.id }).then((res) => {
-        console.log(res)
+    onRollingRateLogBtnClick(rowData) {
+      this.dataLoading = true
+      agentRollingRateLog({ agentId: rowData.id }).then((res) => {
+        this.curDialogIndex = this.rollingRateDialog
+        this.rateData = res.rows
+        this.dataLoading = false
       })
     },
     onTotalPlayerBtnClick() {
@@ -297,7 +347,13 @@ export default {
     },
     onModPasswordBtnClick(id) {
       this.editForm = { id: id }
-      this.modPasswordDialogVisible = true
+      this.curDialogIndex = this.modPasswordDialog
+    },
+    onDepositBtnClick(id) {
+      this.editForm = { id: id }
+    },
+    onWithdrawBtnClick(id) {
+      this.editForm = { id: id }
     },
     async onAddSubAgentBtnClick() {
       this.dataLoading = true
@@ -309,7 +365,7 @@ export default {
       }
       this.editForm = JSON.parse(JSON.stringify(defaultForm))
       this.dataLoading = false
-      this.createDialogVisible = true
+      this.curDialogIndex = this.createDialog
     },
     async onEditBtnClick(rowData) {
       this.dataLoading = true
@@ -318,18 +374,14 @@ export default {
 
       this.editForm = JSON.parse(JSON.stringify(rowData))
       this.dataLoading = false
-      this.editDialogVisible = true
+      this.curDialogIndex = this.editDialog
     },
     agentEditDialogEditSuccess(res) {
       this.closeDialogEven()
       this.handleRespone(res)
     },
     closeDialogEven() {
-      this.createDialogVisible = false
-      this.editDialogVisible = false
-      this.limitDialogVisible = false
-      this.rateLogDialogVisible = false
-      this.modPasswordDialogVisible = false
+      this.curDialogIndex = 0
     },
     renderContent(h, { node, data, store }) {
       return (
@@ -386,6 +438,10 @@ label {
 .labelButton {
   padding-left: 5px;
   padding-right: 5px;
+}
+
+.labelWithdrawButton {
+  margin-left: 5px;
 }
 
 .labelContent {

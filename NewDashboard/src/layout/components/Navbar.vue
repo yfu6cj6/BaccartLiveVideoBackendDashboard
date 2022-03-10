@@ -16,7 +16,7 @@
           Hi, {{ nickname }}
         </span>
         <span class="language-item">
-          {{ $t('__agent') }}: {{ agentName }}
+          {{ $t('__agent') }}: {{ agentFullName }}
         </span>
         <span class="language-item">
           {{ $t('__balance') }}: {{ balance }}
@@ -45,7 +45,7 @@ export default {
     ...mapGetters([
       'sidebar',
       'marqueeMsg',
-      'agentName',
+      'agentFullName',
       'nickname',
       'balance'
     ]),
