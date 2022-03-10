@@ -2,7 +2,7 @@
   <el-dialog :title="title" :visible.sync="visible" width="25%" :before-close="onClose">
     <el-row>
       <el-col :span="24">
-        <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
+        <el-form ref="editForm" label-width="auto" :model="editForm" :rules="rules">
           <el-form-item :label="$t('__account')" prop="account">
             <el-input v-model="editForm.account" />
           </el-form-item>

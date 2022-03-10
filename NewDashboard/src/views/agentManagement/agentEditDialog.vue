@@ -26,10 +26,10 @@
       <el-form-item :label="$t('__agentNickname')" prop="nickname">
         <el-input v-model="form.nickname" />
       </el-form-item>
-      <el-form-item v-if="isCreate" :label="$t('__password')" prop="password">
+      <el-form-item v-if="isCreate&&visible" :label="$t('__password')" prop="password">
         <el-input v-model="form.password" show-password />
       </el-form-item>
-      <el-form-item v-if="isCreate" :label="$t('__confirmPassword')" prop="confirmPassword">
+      <el-form-item v-if="isCreate&&visible" :label="$t('__confirmPassword')" prop="confirmPassword">
         <el-input v-model="form.confirmPassword" show-password />
       </el-form-item>
       <el-form-item :label="$t('__accountStatus')" prop="status">
@@ -147,7 +147,7 @@
           <el-table-column prop="currency" :label="$t('__currency')" align="center" :show-overflow-tooltip="true" />
         </el-table>
       </el-row>
-      <el-form-item :label="$t('__userPassword')" prop="userPassword">
+      <el-form-item v-if="visible" :label="$t('__userPassword')" prop="userPassword">
         <el-input v-model="form.userPassword" show-password />
       </el-form-item>
     </el-form>
@@ -413,7 +413,6 @@ export default {
             })
           } else {
             this.$confirm(this.$t('__confirmChanges')).then(_ => {
-              data.parent = this.parent.id
               agentEdit(data).then((res) => {
                 this.$emit('editSuccess', res)
                 this.dialogLoading = false

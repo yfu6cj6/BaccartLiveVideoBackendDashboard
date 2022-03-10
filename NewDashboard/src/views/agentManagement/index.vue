@@ -75,7 +75,7 @@
             <template slot-scope="scope">
               <span class="scope-content">{{ scope.row.fullName }}</span>
               <el-button class="iconButton" type="primary" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
-              <el-button class="iconButton" type="primary" size="mini" icon="el-icon-unlock" @click="onEditBtnClick(scope.row)" />
+              <el-button class="iconButton" type="primary" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row.id)" />
             </template>
           </el-table-column>
           <el-table-column prop="currency" :label="$t('__currency')" align="center" />
@@ -121,6 +121,17 @@
       </el-col>
     </el-row>
 
+    <AgentModPasswordDialog
+      :title="$t('__modPassword')"
+      :visible="modPasswordDialogVisible"
+      :confirm="$t('__revise')"
+      :form="editForm"
+      :pc-width="'35%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @editSuccess="agentEditDialogEditSuccess"
+    />
+
     <AgentLimitDialog
       :title="$t('__limit')"
       :visible="limitDialogVisible"
@@ -137,7 +148,7 @@
       :is-create="false"
       :agent-info="agentInfo"
       :confirm="$t('__revise')"
-      :form="form"
+      :form="editForm"
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
@@ -151,7 +162,7 @@
       :is-create="true"
       :agent-info="agentInfo"
       :confirm="$t('__confirm')"
-      :form="form"
+      :form="editForm"
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
@@ -168,6 +179,7 @@ import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import AgentEditDialog from './agentEditDialog'
+import AgentModPasswordDialog from './agentModPasswordDialog'
 import AgentLimitDialog from './agentLimitDialog'
 import { mapGetters } from 'vuex'
 
@@ -192,7 +204,7 @@ const defaultForm = {
 
 export default {
   name: 'AgentManagement',
-  components: { AgentEditDialog, AgentLimitDialog },
+  components: { AgentEditDialog, AgentModPasswordDialog, AgentLimitDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
@@ -203,9 +215,10 @@ export default {
       agentLevel: [],
       agentInfo: {},
       handicaps: [],
-      form: JSON.parse(JSON.stringify(defaultForm)),
+      editForm: JSON.parse(JSON.stringify(defaultForm)),
       createDialogVisible: false,
       editDialogVisible: false,
+      modPasswordDialogVisible: false,
       limitDialogVisible: false,
       rateLogDialogVisible: false,
       accountStatusEnable: false,
@@ -282,6 +295,10 @@ export default {
         this.dataLoading = false
       })
     },
+    onModPasswordBtnClick(id) {
+      this.editForm = { id: id }
+      this.modPasswordDialogVisible = true
+    },
     async onAddSubAgentBtnClick() {
       this.dataLoading = true
       const timezone = await timezoneSearch({})
@@ -290,7 +307,7 @@ export default {
         const currency = await currencySearch({})
         this.$refs.agentCreateDialog.setCurrency(currency)
       }
-      this.form = JSON.parse(JSON.stringify(defaultForm))
+      this.editForm = JSON.parse(JSON.stringify(defaultForm))
       this.dataLoading = false
       this.createDialogVisible = true
     },
@@ -299,7 +316,7 @@ export default {
       const timezone = await timezoneSearch({})
       this.$refs.agentEditDialog.setTimeZone(timezone)
 
-      this.form = JSON.parse(JSON.stringify(rowData))
+      this.editForm = JSON.parse(JSON.stringify(rowData))
       this.dataLoading = false
       this.editDialogVisible = true
     },
@@ -312,6 +329,7 @@ export default {
       this.editDialogVisible = false
       this.limitDialogVisible = false
       this.rateLogDialogVisible = false
+      this.modPasswordDialogVisible = false
     },
     renderContent(h, { node, data, store }) {
       return (

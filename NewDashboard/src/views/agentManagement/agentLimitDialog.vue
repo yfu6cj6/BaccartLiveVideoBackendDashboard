@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="aA123" :custom-class="'test'" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
+  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
     <el-row>
       <el-col :span="24">
         <el-table :data="handicaps" tooltip-effect="dark" max-height="400px">
