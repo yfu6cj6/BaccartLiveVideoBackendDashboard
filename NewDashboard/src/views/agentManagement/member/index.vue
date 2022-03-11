@@ -34,6 +34,19 @@
       @current-change="handlePageChangeByClient"
     />
 
+    <ModPasswordDialog
+      ref="memberModPasswordDialog"
+      :title="$t('__modPassword')"
+      :visible="curDialogIndex === dialogEnum.memberModPassword"
+      :confirm="$t('__revise')"
+      :name-label="$t('__member')"
+      :form="editForm"
+      :pc-width="'35%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @modPassword="modPassword"
+    />
+
     <LimitDialog
       :title="$t('__limit')"
       :visible="curDialogIndex === dialogEnum.memberLimit"
@@ -46,13 +59,15 @@
 </template>
 
 <script>
+import { memberModPassword } from '@/api/agentManagement/memberList'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import LimitDialog from '@/views/agentManagement/limitDialog'
+import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
 import shared from '@/layout/mixin/shared'
 
 export default {
   name: 'Member',
-  components: { LimitDialog },
+  components: { LimitDialog, ModPasswordDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -67,10 +82,12 @@ export default {
     return {
       dialogEnum: Object.freeze({
         'none': 0,
-        'memberLimit': 1
+        'memberLimit': 1,
+        'memberModPassword': 2
       }),
       agentInfo: {},
       handicaps: [],
+      editForm: {},
       curDialogIndex: 0
     }
   },
@@ -93,6 +110,19 @@ export default {
     onLimitBtnClick(handicaps) {
       this.handicaps = JSON.parse(JSON.stringify(handicaps))
       this.curDialogIndex = this.dialogEnum.memberLimit
+    },
+    onModPasswordBtnClick(rowData) {
+      this.editForm = { id: rowData.id, fullName: rowData.name }
+      this.curDialogIndex = this.dialogEnum.memberModPassword
+    },
+    modPassword(data) {
+      memberModPassword(data).then((res) => {
+        this.$refs.memberModPasswordDialog.setDialogLoading(false)
+        this.$emit('serverResponse', res)
+        this.closeDialogEven()
+      }).catch(() => {
+        this.$refs.memberModPasswordDialog.setDialogLoading(false)
+      })
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none

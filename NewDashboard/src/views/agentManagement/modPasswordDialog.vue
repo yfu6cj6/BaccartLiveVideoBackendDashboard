@@ -1,7 +1,7 @@
 <template>
   <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
     <el-form ref="form" label-width="auto" :model="form" :rules="rules">
-      <el-form-item :label="$t('__agent') + ': '">
+      <el-form-item :label="nameLabel + ': '">
         <span>{{ form.fullName }}</span>
       </el-form-item>
       <el-form-item v-if="visible" :label="$t('__newPassword')" prop="newPassword">
@@ -22,10 +22,9 @@
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
-import { agentModPassword } from '@/api/agentManagement/agentList'
 
 export default {
-  name: 'AgentModPasswordDialog',
+  name: 'ModPasswordDialog',
   mixins: [handleDialogWidth],
   props: {
     'title': {
@@ -40,6 +39,13 @@ export default {
       require: true
     },
     'confirm': {
+      type: String,
+      require: true,
+      default() {
+        return ''
+      }
+    },
+    'nameLabel': {
       type: String,
       require: true,
       default() {
@@ -103,18 +109,16 @@ export default {
           this.$confirm(this.$t('__confirmChanges')).then(_ => {
             this.dialogLoading = true
             const data = JSON.parse(JSON.stringify(this.form))
-            agentModPassword(data).then((res) => {
-              this.$emit('editSuccess', res)
-              this.dialogLoading = false
-            }).catch(() => {
-              this.dialogLoading = false
-            })
+            this.$emit('modPassword', data)
           })
         }
       })
     },
     onClose() {
       this.$emit('close')
+    },
+    setDialogLoading(dialogLoading) {
+      this.dialogLoading = dialogLoading
     }
   }
 }

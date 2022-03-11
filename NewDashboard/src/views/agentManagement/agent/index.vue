@@ -53,15 +53,17 @@
       @current-change="handlePageChangeByClient"
     />
 
-    <AgentModPasswordDialog
+    <ModPasswordDialog
+      ref="agentModPasswordDialog"
       :title="$t('__modPassword')"
       :visible="curDialogIndex === dialogEnum.agentModPassword"
       :confirm="$t('__revise')"
+      :name-label="$t('__agent')"
       :form="editForm"
       :pc-width="'35%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="agentEditDialogEditSuccess"
+      @modPassword="modPassword"
     />
 
     <AgentRateLogDialog
@@ -72,7 +74,6 @@
       :pc-width="'35%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="agentEditDialogEditSuccess"
     />
 
     <AgentRateLogDialog
@@ -83,7 +84,6 @@
       :pc-width="'35%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="agentEditDialogEditSuccess"
     />
 
     <LimitDialog
@@ -152,13 +152,13 @@
 </template>
 
 <script>
-import { agentSearch, agentCommissionRateLog, agentRollingRateLog } from '@/api/agentManagement/agentList'
+import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword } from '@/api/agentManagement/agentList'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import { currencySearch } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import AgentEditDialog from './agentEditDialog'
-import AgentModPasswordDialog from './agentModPasswordDialog'
+import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
 import LimitDialog from '@/views/agentManagement/limitDialog'
 import AgentRateLogDialog from './agentRateLogDialog'
 import AgentBalanceDialog from './agentBalanceDialog'
@@ -188,7 +188,7 @@ const editFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 
 
 export default {
   name: 'Agent',
-  components: { AgentEditDialog, AgentModPasswordDialog, LimitDialog, AgentRateLogDialog, AgentBalanceDialog },
+  components: { AgentEditDialog, ModPasswordDialog, LimitDialog, AgentRateLogDialog, AgentBalanceDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -303,9 +303,18 @@ export default {
       this.curDialogIndex = this.dialogEnum.agentEdit
       this.setDataLoading(false)
     },
+    modPassword(data) {
+      agentModPassword(data).then((res) => {
+        this.$refs.agentModPasswordDialog.setDialogLoading(false)
+        this.$emit('serverResponse', res)
+        this.closeDialogEven()
+      }).catch(() => {
+        this.$refs.agentModPasswordDialog.setDialogLoading(false)
+      })
+    },
     agentEditDialogEditSuccess(res) {
-      this.closeDialogEven()
       this.$emit('serverResponse', res)
+      this.closeDialogEven()
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none

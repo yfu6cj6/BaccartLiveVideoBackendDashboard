@@ -68,7 +68,7 @@
         <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onTableBtnClick(tableEnum.agent, agentInfo.id)">{{ $t("__agent") }}</el-button>
         <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onTableBtnClick(tableEnum.member, agentInfo.id)">{{ $t("__member") }}</el-button>
         <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onTableBtnClick(tableEnum.subAccount, agentInfo.id)">{{ $t("__subAccount") }}</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onAddSubBtnClick()">{{ $t("__addSubAgent") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onAddSubBtnClick()">{{ addSubLabel }}</el-button>
         <Agent
           v-show="curTableIndex === tableEnum.agent"
           ref="agent"
@@ -142,6 +142,20 @@ export default {
     ]),
     treeDefaultExpandedKeys() {
       return this.agentLevel.length === 0 ? [] : [this.agentLevel[0].AgentId]
+    },
+    addSubLabel() {
+      switch (this.curTableIndex) {
+        case this.tableEnum.agent: {
+          return this.$t('__addSubAgent')
+        }
+        case this.tableEnum.member: {
+          return this.$t('__addMember')
+        }
+        case this.tableEnum.subAccount: {
+          return ''
+        }
+      }
+      return ''
     }
   },
   created() {

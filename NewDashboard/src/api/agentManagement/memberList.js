@@ -7,3 +7,11 @@ export function memberSearch(data) {
     data: data
   })
 }
+
+export function memberModPassword(data) {
+  return request({
+    url: '/member/modPassword',
+    method: 'post',
+    data: data
+  })
+}
