@@ -26,10 +26,10 @@
       <el-form-item :label="$t('__agentNickname')" prop="nickname">
         <el-input v-model="form.nickname" />
       </el-form-item>
-      <el-form-item v-if="isCreate&&visible" :label="$t('__password')" prop="password">
+      <el-form-item v-if="operationType===1&&visible" :label="$t('__password')" prop="password">
         <el-input v-model="form.password" show-password />
       </el-form-item>
-      <el-form-item v-if="isCreate&&visible" :label="$t('__confirmPassword')" prop="confirmPassword">
+      <el-form-item v-if="operationType===1&&visible" :label="$t('__confirmPassword')" prop="confirmPassword">
         <el-input v-model="form.confirmPassword" show-password />
       </el-form-item>
       <el-form-item :label="$t('__accountStatus')" prop="status">
@@ -80,7 +80,7 @@
       </label>
       <br>
       <label>{{ $t('__balance') + ': ' }}
-        <span>{{ agentBalanceInfo.parentBalance }}</span>
+        <span>{{ parentBalance }}</span>
       </label>
       <br>
       <label>{{ $t('__agentAccount') + ': ' }}
@@ -91,7 +91,7 @@
         <span>{{ agentBalanceInfo.agentBalance }}</span>
       </label>
       <el-form-item :label="$t('__depositBalance')" prop="balance">
-        <el-input v-model="form.balance" type="number" :disabled="balanceDisable" min="0" :max="agentBalanceInfo.parentBalance" />
+        <el-input v-model="form.balance" type="number" :disabled="balanceDisable" min="0" />
       </el-form-item>
     </el-form>
     <el-form v-show="curIndex === 4" ref="step5" :model="form" :rules="step5Rules">
@@ -118,7 +118,7 @@
             <br>
           </template>
           <label>{{ $t('__balance') }}
-            <span>{{ form.balance }}</span>
+            <span>{{ numberFormatStr(form.balance) }}</span>
           </label>
           <br>
           <label>{{ $t('__remark') }}
@@ -180,9 +180,14 @@ export default {
       type: Boolean,
       require: true
     },
-    'isCreate': {
-      type: Boolean,
-      require: true
+    // operationType === 1 新增
+    // operationType === 2 編輯
+    'operationType': {
+      type: Number,
+      require: true,
+      default() {
+        return 0
+      }
     },
     'agentInfo': {
       type: Object,
@@ -257,10 +262,10 @@ export default {
     const validateBlance = (rule, value, callback) => {
       if (!value && value !== 0) {
         callback(new Error(this.$t('__requiredField')))
-      } else if (this.form.balance > this.agentBalanceInfo.parentBalance) {
-        callback(new Error(this.$t('__overMax')))
       } else if (this.form.balance < 0) {
         callback(new Error(this.$t('__lowerMin')))
+      } else if (this.agentBalanceInfo.parentId !== 1 && Number(this.form.balance) > Number(this.agentBalanceInfo.parentBalance)) {
+        callback(new Error(this.$t('__overMax')))
       } else {
         callback()
       }
@@ -280,7 +285,7 @@ export default {
         balance: [{ required: true, trigger: 'blur', validator: validateBlance }]
       },
       step5Rules: {
-        userPassword: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        userPassword: [{ required: true, trigger: 'blur', validator: validate }]
       },
       autoGenerateAccount: false,
       curIndex: 0,
@@ -314,10 +319,13 @@ export default {
       return this.curIndex >= 4
     },
     showCurrency() {
-      return this.isCreate && this.agentInfo.id === 1
+      return this.operationType === 1 && this.agentInfo.id === 1
     },
     balanceDisable() {
-      return parseInt(this.agentBalanceInfo.parentBalance, 10) === 0
+      if (this.agentBalanceInfo.parentId === 1) {
+        return false
+      }
+      return Number(this.agentBalanceInfo.parentBalance) === 0
     },
     timeZoneCityName() {
       const timeZoneData = this.time_zone.find(timezone => this.form.time_zone === timezone.id)
@@ -326,6 +334,9 @@ export default {
     currencyName() {
       const currencyData = this.currency.find(currencyItem => this.form.currency === currencyItem.id)
       return currencyData ? currencyData.name : ''
+    },
+    parentBalance() {
+      return this.agentBalanceInfo.parentId === 1 ? '∞' : this.agentBalanceInfo.parentBalance
     }
   },
   watch: {
@@ -356,9 +367,11 @@ export default {
           }
         })
       } else if (this.curIndex === 3) {
-        const agentId = this.isCreate ? this.agentInfo.id : this.form.id
+        const agentId = this.operationType === 1 ? this.agentInfo.id : this.form.id
+        this.dialogLoading = true
         agentGetSetBalanceInfo({ agentId: agentId }).then((res) => {
           this.agentBalanceInfo = res.rows
+          this.dialogLoading = false
         })
       }
     }
@@ -407,7 +420,7 @@ export default {
           this.selectHandicaps.forEach(element => {
             data.handicaps.push(element.id)
           })
-          if (this.isCreate) {
+          if (this.operationType === 1) {
             data.parent = this.agentInfo.id
             agentCreate(data).then((res) => {
               this.$emit('editSuccess', res)
@@ -415,7 +428,7 @@ export default {
             }).catch(() => {
               this.dialogLoading = false
             })
-          } else {
+          } else if (this.operationType === 2) {
             this.$confirm(this.$t('__confirmChanges')).then(_ => {
               agentEdit(data).then((res) => {
                 this.$emit('editSuccess', res)
@@ -424,6 +437,8 @@ export default {
                 this.dialogLoading = false
               })
             })
+          } else {
+            this.dialogLoading = false
           }
         }
       })

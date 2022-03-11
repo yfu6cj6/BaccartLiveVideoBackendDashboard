@@ -2,8 +2,8 @@
   <el-dialog :title="title" :visible.sync="visible" width="40%" :before-close="onClose">
     <el-table :data="listData" tooltip-effect="dark" max-height="400px">
       <el-table-column prop="user" :label="$t('__user')" align="center" />
-      <el-table-column v-if="rateType === 1" prop="commission_rate" :label="$t('__commissionRate')" align="center" />
-      <el-table-column v-if="rateType === 2" prop="rolling_rate" :label="$t('__rollingRate')" align="center" />
+      <el-table-column v-if="operationType === 1" prop="commission_rate" :label="$t('__commissionRate')" align="center" />
+      <el-table-column v-if="operationType === 2" prop="rolling_rate" :label="$t('__rollingRate')" align="center" />
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
     </el-table>
   </el-dialog>
@@ -31,7 +31,9 @@ export default {
         return {}
       }
     },
-    'rateType': {
+    // operationType === 1 輸贏佔成
+    // operationType === 2 洗碼佔成
+    'operationType': {
       type: Number,
       require: true,
       default() {

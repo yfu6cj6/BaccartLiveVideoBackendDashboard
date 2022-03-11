@@ -2,7 +2,7 @@ export function numberFormat(number) {
   if (number !== undefined) {
     let str = number.toString()
     if (str.indexOf('.') < 0) {
-      str = number.toFixed(2)
+      str = Number(number).toFixed(2)
     }
     const x = str.split('.')
     let x1 = x[0]

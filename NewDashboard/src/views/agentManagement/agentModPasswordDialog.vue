@@ -1,6 +1,9 @@
 <template>
   <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
     <el-form ref="form" label-width="auto" :model="form" :rules="rules">
+      <el-form-item :label="$t('__agent') + ': '">
+        <span>{{ form.fullName }}</span>
+      </el-form-item>
       <el-form-item v-if="visible" :label="$t('__newPassword')" prop="newPassword">
         <el-input v-model="form.newPassword" show-password />
       </el-form-item>
@@ -52,6 +55,13 @@ export default {
     }
   },
   data: function() {
+    const validate = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t('__requiredField')))
+      } else {
+        callback()
+      }
+    }
     const validatePassword = (rule, value, callback) => {
       if (!value) {
         callback(new Error(this.$t('__requiredField')))
@@ -74,7 +84,7 @@ export default {
       rules: {
         newPassword: [{ required: true, trigger: 'blur', validator: validatePassword }],
         newPassword_confirmation: [{ required: true, trigger: 'blur', validator: validateConfirmPassword }],
-        userPassword: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        userPassword: [{ required: true, trigger: 'blur', validator: validate }]
       },
       dialogLoading: false
     }

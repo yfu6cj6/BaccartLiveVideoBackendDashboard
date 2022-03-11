@@ -75,15 +75,15 @@
             <template slot-scope="scope">
               <span class="scope-content">{{ scope.row.fullName }}</span>
               <el-button class="iconButton" type="primary" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
-              <el-button class="iconButton" type="primary" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row.id)" />
+              <el-button class="iconButton" type="primary" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
             </template>
           </el-table-column>
           <el-table-column prop="currency" :label="$t('__currency')" align="center" />
           <el-table-column :label="$t('__balance')" align="center">
             <template slot-scope="scope">
               <span class="scope-content">{{ scope.row.balance }}</span>
-              <el-button class="labelButton" type="primary" size="mini" @click="onDepositBtnClick(scope.row.id)">{{ $t("__deposit") }}</el-button>
-              <el-button class="labelButton labelWithdrawButton" type="primary" size="mini" @click="onWithdrawBtnClick(scope.row.id)">{{ $t("__withdraw") }}</el-button>
+              <el-button class="labelButton" type="primary" size="mini" @click="onDepositBtnClick(scope.row)">{{ $t("__deposit") }}</el-button>
+              <el-button class="labelButton labelWithdrawButton" type="primary" size="mini" @click="onWithdrawBtnClick(scope.row)">{{ $t("__withdraw") }}</el-button>
             </template>
           </el-table-column>
           <el-table-column prop="timeZone.city_name" :label="$t('__timeZone')" align="center" />
@@ -140,7 +140,7 @@
       :title="$t('__commissionRate')"
       :visible="curDialogIndex === commissionRateDialog"
       :list-data="rateData"
-      :rate-type="1"
+      :operation-type="1"
       :pc-width="'35%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
@@ -151,7 +151,7 @@
       :title="$t('__rollingRate')"
       :visible="curDialogIndex === rollingRateDialog"
       :list-data="rateData"
-      :rate-type="2"
+      :operation-type="2"
       :pc-width="'35%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
@@ -167,11 +167,35 @@
       @close="closeDialogEven"
     />
 
+    <AgentBalanceDialog
+      :title="$t('__depositBalance')"
+      :visible="curDialogIndex === depositBalanceDialog"
+      :confirm="$t('__confirm')"
+      :form="editForm"
+      :operation-type="1"
+      :pc-width="'35%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @editSuccess="agentEditDialogEditSuccess"
+    />
+
+    <AgentBalanceDialog
+      :title="$t('__withdrawBalance')"
+      :visible="curDialogIndex === withdrawBalanceDialog"
+      :confirm="$t('__confirm')"
+      :form="editForm"
+      :operation-type="2"
+      :pc-width="'35%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @editSuccess="agentEditDialogEditSuccess"
+    />
+
     <AgentEditDialog
       ref="agentEditDialog"
       :title="$t('__edit')"
       :visible="curDialogIndex === editDialog"
-      :is-create="false"
+      :operation-type="2"
       :agent-info="agentInfo"
       :confirm="$t('__revise')"
       :form="editForm"
@@ -185,7 +209,7 @@
       ref="agentCreateDialog"
       :title="$t('__create')"
       :visible="curDialogIndex === createDialog"
-      :is-create="true"
+      :operation-type="1"
       :agent-info="agentInfo"
       :confirm="$t('__confirm')"
       :form="editForm"
@@ -208,6 +232,7 @@ import AgentEditDialog from './agentEditDialog'
 import AgentModPasswordDialog from './agentModPasswordDialog'
 import AgentLimitDialog from './agentLimitDialog'
 import AgentRateLogDialog from './agentRateLogDialog'
+import AgentBalanceDialog from './agentBalanceDialog'
 import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
 
@@ -232,7 +257,7 @@ const defaultForm = {
 
 export default {
   name: 'AgentManagement',
-  components: { AgentEditDialog, AgentModPasswordDialog, AgentLimitDialog, AgentRateLogDialog },
+  components: { AgentEditDialog, AgentModPasswordDialog, AgentLimitDialog, AgentRateLogDialog, AgentBalanceDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
@@ -274,6 +299,12 @@ export default {
     },
     rollingRateDialog() {
       return 6
+    },
+    depositBalanceDialog() {
+      return 7
+    },
+    withdrawBalanceDialog() {
+      return 8
     }
   },
   created() {
@@ -345,15 +376,17 @@ export default {
         this.dataLoading = false
       })
     },
-    onModPasswordBtnClick(id) {
-      this.editForm = { id: id }
+    onModPasswordBtnClick(rowData) {
+      this.editForm = { id: rowData.id, fullName: rowData.fullName }
       this.curDialogIndex = this.modPasswordDialog
     },
-    onDepositBtnClick(id) {
-      this.editForm = { id: id }
+    onDepositBtnClick(rowData) {
+      this.editForm = { agentId: rowData.id, amount: this.numberFormatStr(0) }
+      this.curDialogIndex = this.depositBalanceDialog
     },
-    onWithdrawBtnClick(id) {
-      this.editForm = { id: id }
+    onWithdrawBtnClick(rowData) {
+      this.editForm = { agentId: rowData.id, amount: this.numberFormatStr(0) }
+      this.curDialogIndex = this.withdrawBalanceDialog
     },
     async onAddSubAgentBtnClick() {
       this.dataLoading = true
