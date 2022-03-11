@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="40%" :before-close="onClose">
+  <el-dialog :title="title" :visible.sync="visible" width="40%" :before-close="onClose" :close-on-click-modal="false">
     <el-table :data="listData" tooltip-effect="dark" max-height="400px">
       <el-table-column prop="user" :label="$t('__user')" align="center" />
       <el-table-column v-if="operationType === operationEnum.commissionRate" prop="commission_rate" :label="$t('__commissionRate')" align="center" />

@@ -1,11 +1,10 @@
 <template>
-  <div class="agentManagement-container">
+  <div v-loading="dataLoading" class="agentManagement-container">
     <el-row>
       <el-col :span="3">
         <el-card shadow="never">
           <el-scrollbar>
             <el-tree
-              v-loading="dataLoading"
               :data="agentLevel"
               :props="defaultProps"
               node-key="AgentId"
@@ -66,20 +65,28 @@
             <span class="labelContent">{{ agentInfo.lastLoginAt }}</span>
           </label>
         </el-row>
-        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onAgentBtnClick()">{{ $t("__agent") }}</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onPlayerBtnClick()">{{ $t("__player") }}</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onSubAccountBtnClick()">{{ $t("__subAccount") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onTableBtnClick(tableEnum.agent, agentInfo.id)">{{ $t("__agent") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onTableBtnClick(tableEnum.member, agentInfo.id)">{{ $t("__member") }}</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onTableBtnClick(tableEnum.subAccount, agentInfo.id)">{{ $t("__subAccount") }}</el-button>
         <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onAddSubBtnClick()">{{ $t("__addSubAgent") }}</el-button>
         <Agent
           v-show="curTableIndex === tableEnum.agent"
           ref="agent"
           :view-height="viewHeight"
-          @serverResponse="handleRespone"
+          @serverResponse="handleAgentRespone"
+          @setDataLoading="setDataLoading"
+        />
+        <Member
+          v-show="curTableIndex === tableEnum.member"
+          ref="member"
+          :view-height="viewHeight"
+          @serverResponse="handleMemberRespone"
+          @setDataLoading="setDataLoading"
         />
       </el-col>
     </el-row>
 
-    <AgentLimitDialog
+    <LimitDialog
       :title="$t('__limit')"
       :visible="curDialogIndex === dialogEnum.limit"
       :handicaps="handicaps"
@@ -92,15 +99,17 @@
 
 <script>
 import { agentSearch, agentTotalPlayerCount } from '@/api/agentManagement/agentList'
-import AgentLimitDialog from './agent/agentLimitDialog'
+import { memberSearch } from '@/api/agentManagement/memberList'
+import LimitDialog from '@/views/agentManagement/limitDialog'
 import Agent from './agent/index'
+import Member from './member/index'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
 
 export default {
   name: 'AgentManagement',
-  components: { AgentLimitDialog, Agent },
+  components: { LimitDialog, Agent, Member },
   mixins: [handleViewResize],
   data() {
     return {
@@ -110,7 +119,7 @@ export default {
       },
       tableEnum: Object.freeze({
         'agent': 0,
-        'player': 1,
+        'member': 1,
         'subAccount': 2
       }),
       dialogEnum: Object.freeze({
@@ -137,12 +146,14 @@ export default {
   },
   created() {
     this.setHeight()
-    this.curTableIndex = this.tableEnum.agent
-    this.searchAgentInfo({})
+    this.onTableBtnClick(this.tableEnum.agent)
   },
   methods: {
     numberFormatStr(number) {
       return numberFormat(number)
+    },
+    setDataLoading(dataLoading) {
+      this.dataLoading = dataLoading
     },
     handleRespone(res) {
       this.agentLevel = res.agentLevel
@@ -155,16 +166,15 @@ export default {
 
       this.accountStatusEnable = this.agentInfo.status === '1'
       this.betStatusEnable = this.agentInfo.bet_status === '1'
-
-      this.$refs.agent.setAgentTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
-
       this.dataLoading = false
     },
-    searchAgentInfo(sarchData) {
-      this.dataLoading = true
-      agentSearch(sarchData).then((res) => {
-        this.handleRespone(res)
-      })
+    handleAgentRespone(res) {
+      this.handleRespone(res)
+      this.$refs.agent.setAgentTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
+    },
+    handleMemberRespone(res) {
+      this.handleRespone(res)
+      this.$refs.member.setMemberTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
     },
     onLimitBtnClick(handicaps) {
       this.handicaps = JSON.parse(JSON.stringify(handicaps))
@@ -177,14 +187,26 @@ export default {
         this.dataLoading = false
       })
     },
-    onAgentBtnClick() {
-      this.curTableIndex = this.tableEnum.agent
-    },
-    onPlayerBtnClick() {
-      this.curTableIndex = this.tableEnum.player
-    },
-    onSubAccountBtnClick() {
-      this.curTableIndex = this.tableEnum.subAccount
+    onTableBtnClick(tableEnum, id) {
+      this.curTableIndex = tableEnum
+      this.dataLoading = true
+      switch (this.curTableIndex) {
+        case this.tableEnum.agent: {
+          agentSearch({ agentId: id }).then((res) => {
+            this.handleAgentRespone(res)
+          })
+          break
+        }
+        case this.tableEnum.member: {
+          memberSearch({ agentId: id }).then((res) => {
+            this.handleMemberRespone(res)
+          })
+          break
+        }
+        case this.tableEnum.subAccount: {
+          break
+        }
+      }
     },
     async onAddSubBtnClick() {
       this.dataLoading = true
@@ -193,7 +215,7 @@ export default {
           await this.$refs.agent.agentCreate()
           break
         }
-        case this.tableEnum.player: {
+        case this.tableEnum.member: {
           break
         }
         case this.tableEnum.subAccount: {
@@ -213,7 +235,7 @@ export default {
       )
     },
     handleNodeClick(data) {
-      this.searchAgentInfo({ agentId: data.AgentId })
+      this.onTableBtnClick(this.curTableIndex, data.AgentId)
     }
   }
 }

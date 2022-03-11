@@ -86,12 +86,3 @@ export function agentWithdrawBalance(data) {
     data: data
   })
 }
-
-// 取得盤口
-export function agentHandicap(data) {
-  return request({
-    url: '/agent/handicap',
-    method: 'post',
-    data: data
-  })
-}

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
+    <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column :label="$t('__agent')" align="center">
         <template slot-scope="scope">
           <span class="scope-content">{{ scope.row.fullName }}</span>
@@ -86,7 +86,7 @@
       @editSuccess="agentEditDialogEditSuccess"
     />
 
-    <AgentLimitDialog
+    <LimitDialog
       :title="$t('__limit')"
       :visible="curDialogIndex === dialogEnum.agentLimit"
       :handicaps="handicaps"
@@ -159,7 +159,7 @@ import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import AgentEditDialog from './agentEditDialog'
 import AgentModPasswordDialog from './agentModPasswordDialog'
-import AgentLimitDialog from './agentLimitDialog'
+import LimitDialog from '@/views/agentManagement/limitDialog'
 import AgentRateLogDialog from './agentRateLogDialog'
 import AgentBalanceDialog from './agentBalanceDialog'
 import { numberFormat } from '@/utils/numberFormat'
@@ -188,7 +188,7 @@ const editFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 
 
 export default {
   name: 'Agent',
-  components: { AgentEditDialog, AgentModPasswordDialog, AgentLimitDialog, AgentRateLogDialog, AgentBalanceDialog },
+  components: { AgentEditDialog, AgentModPasswordDialog, LimitDialog, AgentRateLogDialog, AgentBalanceDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -221,8 +221,8 @@ export default {
     }
   },
   methods: {
+    // 父物件呼叫
     async agentCreate() {
-      this.dataLoading = true
       const timezone = await timezoneSearch({})
       this.$refs.agentCreateDialog.setTimeZone(timezone)
       if (this.agentInfo.id === 1) {
@@ -230,7 +230,6 @@ export default {
         this.$refs.agentCreateDialog.setCurrency(currency)
       }
       this.editForm = JSON.parse(JSON.stringify(defaultForm))
-      this.dataLoading = false
       this.editStepEnum = createFormStepEnum
       this.curDialogIndex = this.dialogEnum.agentCreate
     },
@@ -246,8 +245,9 @@ export default {
       })
       this.totalCount = rows.length
       this.handlePageChangeByClient(this.currentPage)
-
-      this.dataLoading = false
+    },
+    setDataLoading(dataLoading) {
+      this.$emit('setDataLoading', dataLoading)
     },
     numberFormatStr(number) {
       return numberFormat(number)
@@ -256,7 +256,7 @@ export default {
       this.searchAgentInfo({})
     },
     searchAgentInfo(sarchData) {
-      this.dataLoading = true
+      this.setDataLoading(true)
       agentSearch(sarchData).then((res) => {
         this.$emit('serverResponse', res)
       })
@@ -266,19 +266,19 @@ export default {
       this.curDialogIndex = this.dialogEnum.agentLimit
     },
     onCommissionRateLogBtnClick(rowData) {
-      this.dataLoading = true
+      this.setDataLoading(true)
       agentCommissionRateLog({ agentId: rowData.id }).then((res) => {
         this.curDialogIndex = this.dialogEnum.agentCommissionRate
         this.rateData = res.rows
-        this.dataLoading = false
+        this.setDataLoading(false)
       })
     },
     onRollingRateLogBtnClick(rowData) {
-      this.dataLoading = true
+      this.setDataLoading(true)
       agentRollingRateLog({ agentId: rowData.id }).then((res) => {
         this.curDialogIndex = this.dialogEnum.agentRollingRate
         this.rateData = res.rows
-        this.dataLoading = false
+        this.setDataLoading(false)
       })
     },
     onModPasswordBtnClick(rowData) {
@@ -294,14 +294,14 @@ export default {
       this.curDialogIndex = this.dialogEnum.agentWithdrawBalance
     },
     async onEditBtnClick(rowData) {
-      this.dataLoading = true
+      this.setDataLoading(true)
       const timezone = await timezoneSearch({})
       this.$refs.agentEditDialog.setTimeZone(timezone)
 
       this.editForm = JSON.parse(JSON.stringify(rowData))
-      this.dataLoading = false
       this.editStepEnum = editFormStepEnum
       this.curDialogIndex = this.dialogEnum.agentEdit
+      this.setDataLoading(false)
     },
     agentEditDialogEditSuccess(res) {
       this.closeDialogEven()

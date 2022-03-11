@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
+  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
     <el-row>
       <el-col :span="24">
         <el-table :data="handicaps" tooltip-effect="dark" max-height="400px">
@@ -18,7 +18,7 @@
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
 
 export default {
-  name: 'AgentLimitDialog',
+  name: 'LimitDialog',
   mixins: [handleDialogWidth],
   props: {
     'title': {

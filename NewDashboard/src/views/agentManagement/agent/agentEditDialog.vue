@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
     <label class="agentName">{{ $t('__superiorAgent') + ': ' }}
       <span>{{ agentInfo.fullName }}</span>
     </label>

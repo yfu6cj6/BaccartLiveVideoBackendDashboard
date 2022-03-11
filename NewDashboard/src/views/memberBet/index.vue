@@ -26,7 +26,7 @@
           <el-option v-for="item in searchItems.agents" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__player')">
+      <el-form-item class="inputTitle" :label="$t('__member')">
         <el-select v-model="searchForm.member_id" multiple>
           <el-option v-for="item in searchItems.members" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
@@ -97,7 +97,7 @@
     >
       <el-table-column :label="$t('__totalCount')" align="right">
         <el-table-column prop="agent" :width="agentWidth" :label="$t('__agent')" align="center" />
-        <el-table-column prop="member" :width="memberWidth" :label="$t('__player')" align="center" />
+        <el-table-column prop="member" :width="memberWidth" :label="$t('__member')" align="center" />
         <el-table-column prop="order_number" :width="orderNumberWidth" :label="$t('__orderNumber')" align="center" />
         <el-table-column prop="bet_time" :width="betTimeWidth" :label="$t('__betTime')" align="center" />
         <el-table-column prop="payout_time" :width="payoutTimeWidth" :label="$t('__payoutTime')" align="center" />
@@ -200,7 +200,7 @@ export default {
       return this.calculateWidth(this.$t('__agent'), 'agent', 10) + 'px'
     },
     memberWidth() {
-      return this.calculateWidth(this.$t('__player'), 'member', 10) + 'px'
+      return this.calculateWidth(this.$t('__member'), 'member', 10) + 'px'
     },
     orderNumberWidth() {
       return this.calculateWidth(this.$t('__orderNumber'), 'order_number', 9) + 'px'

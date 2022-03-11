@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
     <el-form ref="form" label-width="auto" :model="form" :rules="rules">
       <el-form-item :label="$t('__agent') + ': '">
         <span>{{ agentBalanceInfo.parent }}</span>
