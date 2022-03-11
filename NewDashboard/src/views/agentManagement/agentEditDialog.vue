@@ -4,13 +4,13 @@
       <span>{{ agentInfo.fullName }}</span>
     </label>
     <el-steps :active="curIndex" align-center finish-status="success">
-      <el-step :description="$t('__agentInfo')" />
-      <el-step :description="$t('__rate')" />
-      <el-step :description="$t('__limit')" />
-      <el-step :description="$t('__quotaConfiguration')" />
-      <el-step :description="$t('__confirm')" />
+      <el-step v-if="hasStep('agentInfo')" :description="$t('__agentInfo')" />
+      <el-step v-if="hasStep('rate')" :description="$t('__rate')" />
+      <el-step v-if="hasStep('limit')" :description="$t('__limit')" />
+      <el-step v-if="hasStep('balanceConfig')" :description="$t('__balanceConfig')" />
+      <el-step v-if="hasStep('confirm')" :description="$t('__confirm')" />
     </el-steps>
-    <el-form v-show="curIndex === 0" ref="step1" :model="form" :rules="step1Rules">
+    <el-form v-show="curIndex === stepEnum.agentInfo" ref="step1" :model="form" :rules="step1Rules">
       <el-form-item :label="$t('__accountGenerateMode')">
         <el-switch
           v-model="autoGenerateAccount"
@@ -26,10 +26,10 @@
       <el-form-item :label="$t('__agentNickname')" prop="nickname">
         <el-input v-model="form.nickname" />
       </el-form-item>
-      <el-form-item v-if="operationType===1&&visible" :label="$t('__password')" prop="password">
+      <el-form-item v-if="operationType===operationEnum.create&&visible" :label="$t('__password')" prop="password">
         <el-input v-model="form.password" show-password />
       </el-form-item>
-      <el-form-item v-if="operationType===1&&visible" :label="$t('__confirmPassword')" prop="confirmPassword">
+      <el-form-item v-if="operationType===operationEnum.create&&visible" :label="$t('__confirmPassword')" prop="confirmPassword">
         <el-input v-model="form.confirmPassword" show-password />
       </el-form-item>
       <el-form-item :label="$t('__accountStatus')" prop="status">
@@ -56,7 +56,7 @@
         <el-input v-model="form.remark" type="textarea" :rows="2" />
       </el-form-item>
     </el-form>
-    <el-form v-show="curIndex === 1" ref="step2" :model="form" :rules="step2Rules">
+    <el-form v-show="curIndex === stepEnum.rate" ref="step2" :model="form" :rules="step2Rules">
       <el-form-item :label="$t('__commissionRate')" prop="commission_rate">
         <el-input v-model="form.commission_rate" type="number" :disabled="agentInfo.commission_rate === 0" min="0" :max="agentInfo.commission_rate" />
         <span class="step2Tip">{{ commissionRateTip }}</span>
@@ -66,7 +66,7 @@
         <span class="step2Tip">{{ rollingRateTip }}</span>
       </el-form-item>
     </el-form>
-    <el-table v-show="curIndex === 2" ref="handicapsTable" :data="agentInfo.handicaps" tooltip-effect="dark" @selection-change="handleSelectionHandicaps">
+    <el-table v-show="curIndex === stepEnum.limit" ref="handicapsTable" :data="agentInfo.handicaps" tooltip-effect="dark" @selection-change="handleSelectionHandicaps">
       <el-table-column type="selection" align="center" />
       <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
@@ -74,7 +74,7 @@
       <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="currency" :label="$t('__currency')" align="center" :show-overflow-tooltip="true" />
     </el-table>
-    <el-form v-show="curIndex === 3" ref="step4" :model="form" :rules="step4Rules">
+    <el-form v-show="curIndex === stepEnum.balanceConfig" ref="step4" :model="form" :rules="step4Rules">
       <label>{{ $t('__superiorAgent') + ': ' }}
         <span>{{ agentBalanceInfo.parent }}</span>
       </label>
@@ -94,7 +94,7 @@
         <el-input v-model="form.balance" type="number" :disabled="balanceDisable" min="0" />
       </el-form-item>
     </el-form>
-    <el-form v-show="curIndex === 4" ref="step5" :model="form" :rules="step5Rules">
+    <el-form v-show="curIndex === stepEnum.confirm" ref="step5" :model="form" :rules="step5Rules">
       <el-row>
         <el-col :span="12">
           <label>{{ $t('__agentInfo') }}</label>
@@ -117,10 +117,12 @@
             </label>
             <br>
           </template>
-          <label>{{ $t('__balance') }}
-            <span>{{ numberFormatStr(form.balance) }}</span>
-          </label>
-          <br>
+          <template v-if="operationType===operationEnum.create">
+            <label>{{ $t('__balance') }}
+              <span>{{ numberFormatStr(form.balance) }}</span>
+            </label>
+            <br>
+          </template>
           <label>{{ $t('__remark') }}
             <span>{{ form.remark }}</span>
           </label>
@@ -180,8 +182,6 @@ export default {
       type: Boolean,
       require: true
     },
-    // operationType === 1 新增
-    // operationType === 2 編輯
     'operationType': {
       type: Number,
       require: true,
@@ -208,6 +208,13 @@ export default {
       require: true,
       default() {
         return {}
+      }
+    },
+    'stepEnum': {
+      type: Object,
+      require: true,
+      default() {
+        return Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 'balanceConfig': 3, 'confirm': 4 })
       }
     }
   },
@@ -287,6 +294,7 @@ export default {
       step5Rules: {
         userPassword: [{ required: true, trigger: 'blur', validator: validate }]
       },
+      operationEnum: Object.freeze({ 'create': 1, 'edit': 2 }),
       autoGenerateAccount: false,
       curIndex: 0,
       time_zone: [],
@@ -307,19 +315,19 @@ export default {
       return this.$t('__range') + '0%-' + this.agentInfo.rolling_rate + '%'
     },
     previousBtnVisible() {
-      return this.curIndex > 0
+      return this.curIndex > this.stepEnum.agentInfo
     },
     nextBtnVisible() {
-      if (this.curIndex === 2) {
+      if (this.curIndex === this.stepEnum.limit) {
         return this.selectHandicaps.length > 0
       }
-      return this.curIndex < 4
+      return this.curIndex < this.stepEnum.confirm
     },
     confirmBtnVisible() {
-      return this.curIndex >= 4
+      return this.curIndex >= this.stepEnum.confirm
     },
     showCurrency() {
-      return this.operationType === 1 && this.agentInfo.id === 1
+      return this.operationType === this.operationEnum.create && this.agentInfo.id === 1
     },
     balanceDisable() {
       if (this.agentBalanceInfo.parentId === 1) {
@@ -342,7 +350,7 @@ export default {
   watch: {
     visible() {
       if (this.visible) {
-        this.curIndex = 0
+        this.curIndex = this.stepEnum.agentInfo
       } else {
         this.autoGenerateAccount = false
         this.$refs.step1.clearValidate()
@@ -360,14 +368,14 @@ export default {
       }
     },
     curIndex() {
-      if (this.curIndex === 2) {
+      if (this.curIndex === this.stepEnum.limit) {
         this.agentInfo.handicaps.forEach(agentInfoHandicap => {
           if (this.form.handicaps.some(formHandicaps => formHandicaps.id === agentInfoHandicap.id)) {
             this.$refs.handicapsTable.toggleRowSelection(agentInfoHandicap, true)
           }
         })
-      } else if (this.curIndex === 3) {
-        const agentId = this.operationType === 1 ? this.agentInfo.id : this.form.id
+      } else if (this.curIndex === this.stepEnum.balanceConfig) {
+        const agentId = this.operationType === this.operationEnum.create ? this.agentInfo.id : this.form.id
         this.dialogLoading = true
         agentGetSetBalanceInfo({ agentId: agentId }).then((res) => {
           this.agentBalanceInfo = res.rows
@@ -377,6 +385,14 @@ export default {
     }
   },
   methods: {
+    hasStep(step) {
+      for (const stepKey in this.stepEnum) {
+        if (step === stepKey) {
+          return true
+        }
+      }
+      return false
+    },
     numberFormatStr(number) {
       return numberFormat(number)
     },
@@ -385,17 +401,17 @@ export default {
     },
     onNextBtnClick() {
       let next = false
-      if (this.curIndex === 0) {
+      if (this.curIndex === this.stepEnum.agentInfo) {
         this.$refs.step1.validate((valid) => {
           next = valid
         })
-      } else if (this.curIndex === 1) {
+      } else if (this.curIndex === this.stepEnum.rate) {
         this.$refs.step2.validate((valid) => {
           next = valid
         })
-      } else if (this.curIndex === 2) {
+      } else if (this.curIndex === this.stepEnum.limit) {
         next = true
-      } else if (this.curIndex === 3) {
+      } else if (this.curIndex === this.stepEnum.balanceConfig) {
         this.$refs.step4.validate((valid) => {
           next = valid
         })
@@ -420,7 +436,7 @@ export default {
           this.selectHandicaps.forEach(element => {
             data.handicaps.push(element.id)
           })
-          if (this.operationType === 1) {
+          if (this.operationType === this.operationEnum.create) {
             data.parent = this.agentInfo.id
             agentCreate(data).then((res) => {
               this.$emit('editSuccess', res)
@@ -428,7 +444,7 @@ export default {
             }).catch(() => {
               this.dialogLoading = false
             })
-          } else if (this.operationType === 2) {
+          } else if (this.operationType === this.operationEnum.edit) {
             this.$confirm(this.$t('__confirmChanges')).then(_ => {
               agentEdit(data).then((res) => {
                 this.$emit('editSuccess', res)

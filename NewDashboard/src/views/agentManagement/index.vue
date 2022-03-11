@@ -127,7 +127,7 @@
 
     <AgentModPasswordDialog
       :title="$t('__modPassword')"
-      :visible="curDialogIndex === modPasswordDialog"
+      :visible="curDialogIndex === dialogEnum.modPassword"
       :confirm="$t('__revise')"
       :form="editForm"
       :pc-width="'35%'"
@@ -138,7 +138,7 @@
 
     <AgentRateLogDialog
       :title="$t('__commissionRate')"
-      :visible="curDialogIndex === commissionRateDialog"
+      :visible="curDialogIndex === dialogEnum.commissionRate"
       :list-data="rateData"
       :operation-type="1"
       :pc-width="'35%'"
@@ -149,7 +149,7 @@
 
     <AgentRateLogDialog
       :title="$t('__rollingRate')"
-      :visible="curDialogIndex === rollingRateDialog"
+      :visible="curDialogIndex === dialogEnum.rollingRate"
       :list-data="rateData"
       :operation-type="2"
       :pc-width="'35%'"
@@ -160,7 +160,7 @@
 
     <AgentLimitDialog
       :title="$t('__limit')"
-      :visible="curDialogIndex === limitDialog"
+      :visible="curDialogIndex === dialogEnum.limit"
       :handicaps="handicaps"
       :pc-width="'35%'"
       :mobile-width="'40%'"
@@ -169,7 +169,7 @@
 
     <AgentBalanceDialog
       :title="$t('__depositBalance')"
-      :visible="curDialogIndex === depositBalanceDialog"
+      :visible="curDialogIndex === dialogEnum.depositBalance"
       :confirm="$t('__confirm')"
       :form="editForm"
       :operation-type="1"
@@ -181,7 +181,7 @@
 
     <AgentBalanceDialog
       :title="$t('__withdrawBalance')"
-      :visible="curDialogIndex === withdrawBalanceDialog"
+      :visible="curDialogIndex === dialogEnum.withdrawBalance"
       :confirm="$t('__confirm')"
       :form="editForm"
       :operation-type="2"
@@ -194,11 +194,12 @@
     <AgentEditDialog
       ref="agentEditDialog"
       :title="$t('__edit')"
-      :visible="curDialogIndex === editDialog"
+      :visible="curDialogIndex === dialogEnum.edit"
       :operation-type="2"
       :agent-info="agentInfo"
       :confirm="$t('__revise')"
       :form="editForm"
+      :step-enum="editStepEnum"
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
@@ -208,11 +209,12 @@
     <AgentEditDialog
       ref="agentCreateDialog"
       :title="$t('__create')"
-      :visible="curDialogIndex === createDialog"
+      :visible="curDialogIndex === dialogEnum.create"
       :operation-type="1"
       :agent-info="agentInfo"
       :confirm="$t('__confirm')"
       :form="editForm"
+      :step-enum="editStepEnum"
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
@@ -255,6 +257,9 @@ const defaultForm = {
   bet_status: '1'
 }
 
+const createFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 'balanceConfig': 3, 'confirm': 4 })
+const editFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 'confirm': 3 })
+
 export default {
   name: 'AgentManagement',
   components: { AgentEditDialog, AgentModPasswordDialog, AgentLimitDialog, AgentRateLogDialog, AgentBalanceDialog },
@@ -265,10 +270,12 @@ export default {
         children: 'SubAgentLevelInfos',
         label: 'AgentName'
       },
+      dialogEnum: Object.freeze({ 'none': 0, 'create': 1, 'edit': 2, 'modPassword': 3, 'limit': 4, 'commissionRate': 5, 'rollingRate': 6, 'depositBalance': 7, 'withdrawBalance': 8 }),
       agentLevel: [],
       agentInfo: {},
       handicaps: [],
       editForm: JSON.parse(JSON.stringify(defaultForm)),
+      editStepEnum: {},
       rateData: [],
       curDialogIndex: 0,
       accountStatusEnable: false,
@@ -281,30 +288,6 @@ export default {
     ]),
     treeDefaultExpandedKeys() {
       return this.agentLevel.length === 0 ? [] : [this.agentLevel[0].AgentId]
-    },
-    createDialog() {
-      return 1
-    },
-    editDialog() {
-      return 2
-    },
-    modPasswordDialog() {
-      return 3
-    },
-    limitDialog() {
-      return 4
-    },
-    commissionRateDialog() {
-      return 5
-    },
-    rollingRateDialog() {
-      return 6
-    },
-    depositBalanceDialog() {
-      return 7
-    },
-    withdrawBalanceDialog() {
-      return 8
     }
   },
   created() {
@@ -351,12 +334,12 @@ export default {
     },
     onLimitBtnClick(handicaps) {
       this.handicaps = JSON.parse(JSON.stringify(handicaps))
-      this.curDialogIndex = this.limitDialog
+      this.curDialogIndex = this.dialogEnum.limit
     },
     onCommissionRateLogBtnClick(rowData) {
       this.dataLoading = true
       agentCommissionRateLog({ agentId: rowData.id }).then((res) => {
-        this.curDialogIndex = this.commissionRateDialog
+        this.curDialogIndex = this.dialogEnum.commissionRate
         this.rateData = res.rows
         this.dataLoading = false
       })
@@ -364,7 +347,7 @@ export default {
     onRollingRateLogBtnClick(rowData) {
       this.dataLoading = true
       agentRollingRateLog({ agentId: rowData.id }).then((res) => {
-        this.curDialogIndex = this.rollingRateDialog
+        this.curDialogIndex = this.dialogEnum.rollingRate
         this.rateData = res.rows
         this.dataLoading = false
       })
@@ -378,15 +361,15 @@ export default {
     },
     onModPasswordBtnClick(rowData) {
       this.editForm = { id: rowData.id, fullName: rowData.fullName }
-      this.curDialogIndex = this.modPasswordDialog
+      this.curDialogIndex = this.dialogEnum.modPassword
     },
     onDepositBtnClick(rowData) {
       this.editForm = { agentId: rowData.id, amount: this.numberFormatStr(0) }
-      this.curDialogIndex = this.depositBalanceDialog
+      this.curDialogIndex = this.dialogEnum.depositBalance
     },
     onWithdrawBtnClick(rowData) {
       this.editForm = { agentId: rowData.id, amount: this.numberFormatStr(0) }
-      this.curDialogIndex = this.withdrawBalanceDialog
+      this.curDialogIndex = this.dialogEnum.withdrawBalance
     },
     async onAddSubAgentBtnClick() {
       this.dataLoading = true
@@ -398,7 +381,8 @@ export default {
       }
       this.editForm = JSON.parse(JSON.stringify(defaultForm))
       this.dataLoading = false
-      this.curDialogIndex = this.createDialog
+      this.editStepEnum = createFormStepEnum
+      this.curDialogIndex = this.dialogEnum.create
     },
     async onEditBtnClick(rowData) {
       this.dataLoading = true
@@ -407,14 +391,15 @@ export default {
 
       this.editForm = JSON.parse(JSON.stringify(rowData))
       this.dataLoading = false
-      this.curDialogIndex = this.editDialog
+      this.editStepEnum = editFormStepEnum
+      this.curDialogIndex = this.dialogEnum.edit
     },
     agentEditDialogEditSuccess(res) {
       this.closeDialogEven()
       this.handleRespone(res)
     },
     closeDialogEven() {
-      this.curDialogIndex = 0
+      this.curDialogIndex = this.dialogEnum.none
     },
     renderContent(h, { node, data, store }) {
       return (

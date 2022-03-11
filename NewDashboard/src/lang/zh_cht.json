@@ -119,7 +119,7 @@
     "__agentInfo": "代理資訊",
     "__rate": "佔成",
     "__limit": "盤口限紅",
-    "__quotaConfiguration": "額度配置",
+    "__balanceConfig": "額度配置",
     "__accountGenerateMode": "帳號生成方式",
     "__auto": "自動",
     "__manual": "手動",

@@ -59,8 +59,6 @@ export default {
         return {}
       }
     },
-    // operationType === 1 存入額度
-    // operationType === 2 提取額度
     'operationType': {
       type: Number,
       require: true,
@@ -84,13 +82,13 @@ export default {
         callback(new Error(this.$t('__lowerMin')))
       } else if (Number(this.form.amount) === 0) {
         callback(new Error(this.$t('__meaningless')))
-      } else if (this.operationType === 1) {
+      } else if (this.operationType === this.operationEnum.depositBalance) {
         if (this.agentBalanceInfo.parentId !== 1 && Number(this.form.amount) > Number(this.agentBalanceInfo.parentBalance)) {
           callback(new Error(this.$t('__overMax')))
         } else {
           callback()
         }
-      } else if (this.operationType === 2) {
+      } else if (this.operationType === this.operationEnum.withdrawBalance) {
         if (Number(this.form.amount) > Number(this.agentBalanceInfo.agentBalance)) {
           callback(new Error(this.$t('__overMax')))
         } else {
@@ -105,16 +103,17 @@ export default {
         amount: [{ required: true, trigger: 'blur', validator: validateBlance }],
         userPassword: [{ required: true, trigger: 'blur', validator: validate }]
       },
+      operationEnum: Object.freeze({ 'depositBalance': 1, 'withdrawBalance': 2 }),
       agentBalanceInfo: {},
       dialogLoading: false
     }
   },
   computed: {
     balanceLabelTitle() {
-      return this.operationType === 1 ? this.$t('__depositBalance') : this.$t('__withdrawBalance')
+      return this.operationType === this.operationEnum.depositBalance ? this.$t('__depositBalance') : this.$t('__withdrawBalance')
     },
     balanceDisable() {
-      if (this.operationType === 1) {
+      if (this.operationType === this.operationEnum.depositBalance) {
         if (this.agentBalanceInfo.parentId === 1) {
           return false
         } else {
@@ -148,14 +147,14 @@ export default {
           this.$confirm(this.$t('__confirmOperation')).then(_ => {
             this.dialogLoading = true
             const data = JSON.parse(JSON.stringify(this.form))
-            if (this.operationType === 1) {
+            if (this.operationType === this.operationEnum.depositBalance) {
               agentDepositBalance(data).then((res) => {
                 this.$emit('editSuccess', res)
                 this.dialogLoading = false
               }).catch(() => {
                 this.dialogLoading = false
               })
-            } else if (this.operationType === 2) {
+            } else if (this.operationType === this.operationEnum.withdrawBalance) {
               agentWithdrawBalance(data).then((res) => {
                 this.$emit('editSuccess', res)
                 this.dialogLoading = false

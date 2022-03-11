@@ -2,8 +2,8 @@
   <el-dialog :title="title" :visible.sync="visible" width="40%" :before-close="onClose">
     <el-table :data="listData" tooltip-effect="dark" max-height="400px">
       <el-table-column prop="user" :label="$t('__user')" align="center" />
-      <el-table-column v-if="operationType === 1" prop="commission_rate" :label="$t('__commissionRate')" align="center" />
-      <el-table-column v-if="operationType === 2" prop="rolling_rate" :label="$t('__rollingRate')" align="center" />
+      <el-table-column v-if="operationType === operationEnum.commissionRate" prop="commission_rate" :label="$t('__commissionRate')" align="center" />
+      <el-table-column v-if="operationType === operationEnum.rollingRate" prop="rolling_rate" :label="$t('__rollingRate')" align="center" />
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
     </el-table>
   </el-dialog>
@@ -31,8 +31,6 @@ export default {
         return {}
       }
     },
-    // operationType === 1 輸贏佔成
-    // operationType === 2 洗碼佔成
     'operationType': {
       type: Number,
       require: true,
@@ -43,6 +41,7 @@ export default {
   },
   data: function() {
     return {
+      operationEnum: Object.freeze({ 'commissionRate': 1, 'rollingRate': 2 })
     }
   },
   methods: {
