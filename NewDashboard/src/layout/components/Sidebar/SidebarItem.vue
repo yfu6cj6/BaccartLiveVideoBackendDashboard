@@ -1,7 +1,12 @@
 <template>
   <div v-if="!item.hidden">
     <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||!onlyOneChild.showChildren&&!item.alwaysShow)">
-      <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
+      <template v-if="onlyOneChild.click">
+        <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}" @click="onlyOneChild.click()">
+          <item :icon="onlyOneChild.meta.icon||(item.meta&&item.meta.icon)" :title="$t(onlyOneChild.meta.title)" />
+        </el-menu-item>
+      </template>
+      <app-link v-else-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
           <item :icon="onlyOneChild.meta.icon||(item.meta&&item.meta.icon)" :title="$t(onlyOneChild.meta.title)" />
         </el-menu-item>

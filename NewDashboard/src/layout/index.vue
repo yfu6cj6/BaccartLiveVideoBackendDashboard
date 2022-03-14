@@ -8,6 +8,7 @@
         <tags-view v-if="tagsView" />
       </div>
       <app-main />
+      <agent-level />
     </div>
   </div>
 </template>
@@ -17,6 +18,7 @@ import { Navbar, Sidebar, AppMain, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { mapGetters } from 'vuex'
 import defaultSettings from '@/settings'
+import AgentLevel from '@/components/AgentLevel'
 
 export default {
   name: 'Layout',
@@ -24,7 +26,8 @@ export default {
     Navbar,
     Sidebar,
     AppMain,
-    TagsView
+    TagsView,
+    AgentLevel
   },
   mixins: [ResizeMixin],
   computed: {

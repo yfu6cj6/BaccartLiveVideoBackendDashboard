@@ -1,90 +1,70 @@
 <template>
   <div v-loading="dataLoading" class="agentManagement-container">
     <el-row>
-      <el-col :span="3">
-        <el-card shadow="never">
-          <el-scrollbar>
-            <el-tree
-              :data="agentLevel"
-              :props="defaultProps"
-              node-key="AgentId"
-              :default-expanded-keys="treeDefaultExpandedKeys"
-              :expand-on-click-node="false"
-              :render-content="renderContent"
-              :indent="14"
-              @node-click="handleNodeClick"
-            />
-          </el-scrollbar>
-        </el-card>
-      </el-col>
-      <el-col :span="21">
-        <el-row>
-          <label class="labelTitle">{{ $t('__agent') + ':' }}
-            <span class="labelContent">{{ agentInfo.fullName }}</span>
-          </label>
-          <label class="labelTitle">{{ $t('__currency') + ':' }}
-            <span class="labelContent">{{ agentInfo.currency }}</span>
-          </label>
-          <label class="labelTitle">{{ $t('__balance') + ':' }}
-            <span class="labelContent">{{ agentInfo.balance }}</span>
-          </label>
-          <label>
-            <el-button class="labelButton" type="primary" size="mini" @click="onLimitBtnClick(agentInfo.handicaps)">
-              {{ $t("__limit") }}
-            </el-button>
-          </label>
-          <br>
-          <label class="labelTitle">{{ $t('__commissionRate') + ':' }}
-            <span class="labelContent">{{ numberFormatStr(agentInfo.commission_rate) + '%' }}</span>
-          </label>
-          <label class="labelTitle">{{ $t('__rollingRate') + ':' }}
-            <span class="labelContent">{{ numberFormatStr(agentInfo.rolling_rate) + '%' }}</span>
-          </label>
-          <label class="labelTitle">{{ $t('__accountStatus') + ':' }}
-            <span class="labelContent" :class="{'enable':accountStatusEnable, 'disEnable':!accountStatusEnable}">{{ $t(agentInfo.accountStatus) }}</span>
-          </label>
-          <label class="labelTitle">{{ $t('__betStatus') + ':' }}
-            <span class="labelContent" :class="{'enable':betStatusEnable, 'disEnable':!betStatusEnable}">{{ $t(agentInfo.betStatus) }}</span>
-          </label>
-          <label class="labelTitle">{{ $t('__directAgentCount') + ':' }}
-            <span class="labelContent">{{ agentInfo.directAgentCount }}</span>
-          </label>
-          <label class="labelTitle">{{ $t('__directPlayerCount') + ':' }}
-            <span class="labelContent">{{ agentInfo.directPlayerCount }}</span>
-          </label>
-          <label>
-            <el-button class="labelButton" type="primary" size="mini" @click="onTotalPlayerBtnClick()">
-              {{ $t("__totalPlayerCount") + ':' }}
-              <span>{{ agentInfo.totalPlayerCount }}</span>
-            </el-button>
-          </label>
-          <label class="labelTitle">{{ $t('__createdAt') + ':' }}
-            <span class="labelContent">{{ agentInfo.created_at }}</span>
-          </label>
-          <label class="labelTitle">{{ $t('__lastLoginAt') + ':' }}
-            <span class="labelContent">{{ agentInfo.lastLoginAt }}</span>
-          </label>
-        </el-row>
-        <el-button type="primary" size="mini" @click="onTableBtnClick(tableEnum.agent, agentInfo.id)">{{ $t("__agent") }}</el-button>
-        <el-button type="primary" size="mini" @click="onTableBtnClick(tableEnum.member, agentInfo.id)">{{ $t("__member") }}</el-button>
-        <el-button type="primary" size="mini" @click="onTableBtnClick(tableEnum.subAccount, agentInfo.id)">{{ $t("__subAccount") }}</el-button>
-        <el-button type="primary" size="mini" @click="onAddSubBtnClick()">{{ addSubLabel }}</el-button>
-        <Agent
-          v-show="curTableIndex === tableEnum.agent"
-          ref="agent"
-          :view-height="viewHeight"
-          @serverResponse="handleAgentRespone"
-          @setDataLoading="setDataLoading"
-        />
-        <Member
-          v-show="curTableIndex === tableEnum.member"
-          ref="member"
-          :view-height="viewHeight"
-          @serverResponse="handleMemberRespone"
-          @setDataLoading="setDataLoading"
-        />
-      </el-col>
+      <label class="labelTitle">{{ $t('__agent') + ':' }}
+        <span class="labelContent">{{ agentInfo.fullName }}</span>
+      </label>
+      <label class="labelTitle">{{ $t('__currency') + ':' }}
+        <span class="labelContent">{{ agentInfo.currency }}</span>
+      </label>
+      <label class="labelTitle">{{ $t('__balance') + ':' }}
+        <span class="labelContent">{{ agentInfo.balance }}</span>
+      </label>
+      <label>
+        <el-button class="labelButton" type="primary" size="mini" @click="onLimitBtnClick(agentInfo.handicaps)">
+          {{ $t("__limit") }}
+        </el-button>
+      </label>
+      <br>
+      <label class="labelTitle">{{ $t('__commissionRate') + ':' }}
+        <span class="labelContent">{{ numberFormatStr(agentInfo.commission_rate) + '%' }}</span>
+      </label>
+      <label class="labelTitle">{{ $t('__rollingRate') + ':' }}
+        <span class="labelContent">{{ numberFormatStr(agentInfo.rolling_rate) + '%' }}</span>
+      </label>
+      <label class="labelTitle">{{ $t('__accountStatus') + ':' }}
+        <span class="labelContent" :class="{'enable':accountStatusEnable, 'disEnable':!accountStatusEnable}">{{ $t(agentInfo.accountStatus) }}</span>
+      </label>
+      <label class="labelTitle">{{ $t('__betStatus') + ':' }}
+        <span class="labelContent" :class="{'enable':betStatusEnable, 'disEnable':!betStatusEnable}">{{ $t(agentInfo.betStatus) }}</span>
+      </label>
+      <label class="labelTitle">{{ $t('__directAgentCount') + ':' }}
+        <span class="labelContent">{{ agentInfo.directAgentCount }}</span>
+      </label>
+      <label class="labelTitle">{{ $t('__directPlayerCount') + ':' }}
+        <span class="labelContent">{{ agentInfo.directPlayerCount }}</span>
+      </label>
+      <label>
+        <el-button class="labelButton" type="primary" size="mini" @click="onTotalPlayerBtnClick()">
+          {{ $t("__totalPlayerCount") + ':' }}
+          <span>{{ agentInfo.totalPlayerCount }}</span>
+        </el-button>
+      </label>
+      <label class="labelTitle">{{ $t('__createdAt') + ':' }}
+        <span class="labelContent">{{ agentInfo.created_at }}</span>
+      </label>
+      <label class="labelTitle">{{ $t('__lastLoginAt') + ':' }}
+        <span class="labelContent">{{ agentInfo.lastLoginAt }}</span>
+      </label>
     </el-row>
+    <el-button type="primary" size="mini" @click="onTableBtnClick(tableEnum.agent, agentInfo.id)">{{ $t("__agent") }}</el-button>
+    <el-button type="primary" size="mini" @click="onTableBtnClick(tableEnum.member, agentInfo.id)">{{ $t("__member") }}</el-button>
+    <el-button type="primary" size="mini" @click="onTableBtnClick(tableEnum.subAccount, agentInfo.id)">{{ $t("__subAccount") }}</el-button>
+    <el-button type="primary" size="mini" @click="onAddSubBtnClick()">{{ addSubLabel }}</el-button>
+    <Agent
+      v-show="curTableIndex === tableEnum.agent"
+      ref="agent"
+      :view-height="viewHeight"
+      @serverResponse="handleAgentRespone"
+      @setDataLoading="setDataLoading"
+    />
+    <Member
+      v-show="curTableIndex === tableEnum.member"
+      ref="member"
+      :view-height="viewHeight"
+      @serverResponse="handleMemberRespone"
+      @setDataLoading="setDataLoading"
+    />
 
     <LimitDialog
       :title="$t('__limit')"
@@ -106,6 +86,7 @@ import Member from './member/index'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
+import { sendData, register, unRegister } from '@/utils/sendTool'
 
 export default {
   name: 'AgentManagement',
@@ -113,10 +94,6 @@ export default {
   mixins: [handleViewResize],
   data() {
     return {
-      defaultProps: {
-        children: 'SubAgentLevelInfos',
-        label: 'AgentName'
-      },
       tableEnum: Object.freeze({
         'agent': 0,
         'member': 1,
@@ -126,7 +103,6 @@ export default {
         'none': 0,
         '1imit': 1
       }),
-      agentLevel: [],
       agentInfo: {},
       handicaps: [],
       curTableIndex: 0,
@@ -140,9 +116,6 @@ export default {
     ...mapGetters([
       'agentAccountStatusType'
     ]),
-    treeDefaultExpandedKeys() {
-      return this.agentLevel.length === 0 ? [] : [this.agentInfo.id]
-    },
     addSubLabel() {
       switch (this.curTableIndex) {
         case this.tableEnum.agent: {
@@ -159,10 +132,16 @@ export default {
     }
   },
   created() {
+    register('agentLevel_AgentId', this.agentLevel_AgentId)
     this.setHeight()
-    this.onTableBtnClick(this.tableEnum.agent)
+  },
+  beforeDestroy() {
+    unRegister('agentLevel_AgentId', this.agentLevel_AgentId)
   },
   methods: {
+    agentLevel_AgentId(id) {
+      this.onTableBtnClick(this.curTableIndex, id)
+    },
     numberFormatStr(number) {
       return numberFormat(number)
     },
@@ -170,8 +149,7 @@ export default {
       this.dataLoading = dataLoading
     },
     handleRespone(res) {
-      this.agentLevel = res.agentLevel
-
+      sendData('agentLevelInfo', res.agentLevel)
       this.agentInfo = res.agentInfo
       this.agentInfo.currency = this.agentInfo.currency.code
       this.agentInfo.fullName = this.agentInfo.nickname + '(' + this.agentInfo.account + ')'
@@ -241,16 +219,6 @@ export default {
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none
-    },
-    renderContent(h, { node, data, store }) {
-      return (
-        <span style='font-size: 14px'>
-          {data.AgentName}
-        </span>
-      )
-    },
-    handleNodeClick(data) {
-      this.onTableBtnClick(this.curTableIndex, data.AgentId)
     }
   }
 }
