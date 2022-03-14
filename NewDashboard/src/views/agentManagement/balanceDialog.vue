@@ -28,10 +28,10 @@
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
-import { agentGetSetBalanceInfo, agentDepositBalance, agentWithdrawBalance } from '@/api/agentManagement/agentList'
+import { agentGetSetBalanceInfo } from '@/api/agentManagement/agentList'
 
 export default {
-  name: 'AgentBalanceDialog',
+  name: 'BalanceDialog',
   mixins: [handleDialogWidth],
   props: {
     'title': {
@@ -148,19 +148,9 @@ export default {
             this.dialogLoading = true
             const data = JSON.parse(JSON.stringify(this.form))
             if (this.operationType === this.operationEnum.depositBalance) {
-              agentDepositBalance(data).then((res) => {
-                this.$emit('editSuccess', res)
-                this.dialogLoading = false
-              }).catch(() => {
-                this.dialogLoading = false
-              })
+              this.$emit('depositBalance', data)
             } else if (this.operationType === this.operationEnum.withdrawBalance) {
-              agentWithdrawBalance(data).then((res) => {
-                this.$emit('editSuccess', res)
-                this.dialogLoading = false
-              }).catch(() => {
-                this.dialogLoading = false
-              })
+              this.$emit('withdrawBalance', data)
             } else {
               this.dialogLoading = false
             }
@@ -170,6 +160,9 @@ export default {
     },
     onClose() {
       this.$emit('close')
+    },
+    setDialogLoading(dialogLoading) {
+      this.dialogLoading = dialogLoading
     }
   }
 }

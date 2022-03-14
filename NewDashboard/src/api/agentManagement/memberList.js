@@ -15,3 +15,19 @@ export function memberModPassword(data) {
     data: data
   })
 }
+
+export function memberDepositBalance(data) {
+  return request({
+    url: '/member/depositBalance',
+    method: 'post',
+    data: data
+  })
+}
+
+export function memberWithdrawBalance(data) {
+  return request({
+    url: '/member/withdrawBalance',
+    method: 'post',
+    data: data
+  })
+}

@@ -55,19 +55,47 @@
       :mobile-width="'40%'"
       @close="closeDialogEven"
     />
+
+    <BalanceDialog
+      ref="memberDepositBalanceDialog"
+      :title="$t('__depositBalance')"
+      :visible="curDialogIndex === dialogEnum.memberDepositBalance"
+      :confirm="$t('__confirm')"
+      :form="editForm"
+      :operation-type="1"
+      :pc-width="'35%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @depositBalance="depositBalance"
+    />
+
+    <BalanceDialog
+      ref="memberWithdrawBalanceDialog"
+      :title="$t('__withdrawBalance')"
+      :visible="curDialogIndex === dialogEnum.memberWithdrawBalance"
+      :confirm="$t('__confirm')"
+      :form="editForm"
+      :operation-type="2"
+      :pc-width="'35%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @withdrawBalance="withdrawBalance"
+    />
   </div>
 </template>
 
 <script>
-import { memberModPassword } from '@/api/agentManagement/memberList'
+import { memberModPassword, memberDepositBalance, memberWithdrawBalance } from '@/api/agentManagement/memberList'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import LimitDialog from '@/views/agentManagement/limitDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
+import BalanceDialog from '@/views/agentManagement/balanceDialog'
 import shared from '@/layout/mixin/shared'
+import { numberFormat } from '@/utils/numberFormat'
 
 export default {
   name: 'Member',
-  components: { LimitDialog, ModPasswordDialog },
+  components: { LimitDialog, ModPasswordDialog, BalanceDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -83,7 +111,9 @@ export default {
       dialogEnum: Object.freeze({
         'none': 0,
         'memberLimit': 1,
-        'memberModPassword': 2
+        'memberModPassword': 2,
+        'memberDepositBalance': 3,
+        'memberWithdrawBalance': 4
       }),
       agentInfo: {},
       handicaps: [],
@@ -104,6 +134,9 @@ export default {
       this.totalCount = rows.length
       this.handlePageChangeByClient(this.currentPage)
     },
+    numberFormatStr(number) {
+      return numberFormat(number)
+    },
     setDataLoading(dataLoading) {
       this.$emit('setDataLoading', dataLoading)
     },
@@ -115,6 +148,14 @@ export default {
       this.editForm = { id: rowData.id, fullName: rowData.name }
       this.curDialogIndex = this.dialogEnum.memberModPassword
     },
+    onDepositBtnClick(rowData) {
+      this.editForm = { memberId: rowData.id, amount: this.numberFormatStr(0) }
+      this.curDialogIndex = this.dialogEnum.memberDepositBalance
+    },
+    onWithdrawBtnClick(rowData) {
+      this.editForm = { memberId: rowData.id, amount: this.numberFormatStr(0) }
+      this.curDialogIndex = this.dialogEnum.memberWithdrawBalance
+    },
     modPassword(data) {
       memberModPassword(data).then((res) => {
         this.$refs.memberModPasswordDialog.setDialogLoading(false)
@@ -122,6 +163,24 @@ export default {
         this.closeDialogEven()
       }).catch(() => {
         this.$refs.memberModPasswordDialog.setDialogLoading(false)
+      })
+    },
+    depositBalance(data) {
+      memberDepositBalance(data).then((res) => {
+        this.$refs.memberDepositBalanceDialog.setDialogLoading(false)
+        this.$emit('serverResponse', res)
+        this.closeDialogEven()
+      }).catch(() => {
+        this.$refs.memberDepositBalanceDialog.setDialogLoading(false)
+      })
+    },
+    withdrawBalance(data) {
+      memberWithdrawBalance(data).then((res) => {
+        this.$refs.memberWithdrawBalanceDialog.setDialogLoading(false)
+        this.$emit('serverResponse', res)
+        this.closeDialogEven()
+      }).catch(() => {
+        this.$refs.memberWithdrawBalanceDialog.setDialogLoading(false)
       })
     },
     closeDialogEven() {

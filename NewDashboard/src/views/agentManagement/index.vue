@@ -141,7 +141,7 @@ export default {
       'agentAccountStatusType'
     ]),
     treeDefaultExpandedKeys() {
-      return this.agentLevel.length === 0 ? [] : [this.agentLevel[0].AgentId]
+      return this.agentLevel.length === 0 ? [] : [this.agentInfo.id]
     },
     addSubLabel() {
       switch (this.curTableIndex) {

@@ -95,7 +95,8 @@
       @close="closeDialogEven"
     />
 
-    <AgentBalanceDialog
+    <BalanceDialog
+      ref="agentDepositBalanceDialog"
       :title="$t('__depositBalance')"
       :visible="curDialogIndex === dialogEnum.agentDepositBalance"
       :confirm="$t('__confirm')"
@@ -104,10 +105,11 @@
       :pc-width="'35%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="agentEditDialogEditSuccess"
+      @depositBalance="depositBalance"
     />
 
-    <AgentBalanceDialog
+    <BalanceDialog
+      ref="agentWithdrawBalanceDialog"
       :title="$t('__withdrawBalance')"
       :visible="curDialogIndex === dialogEnum.agentWithdrawBalance"
       :confirm="$t('__confirm')"
@@ -116,7 +118,7 @@
       :pc-width="'35%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="agentEditDialogEditSuccess"
+      @withdrawBalance="withdrawBalance"
     />
 
     <AgentEditDialog
@@ -152,7 +154,7 @@
 </template>
 
 <script>
-import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword } from '@/api/agentManagement/agentList'
+import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword, agentDepositBalance, agentWithdrawBalance } from '@/api/agentManagement/agentList'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import { currencySearch } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
@@ -161,7 +163,7 @@ import AgentEditDialog from './agentEditDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
 import LimitDialog from '@/views/agentManagement/limitDialog'
 import AgentRateLogDialog from './agentRateLogDialog'
-import AgentBalanceDialog from './agentBalanceDialog'
+import BalanceDialog from '@/views/agentManagement/balanceDialog'
 import { numberFormat } from '@/utils/numberFormat'
 
 const defaultForm = {
@@ -188,7 +190,7 @@ const editFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 
 
 export default {
   name: 'Agent',
-  components: { AgentEditDialog, ModPasswordDialog, LimitDialog, AgentRateLogDialog, AgentBalanceDialog },
+  components: { AgentEditDialog, ModPasswordDialog, LimitDialog, AgentRateLogDialog, BalanceDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -310,6 +312,24 @@ export default {
         this.closeDialogEven()
       }).catch(() => {
         this.$refs.agentModPasswordDialog.setDialogLoading(false)
+      })
+    },
+    depositBalance(data) {
+      agentDepositBalance(data).then((res) => {
+        this.$refs.agentDepositBalanceDialog.setDialogLoading(false)
+        this.$emit('serverResponse', res)
+        this.closeDialogEven()
+      }).catch(() => {
+        this.$refs.agentDepositBalanceDialog.setDialogLoading(false)
+      })
+    },
+    withdrawBalance(data) {
+      agentWithdrawBalance(data).then((res) => {
+        this.$refs.agentWithdrawBalanceDialog.setDialogLoading(false)
+        this.$emit('serverResponse', res)
+        this.closeDialogEven()
+      }).catch(() => {
+        this.$refs.agentWithdrawBalanceDialog.setDialogLoading(false)
       })
     },
     agentEditDialogEditSuccess(res) {
