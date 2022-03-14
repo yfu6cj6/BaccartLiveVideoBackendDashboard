@@ -66,6 +66,14 @@
       @setDataLoading="setDataLoading"
     />
 
+    <SubAccount
+      v-show="curTableIndex === tableEnum.subAccount"
+      ref="subAccount"
+      :view-height="viewHeight"
+      @serverResponse="handleSubAccountRespone"
+      @setDataLoading="setDataLoading"
+    />
+
     <LimitDialog
       :title="$t('__limit')"
       :visible="curDialogIndex === dialogEnum.limit"
@@ -80,9 +88,11 @@
 <script>
 import { agentSearch, agentTotalPlayerCount } from '@/api/agentManagement/agentList'
 import { memberSearch } from '@/api/agentManagement/memberList'
+import { subAccountSearch } from '@/api/agentManagement/subAccount'
 import LimitDialog from '@/views/agentManagement/limitDialog'
 import Agent from './agent/index'
 import Member from './member/index'
+import SubAccount from './subAccount/index'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
@@ -90,7 +100,7 @@ import { sendData, register, unRegister } from '@/utils/sendTool'
 
 export default {
   name: 'AgentManagement',
-  components: { LimitDialog, Agent, Member },
+  components: { LimitDialog, Agent, Member, SubAccount },
   mixins: [handleViewResize],
   data() {
     return {
@@ -169,6 +179,10 @@ export default {
       this.handleRespone(res)
       this.$refs.member.setMemberTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
     },
+    handleSubAccountRespone(res) {
+      this.handleRespone(res)
+      this.$refs.subAccount.setSubAccountTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
+    },
     onLimitBtnClick(handicaps) {
       this.handicaps = JSON.parse(JSON.stringify(handicaps))
       this.curDialogIndex = this.dialogEnum.limit
@@ -197,7 +211,9 @@ export default {
           break
         }
         case this.tableEnum.subAccount: {
-          this.dataLoading = false // 暫代
+          subAccountSearch({ agentId: id }).then((res) => {
+            this.handleSubAccountRespone(res)
+          })
           break
         }
       }
@@ -210,6 +226,7 @@ export default {
           break
         }
         case this.tableEnum.member: {
+          this.$refs.member.memberCreate()
           break
         }
         case this.tableEnum.subAccount: {

@@ -148,5 +148,9 @@
     "__deposit": "存入",
     "__withdraw": "提取",
     "__confirmOperation": "確定操作?",
-    "__meaningless": "無意義"
+    "__meaningless": "無意義",
+    "__maxWinAmountLimit": "最大限額",
+    "__maxLoseAmountLimit": "最大輸額",
+    "__totalPayout": "累計輸贏",
+    "__totalValidBetAmount": "累計有效投注"
 }

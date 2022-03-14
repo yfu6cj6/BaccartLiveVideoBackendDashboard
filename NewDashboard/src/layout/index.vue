@@ -14,11 +14,10 @@
 </template>
 
 <script>
-import { Navbar, Sidebar, AppMain, TagsView } from './components'
+import { Navbar, Sidebar, AppMain, TagsView, AgentLevel } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { mapGetters } from 'vuex'
 import defaultSettings from '@/settings'
-import AgentLevel from '@/components/AgentLevel'
 
 export default {
   name: 'Layout',

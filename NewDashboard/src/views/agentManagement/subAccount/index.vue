@@ -9,18 +9,6 @@
         </template>
       </el-table-column>
       <el-table-column prop="currency" :label="$t('__currency')" align="center" />
-      <el-table-column :label="$t('__balance')" align="center">
-        <template slot-scope="scope">
-          <span class="scope-content">{{ scope.row.balance }}</span>
-          <el-button class="labelButton" type="primary" size="mini" @click="onDepositBtnClick(scope.row)">{{ $t("__deposit") }}</el-button>
-          <el-button class="labelButton labelWithdrawButton" type="primary" size="mini" @click="onWithdrawBtnClick(scope.row)">{{ $t("__withdraw") }}</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('__limit')" align="center">
-        <template slot-scope="scope">
-          <el-button class="labelButton" type="primary" size="mini" @click="onLimitBtnClick(scope.row.handicaps)">{{ $t("__limit") }}</el-button>
-        </template>
-      </el-table-column>
       <el-table-column prop="max_win_amount_limit" :label="$t('__maxWinAmountLimit')" align="center" />
       <el-table-column prop="max_lose_amount_limit" :label="$t('__maxLoseAmountLimit')" align="center" />
       <el-table-column prop="total_payout" :label="$t('__totalPayout')" align="center" />
@@ -42,7 +30,7 @@
     <ModPasswordDialog
       ref="memberModPasswordDialog"
       :title="$t('__modPassword')"
-      :visible="curDialogIndex === dialogEnum.memberModPassword"
+      :visible="curDialogIndex === dialogEnum.subAccountModPassword"
       :confirm="$t('__revise')"
       :name-label="$t('__member')"
       :form="editForm"
@@ -51,59 +39,22 @@
       @close="closeDialogEven"
       @modPassword="modPassword"
     />
-
-    <LimitDialog
-      :title="$t('__limit')"
-      :visible="curDialogIndex === dialogEnum.memberLimit"
-      :handicaps="handicaps"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
-      @close="closeDialogEven"
-    />
-
-    <BalanceDialog
-      ref="memberDepositBalanceDialog"
-      :title="$t('__depositBalance')"
-      :visible="curDialogIndex === dialogEnum.memberDepositBalance"
-      :confirm="$t('__confirm')"
-      :form="editForm"
-      :operation-type="1"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
-      @close="closeDialogEven"
-      @depositBalance="depositBalance"
-    />
-
-    <BalanceDialog
-      ref="memberWithdrawBalanceDialog"
-      :title="$t('__withdrawBalance')"
-      :visible="curDialogIndex === dialogEnum.memberWithdrawBalance"
-      :confirm="$t('__confirm')"
-      :form="editForm"
-      :operation-type="2"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
-      @close="closeDialogEven"
-      @withdrawBalance="withdrawBalance"
-    />
   </div>
 </template>
 
 <script>
-import { memberModPassword, memberDepositBalance, memberWithdrawBalance } from '@/api/agentManagement/memberList'
+import { subAccountModPassword } from '@/api/agentManagement/subAccount'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
-import LimitDialog from '@/views/agentManagement/limitDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
-import BalanceDialog from '@/views/agentManagement/balanceDialog'
 import { numberFormat } from '@/utils/numberFormat'
 
 const createFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 'balanceConfig': 3, 'confirm': 4 })
 const editFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 'confirm': 3 })
 
 export default {
-  name: 'Member',
-  components: { LimitDialog, ModPasswordDialog, BalanceDialog },
+  name: 'SubAccount',
+  components: { ModPasswordDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -118,15 +69,11 @@ export default {
     return {
       dialogEnum: Object.freeze({
         'none': 0,
-        'memberCreate': 1,
-        'memberEdit': 2,
-        'memberModPassword': 3,
-        'memberLimit': 4,
-        'memberDepositBalance': 5,
-        'memberWithdrawBalance': 6
+        'subAccountCreate': 1,
+        'subAccountEdit': 2,
+        'subAccountModPassword': 3
       }),
       agentInfo: {},
-      handicaps: [],
       editForm: {},
       editStepEnum: {},
       curDialogIndex: 0
@@ -134,13 +81,13 @@ export default {
   },
   methods: {
     // 父物件呼叫
-    memberCreate() {
+    subAccountCreate() {
       this.editForm = {}
       this.editStepEnum = createFormStepEnum
       this.curDialogIndex = this.dialogEnum.memberCreate
     },
     // 父物件呼叫
-    setMemberTableData(rows, agentInfo) {
+    setSubAccountTableData(rows, agentInfo) {
       this.agentInfo = agentInfo
 
       this.allDataByClient = rows
@@ -164,47 +111,17 @@ export default {
       this.curDialogIndex = this.dialogEnum.memberEdit
       this.setDataLoading(false)
     },
-    onLimitBtnClick(handicaps) {
-      this.handicaps = JSON.parse(JSON.stringify(handicaps))
-      this.curDialogIndex = this.dialogEnum.memberLimit
-    },
     onModPasswordBtnClick(rowData) {
       this.editForm = { id: rowData.id, fullName: rowData.name }
-      this.curDialogIndex = this.dialogEnum.memberModPassword
-    },
-    onDepositBtnClick(rowData) {
-      this.editForm = { memberId: rowData.id, amount: this.numberFormatStr(0) }
-      this.curDialogIndex = this.dialogEnum.memberDepositBalance
-    },
-    onWithdrawBtnClick(rowData) {
-      this.editForm = { memberId: rowData.id, amount: this.numberFormatStr(0) }
-      this.curDialogIndex = this.dialogEnum.memberWithdrawBalance
+      this.curDialogIndex = this.dialogEnum.subAccountModPassword
     },
     modPassword(data) {
-      memberModPassword(data).then((res) => {
+      subAccountModPassword(data).then((res) => {
         this.$refs.memberModPasswordDialog.setDialogLoading(false)
         this.$emit('serverResponse', res)
         this.closeDialogEven()
       }).catch(() => {
         this.$refs.memberModPasswordDialog.setDialogLoading(false)
-      })
-    },
-    depositBalance(data) {
-      memberDepositBalance(data).then((res) => {
-        this.$refs.memberDepositBalanceDialog.setDialogLoading(false)
-        this.$emit('serverResponse', res)
-        this.closeDialogEven()
-      }).catch(() => {
-        this.$refs.memberDepositBalanceDialog.setDialogLoading(false)
-      })
-    },
-    withdrawBalance(data) {
-      memberWithdrawBalance(data).then((res) => {
-        this.$refs.memberWithdrawBalanceDialog.setDialogLoading(false)
-        this.$emit('serverResponse', res)
-        this.closeDialogEven()
-      }).catch(() => {
-        this.$refs.memberWithdrawBalanceDialog.setDialogLoading(false)
       })
     },
     closeDialogEven() {

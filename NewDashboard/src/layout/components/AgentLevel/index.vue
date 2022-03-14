@@ -46,7 +46,8 @@ export default {
   computed: {
     ...mapGetters([
       'agentLevelVisable',
-      'visitedViews'
+      'visitedViews',
+      'cachedViews'
     ]),
     treeDefaultExpandedKeys() {
       return this.agentLevel.length === 0 ? [] : [this.agentInfo.id]
@@ -106,20 +107,17 @@ export default {
     },
     async handleNodeClick(data) {
       this.dataLoading = true
-      let awaitTime = false
-      if (!this.visitedViews.some(v => v.name === 'AgentManagement')) {
-        awaitTime = true
-      }
+      const awaitTime = !this.cachedViews.some(v => v.name === 'AgentManagement')
       this.$router.push({ path: '/agentManagement/agentManagement' })
       if (awaitTime) {
-        await this.delay(1)
+        await this.delay(1000)
       }
       sendData('agentLevel_AgentId', data.AgentId)
       this.dataLoading = false
     },
     delay(n) {
       return new Promise(function(resolve) {
-        setTimeout(resolve, n * 1000)
+        setTimeout(resolve, n)
       })
     }
   }
@@ -137,13 +135,13 @@ export default {
   transform-origin: right top;
   box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, .05);
   background: #fff;
-  transition: all .25s cubic-bezier(.7, .3, .1, 1);
+  transition: all .4s cubic-bezier(.7, .3, .1, 1);
   transform: translate(0%);
   z-index: 40000;
 }
 
 .show {
-  transition: all .3s cubic-bezier(.7, .3, .1, 1);
+  transition: all .4s cubic-bezier(.7, .3, .1, 1);
 
   .agentLevel {
     transform: translate(100%);
