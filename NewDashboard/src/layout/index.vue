@@ -48,6 +48,7 @@ export default {
   },
   created() {
     this.$store.dispatch('settings/changeSetting', defaultSettings)
+    this.$store.dispatch('agentManagement/setAgentManagementSideBarVisable', false)
   },
   methods: {
     handleClickOutside() {

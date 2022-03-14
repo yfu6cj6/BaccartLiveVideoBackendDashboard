@@ -46,7 +46,7 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-    if (res.code === 401) {
+    if (res.code === 401 || res.code === 101) {
       store.dispatch('user/resetToken').then(() => {
         router.push({ path: '/logout' })
         showMsgLog(res.message)

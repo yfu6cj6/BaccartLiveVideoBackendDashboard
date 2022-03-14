@@ -132,6 +132,7 @@ export default {
     }
   },
   created() {
+    this.dataLoading = true
     register('agentLevel_AgentId', this.agentLevel_AgentId)
     this.setHeight()
   },

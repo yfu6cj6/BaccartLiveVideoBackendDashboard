@@ -24,9 +24,13 @@ export function register(registerKey, func) {
 export function unRegister(registerKey, func) {
   sendContainer.forEach(element => {
     if (element.key === registerKey) {
-      const index = element.callBacks.indexOf(func)
-      if (index >= 0) {
-        element.callBacks.slice(index, 1)
+      const callBackIndex = element.callBacks.indexOf(func)
+      if (callBackIndex >= 0) {
+        element.callBacks.splice(callBackIndex, 1)
+        if (element.callBacks.length === 0) {
+          const containerIndex = sendContainer.indexOf(element)
+          sendContainer.splice(containerIndex, 1)
+        }
         return
       }
     }

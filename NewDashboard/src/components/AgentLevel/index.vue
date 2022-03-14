@@ -1,5 +1,5 @@
 <template>
-  <div ref="agentLevel" v-loading="dataLoading" :class="{show:agentLevelVisable}" class="agentLevel-container">
+  <div ref="agentLevel" :class="{show:agentLevelVisable}" class="agentLevel-container">
     <div class="agentLevel">
       <div class="agentLevel-items">
         <div class="handle-button" @click="show=onHandleBtnClick()">
@@ -8,6 +8,7 @@
         <el-card shadow="never">
           <el-scrollbar>
             <el-tree
+              v-loading="dataLoading"
               :data="agentLevel"
               :props="defaultProps"
               node-key="AgentId"
@@ -44,7 +45,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'agentLevelVisable'
+      'agentLevelVisable',
+      'visitedViews'
     ]),
     treeDefaultExpandedKeys() {
       return this.agentLevel.length === 0 ? [] : [this.agentInfo.id]
@@ -102,10 +104,22 @@ export default {
         </span>
       )
     },
-    handleNodeClick(data) {
+    async handleNodeClick(data) {
+      this.dataLoading = true
+      let awaitTime = false
+      if (!this.visitedViews.some(v => v.name === 'AgentManagement')) {
+        awaitTime = true
+      }
       this.$router.push({ path: '/agentManagement/agentManagement' })
-      this.$nextTick(() => {
-        sendData('agentLevel_AgentId', data.AgentId)
+      if (awaitTime) {
+        await this.delay(1)
+      }
+      sendData('agentLevel_AgentId', data.AgentId)
+      this.dataLoading = false
+    },
+    delay(n) {
+      return new Promise(function(resolve) {
+        setTimeout(resolve, n * 1000)
       })
     }
   }
