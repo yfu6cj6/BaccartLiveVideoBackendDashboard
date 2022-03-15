@@ -4,14 +4,20 @@
       <el-form-item :label="$t('__superiorAgent') + ': '">
         <span>{{ agentBalanceInfo.parent }}</span>
       </el-form-item>
-      <el-form-item :label="$t('__balance') + ': '">
+      <el-form-item :label="$t('__superiorBalance') + ': '">
         <span>{{ parentBalance }}</span>
       </el-form-item>
-      <el-form-item :label="$t('__agent') + ': '">
+      <el-form-item v-if="modeType===modeEnum.agent" :label="$t('__agent') + ': '">
         <span>{{ agentBalanceInfo.agent }}</span>
       </el-form-item>
-      <el-form-item :label="$t('__balance') + ': '">
+      <el-form-item v-if="modeType===modeEnum.agent" :label="$t('__agentBalance') + ': '">
         <span>{{ agentBalanceInfo.agentBalance }}</span>
+      </el-form-item>
+      <el-form-item v-if="modeType===modeEnum.member" :label="$t('__member') + ': '">
+        <span>{{ agentBalanceInfo.member }}</span>
+      </el-form-item>
+      <el-form-item v-if="modeType===modeEnum.member" :label="$t('__memberBalance') + ': '">
+        <span>{{ agentBalanceInfo.memberBalance }}</span>
       </el-form-item>
       <el-form-item :label="balanceLabelTitle" prop="amount">
         <el-input v-model="form.amount" type="number" :disabled="balanceDisable" min="0" />
@@ -64,6 +70,13 @@ export default {
       default() {
         return 0
       }
+    },
+    'modeType': {
+      type: Number,
+      require: true,
+      default() {
+        return 0
+      }
     }
   },
   data: function() {
@@ -103,6 +116,7 @@ export default {
         userPassword: [{ required: true, trigger: 'blur', validator: validate }]
       },
       operationEnum: Object.freeze({ 'depositBalance': 1, 'withdrawBalance': 2 }),
+      modeEnum: Object.freeze({ 'agent': 1, 'member': 2 }),
       agentBalanceInfo: {},
       dialogLoading: false
     }
