@@ -144,8 +144,10 @@ export default {
   created() {
     this.dataLoading = true
     register('agentLevel_AgentId', this.agentLevel_AgentId)
-    sendData('agentLevel_Inited', true)
     this.setHeight()
+  },
+  mounted() {
+    sendData('agentLevel_Inited', true)
   },
   beforeDestroy() {
     sendData('agentLevel_Inited', false)

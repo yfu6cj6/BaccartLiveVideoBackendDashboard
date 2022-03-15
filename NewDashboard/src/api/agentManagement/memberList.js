@@ -16,6 +16,14 @@ export function memberModPassword(data) {
   })
 }
 
+export function memberGetSetBalanceInfo(data) {
+  return request({
+    url: '/member/getSetBalanceInfo',
+    method: 'post',
+    data: data
+  })
+}
+
 export function memberDepositBalance(data) {
   return request({
     url: '/member/depositBalance',

@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword, agentDepositBalance, agentWithdrawBalance } from '@/api/agentManagement/agentList'
+import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword, agentGetSetBalanceInfo, agentDepositBalance, agentWithdrawBalance } from '@/api/agentManagement/agentList'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import { currencySearch } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
@@ -290,10 +290,20 @@ export default {
     onDepositBtnClick(rowData) {
       this.editForm = { agentId: rowData.id, amount: this.numberFormatStr(0) }
       this.curDialogIndex = this.dialogEnum.agentDepositBalance
+      this.$refs.agentDepositBalanceDialog.setDialogLoading(true)
+      agentGetSetBalanceInfo({ agentId: rowData.id }).then((res) => {
+        this.$refs.agentDepositBalanceDialog.setBalanceInfo(res.rows)
+        this.$refs.agentDepositBalanceDialog.setDialogLoading(false)
+      })
     },
     onWithdrawBtnClick(rowData) {
       this.editForm = { agentId: rowData.id, amount: this.numberFormatStr(0) }
       this.curDialogIndex = this.dialogEnum.agentWithdrawBalance
+      this.$refs.agentWithdrawBalanceDialog.setDialogLoading(true)
+      agentGetSetBalanceInfo({ agentId: rowData.id }).then((res) => {
+        this.$refs.agentWithdrawBalanceDialog.setBalanceInfo(res.rows)
+        this.$refs.agentWithdrawBalanceDialog.setDialogLoading(false)
+      })
     },
     async onEditBtnClick(rowData) {
       this.setDataLoading(true)

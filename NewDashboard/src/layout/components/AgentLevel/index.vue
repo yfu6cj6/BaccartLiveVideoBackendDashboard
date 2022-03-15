@@ -140,7 +140,7 @@ export default {
   background: #fff;
   transition: all .4s cubic-bezier(.7, .3, .1, 1);
   transform: translate(0%);
-  z-index: 40000;
+  z-index: 1002;
 }
 
 .show {

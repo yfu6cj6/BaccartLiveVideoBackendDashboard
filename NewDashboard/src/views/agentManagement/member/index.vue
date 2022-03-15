@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import { memberModPassword, memberDepositBalance, memberWithdrawBalance } from '@/api/agentManagement/memberList'
+import { memberModPassword, memberGetSetBalanceInfo, memberDepositBalance, memberWithdrawBalance } from '@/api/agentManagement/memberList'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import LimitDialog from '@/views/agentManagement/limitDialog'
@@ -175,10 +175,20 @@ export default {
     onDepositBtnClick(rowData) {
       this.editForm = { memberId: rowData.id, amount: this.numberFormatStr(0) }
       this.curDialogIndex = this.dialogEnum.memberDepositBalance
+      this.$refs.memberDepositBalanceDialog.setDialogLoading(true)
+      memberGetSetBalanceInfo({ memberId: rowData.id }).then((res) => {
+        this.$refs.memberDepositBalanceDialog.setBalanceInfo(res.rows)
+        this.$refs.memberDepositBalanceDialog.setDialogLoading(false)
+      })
     },
     onWithdrawBtnClick(rowData) {
       this.editForm = { memberId: rowData.id, amount: this.numberFormatStr(0) }
       this.curDialogIndex = this.dialogEnum.memberWithdrawBalance
+      this.$refs.memberWithdrawBalanceDialog.setDialogLoading(true)
+      memberGetSetBalanceInfo({ memberId: rowData.id }).then((res) => {
+        this.$refs.memberWithdrawBalanceDialog.setBalanceInfo(res.rows)
+        this.$refs.memberWithdrawBalanceDialog.setDialogLoading(false)
+      })
     },
     modPassword(data) {
       memberModPassword(data).then((res) => {

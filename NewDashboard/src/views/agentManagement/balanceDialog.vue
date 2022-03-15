@@ -28,7 +28,6 @@
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
-import { agentGetSetBalanceInfo } from '@/api/agentManagement/agentList'
 
 export default {
   name: 'BalanceDialog',
@@ -129,13 +128,7 @@ export default {
   },
   watch: {
     visible() {
-      if (this.visible) {
-        this.dialogLoading = true
-        agentGetSetBalanceInfo({ agentId: this.form.agentId }).then((res) => {
-          this.agentBalanceInfo = res.rows
-          this.dialogLoading = false
-        })
-      } else {
+      if (!this.visible) {
         this.$refs.form.clearValidate()
       }
     }
@@ -163,6 +156,9 @@ export default {
     },
     setDialogLoading(dialogLoading) {
       this.dialogLoading = dialogLoading
+    },
+    setBalanceInfo(balanceInfo) {
+      this.agentBalanceInfo = balanceInfo
     }
   }
 }
