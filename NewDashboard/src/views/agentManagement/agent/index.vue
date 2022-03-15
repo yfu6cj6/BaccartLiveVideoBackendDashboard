@@ -17,22 +17,22 @@
         </template>
       </el-table-column>
       <el-table-column prop="timeZone.city_name" :label="$t('__timeZone')" align="center" />
-      <el-table-column :label="$t('__limit')" align="center">
+      <el-table-column :label="$t('_handicapLimit')" align="center">
         <template slot-scope="scope">
-          <el-button class="labelButton" type="primary" size="mini" @click="onLimitBtnClick(scope.row.handicaps)">{{ $t("__limit") }}</el-button>
+          <el-button class="labelButton" type="primary" size="mini" @click="onLimitBtnClick(scope.row.handicaps)">{{ $t("_handicapLimit") }}</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="directAgentCount" :label="$t('__directAgentCount')" align="center" />
       <el-table-column prop="directPlayerCount" :label="$t('__directPlayerCount')" align="center" />
-      <el-table-column :label="$t('__commissionRate')" align="center">
+      <el-table-column :label="$t('__liveCommissionRate')" align="center">
         <template slot-scope="scope">
-          <span class="scope-content">{{ numberFormatStr(scope.row.commission_rate) + '%' }}</span>
+          <span class="scope-content">{{ numberFormatStr(scope.row.live_commission_rate) + '%' }}</span>
           <el-button class="iconButton" type="primary" size="mini" icon="el-icon-tickets" @click="onCommissionRateLogBtnClick(scope.row)" />
         </template>
       </el-table-column>
-      <el-table-column :label="$t('__rollingRate')" align="center">
+      <el-table-column :label="$t('__liveRollingRate')" align="center">
         <template slot-scope="scope">
-          <span class="scope-content">{{ numberFormatStr(scope.row.rolling_rate) + '%' }}</span>
+          <span class="scope-content">{{ numberFormatStr(scope.row.live_rolling_rate) + '%' }}</span>
           <el-button class="iconButton" type="primary" size="mini" icon="el-icon-tickets" @click="onRollingRateLogBtnClick(scope.row)" />
         </template>
       </el-table-column>
@@ -54,9 +54,9 @@
     />
 
     <ModPasswordDialog
-      ref="agentModPasswordDialog"
+      ref="modPasswordDialog"
       :title="$t('__modPassword')"
-      :visible="curDialogIndex === dialogEnum.agentModPassword"
+      :visible="curDialogIndex === dialogEnum.modPassword"
       :confirm="$t('__revise')"
       :name-label="$t('__agent')"
       :form="editForm"
@@ -67,8 +67,8 @@
     />
 
     <AgentRateLogDialog
-      :title="$t('__commissionRate')"
-      :visible="curDialogIndex === dialogEnum.agentCommissionRate"
+      :title="$t('__liveCommissionRate')"
+      :visible="curDialogIndex === dialogEnum.liveCommissionRate"
       :list-data="rateData"
       :operation-type="1"
       :pc-width="'35%'"
@@ -77,8 +77,8 @@
     />
 
     <AgentRateLogDialog
-      :title="$t('__rollingRate')"
-      :visible="curDialogIndex === dialogEnum.agentRollingRate"
+      :title="$t('__liveRollingRate')"
+      :visible="curDialogIndex === dialogEnum.liveRollingRate"
       :list-data="rateData"
       :operation-type="2"
       :pc-width="'35%'"
@@ -87,8 +87,8 @@
     />
 
     <LimitDialog
-      :title="$t('__limit')"
-      :visible="curDialogIndex === dialogEnum.agentLimit"
+      :title="$t('_handicapLimit')"
+      :visible="curDialogIndex === dialogEnum.limit"
       :handicaps="handicaps"
       :pc-width="'35%'"
       :mobile-width="'40%'"
@@ -96,9 +96,9 @@
     />
 
     <BalanceDialog
-      ref="agentDepositBalanceDialog"
+      ref="depositBalanceDialog"
       :title="$t('__depositBalance')"
-      :visible="curDialogIndex === dialogEnum.agentDepositBalance"
+      :visible="curDialogIndex === dialogEnum.depositBalance"
       :confirm="$t('__confirm')"
       :form="editForm"
       :operation-type="1"
@@ -110,9 +110,9 @@
     />
 
     <BalanceDialog
-      ref="agentWithdrawBalanceDialog"
+      ref="withdrawBalanceDialog"
       :title="$t('__withdrawBalance')"
-      :visible="curDialogIndex === dialogEnum.agentWithdrawBalance"
+      :visible="curDialogIndex === dialogEnum.withdrawBalance"
       :confirm="$t('__confirm')"
       :form="editForm"
       :operation-type="2"
@@ -124,9 +124,9 @@
     />
 
     <AgentEditDialog
-      ref="agentEditDialog"
-      :title="$t('__edit')"
-      :visible="curDialogIndex === dialogEnum.agentEdit"
+      ref="editDialog"
+      :title="$t('__editSubAgent')"
+      :visible="curDialogIndex === dialogEnum.edit"
       :operation-type="2"
       :agent-info="agentInfo"
       :confirm="$t('__revise')"
@@ -135,13 +135,13 @@
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="agentEditDialogEditSuccess"
+      @editSuccess="editSuccess"
     />
 
     <AgentEditDialog
-      ref="agentCreateDialog"
-      :title="$t('__create')"
-      :visible="curDialogIndex === dialogEnum.agentCreate"
+      ref="createDialog"
+      :title="$t('__addSubAgent')"
+      :visible="curDialogIndex === dialogEnum.create"
       :operation-type="1"
       :agent-info="agentInfo"
       :confirm="$t('__confirm')"
@@ -150,7 +150,7 @@
       :pc-width="'30%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="agentEditDialogEditSuccess"
+      @editSuccess="editSuccess"
     />
   </div>
 </template>
@@ -177,8 +177,8 @@ const defaultForm = {
   time_zone: 1,
   currency: 1,
   remark: '',
-  commission_rate: 0,
-  rolling_rate: 0,
+  live_commission_rate: 0,
+  live_rolling_rate: 0,
   handicaps: [],
   balance: 0,
   userPassword: '',
@@ -207,18 +207,18 @@ export default {
     return {
       dialogEnum: Object.freeze({
         'none': 0,
-        'agentCreate': 1,
-        'agentEdit': 2,
-        'agentModPassword': 3,
-        'agentLimit': 4,
-        'agentCommissionRate': 5,
-        'agentRollingRate': 6,
-        'agentDepositBalance': 7,
-        'agentWithdrawBalance': 8
+        'create': 1,
+        'edit': 2,
+        'modPassword': 3,
+        'limit': 4,
+        'liveCommissionRate': 5,
+        'liveRollingRate': 6,
+        'depositBalance': 7,
+        'withdrawBalance': 8
       }),
       handicaps: [],
       agentInfo: {},
-      editForm: JSON.parse(JSON.stringify(defaultForm)),
+      editForm: {},
       editStepEnum: {},
       rateData: [],
       curDialogIndex: 0
@@ -226,19 +226,19 @@ export default {
   },
   methods: {
     // 父物件呼叫
-    async agentCreate() {
+    async create() {
       const timezone = await timezoneSearch({})
-      this.$refs.agentCreateDialog.setTimeZone(timezone)
+      this.$refs.createDialog.setTimeZone(timezone)
       if (this.agentInfo.id === 1) {
         const currency = await currencySearch({})
-        this.$refs.agentCreateDialog.setCurrency(currency)
+        this.$refs.createDialog.setCurrency(currency)
       }
       this.editForm = JSON.parse(JSON.stringify(defaultForm))
       this.editStepEnum = createFormStepEnum
-      this.curDialogIndex = this.dialogEnum.agentCreate
+      this.curDialogIndex = this.dialogEnum.create
     },
     // 父物件呼叫
-    setAgentTableData(rows, agentInfo) {
+    setTableData(rows, agentInfo) {
       this.agentInfo = agentInfo
 
       this.allDataByClient = rows
@@ -267,84 +267,84 @@ export default {
     },
     onLimitBtnClick(handicaps) {
       this.handicaps = JSON.parse(JSON.stringify(handicaps))
-      this.curDialogIndex = this.dialogEnum.agentLimit
+      this.curDialogIndex = this.dialogEnum.limit
     },
     onCommissionRateLogBtnClick(rowData) {
       this.setDataLoading(true)
-      agentCommissionRateLog({ agentId: rowData.id }).then((res) => {
-        this.curDialogIndex = this.dialogEnum.agentCommissionRate
+      agentCommissionRateLog({ agentId: rowData.id, cate: 'live' }).then((res) => {
+        this.curDialogIndex = this.dialogEnum.liveCommissionRate
         this.rateData = res.rows
         this.setDataLoading(false)
       })
     },
     onRollingRateLogBtnClick(rowData) {
       this.setDataLoading(true)
-      agentRollingRateLog({ agentId: rowData.id }).then((res) => {
-        this.curDialogIndex = this.dialogEnum.agentRollingRate
+      agentRollingRateLog({ agentId: rowData.id, cate: 'live' }).then((res) => {
+        this.curDialogIndex = this.dialogEnum.liveRollingRate
         this.rateData = res.rows
         this.setDataLoading(false)
       })
     },
     onModPasswordBtnClick(rowData) {
       this.editForm = { id: rowData.id, fullName: rowData.fullName }
-      this.curDialogIndex = this.dialogEnum.agentModPassword
+      this.curDialogIndex = this.dialogEnum.modPassword
     },
     onDepositBtnClick(rowData) {
       this.editForm = { agentId: rowData.id, amount: this.numberFormatStr(0) }
-      this.curDialogIndex = this.dialogEnum.agentDepositBalance
-      this.$refs.agentDepositBalanceDialog.setDialogLoading(true)
+      this.curDialogIndex = this.dialogEnum.depositBalance
+      this.$refs.depositBalanceDialog.setDialogLoading(true)
       agentGetSetBalanceInfo({ agentId: rowData.id }).then((res) => {
-        this.$refs.agentDepositBalanceDialog.setBalanceInfo(res.rows)
-        this.$refs.agentDepositBalanceDialog.setDialogLoading(false)
+        this.$refs.depositBalanceDialog.setBalanceInfo(res.rows)
+        this.$refs.depositBalanceDialog.setDialogLoading(false)
       })
     },
     onWithdrawBtnClick(rowData) {
       this.editForm = { agentId: rowData.id, amount: this.numberFormatStr(0) }
-      this.curDialogIndex = this.dialogEnum.agentWithdrawBalance
-      this.$refs.agentWithdrawBalanceDialog.setDialogLoading(true)
+      this.curDialogIndex = this.dialogEnum.withdrawBalance
+      this.$refs.withdrawBalanceDialog.setDialogLoading(true)
       agentGetSetBalanceInfo({ agentId: rowData.id }).then((res) => {
-        this.$refs.agentWithdrawBalanceDialog.setBalanceInfo(res.rows)
-        this.$refs.agentWithdrawBalanceDialog.setDialogLoading(false)
+        this.$refs.withdrawBalanceDialog.setBalanceInfo(res.rows)
+        this.$refs.withdrawBalanceDialog.setDialogLoading(false)
       })
     },
     async onEditBtnClick(rowData) {
       this.setDataLoading(true)
       const timezone = await timezoneSearch({})
-      this.$refs.agentEditDialog.setTimeZone(timezone)
+      this.$refs.editDialog.setTimeZone(timezone)
 
       this.editForm = JSON.parse(JSON.stringify(rowData))
       this.editStepEnum = editFormStepEnum
-      this.curDialogIndex = this.dialogEnum.agentEdit
+      this.curDialogIndex = this.dialogEnum.edit
       this.setDataLoading(false)
     },
     modPassword(data) {
       agentModPassword(data).then((res) => {
-        this.$refs.agentModPasswordDialog.setDialogLoading(false)
+        this.$refs.modPasswordDialog.setDialogLoading(false)
         this.$emit('serverResponse', res)
         this.closeDialogEven()
       }).catch(() => {
-        this.$refs.agentModPasswordDialog.setDialogLoading(false)
+        this.$refs.modPasswordDialog.setDialogLoading(false)
       })
     },
     depositBalance(data) {
       agentDepositBalance(data).then((res) => {
-        this.$refs.agentDepositBalanceDialog.setDialogLoading(false)
+        this.$refs.depositBalanceDialog.setDialogLoading(false)
         this.$emit('serverResponse', res)
         this.closeDialogEven()
       }).catch(() => {
-        this.$refs.agentDepositBalanceDialog.setDialogLoading(false)
+        this.$refs.depositBalanceDialog.setDialogLoading(false)
       })
     },
     withdrawBalance(data) {
       agentWithdrawBalance(data).then((res) => {
-        this.$refs.agentWithdrawBalanceDialog.setDialogLoading(false)
+        this.$refs.withdrawBalanceDialog.setDialogLoading(false)
         this.$emit('serverResponse', res)
         this.closeDialogEven()
       }).catch(() => {
-        this.$refs.agentWithdrawBalanceDialog.setDialogLoading(false)
+        this.$refs.withdrawBalanceDialog.setDialogLoading(false)
       })
     },
-    agentEditDialogEditSuccess(res) {
+    editSuccess(res) {
       this.$emit('serverResponse', res)
       this.closeDialogEven()
     },

@@ -6,7 +6,7 @@
     <el-steps :active="curIndex" align-center finish-status="success">
       <el-step v-if="hasStep('agentInfo')" :description="$t('__agentInfo')" />
       <el-step v-if="hasStep('rate')" :description="$t('__rate')" />
-      <el-step v-if="hasStep('limit')" :description="$t('__limit')" />
+      <el-step v-if="hasStep('limit')" :description="$t('_handicapLimit')" />
       <el-step v-if="hasStep('balanceConfig')" :description="$t('__balanceConfig')" />
       <el-step v-if="hasStep('confirm')" :description="$t('__confirm')" />
     </el-steps>
@@ -57,12 +57,12 @@
       </el-form-item>
     </el-form>
     <el-form v-show="curIndex === stepEnum.rate" ref="step2" :model="form" :rules="step2Rules">
-      <el-form-item :label="$t('__commissionRate')" prop="commission_rate">
-        <el-input v-model="form.commission_rate" type="number" :disabled="agentInfo.commission_rate === 0" min="0" :max="agentInfo.commission_rate" />
+      <el-form-item :label="$t('__liveCommissionRate')" prop="live_commission_rate">
+        <el-input v-model="form.live_commission_rate" type="number" :disabled="agentInfo.live_commission_rate === 0" min="0" :max="agentInfo.live_commission_rate" />
         <span class="step2Tip">{{ commissionRateTip }}</span>
       </el-form-item>
-      <el-form-item :label="$t('__rollingRate')" prop="rolling_rate">
-        <el-input v-model="form.rolling_rate" type="number" :disabled="agentInfo.rolling_rate === 0" min="0" :max="agentInfo.rolling_rate" />
+      <el-form-item :label="$t('__liveRollingRate')" prop="live_rolling_rate">
+        <el-input v-model="form.live_rolling_rate" type="number" :disabled="agentInfo.live_rolling_rate === 0" min="0" :max="agentInfo.live_rolling_rate" />
         <span class="step2Tip">{{ rollingRateTip }}</span>
       </el-form-item>
     </el-form>
@@ -130,17 +130,17 @@
         <el-col :span="12">
           <label>{{ $t('__rate') }}</label>
           <br>
-          <label>{{ $t('__commissionRate') }}
-            <span>{{ numberFormatStr(form.commission_rate) + '%' }}</span>
+          <label>{{ $t('__liveCommissionRate') }}
+            <span>{{ numberFormatStr(form.live_commission_rate) + '%' }}</span>
           </label>
           <br>
-          <label>{{ $t('__rollingRate') }}
-            <span>{{ numberFormatStr(form.rolling_rate) + '%' }}</span>
+          <label>{{ $t('__liveRollingRate') }}
+            <span>{{ numberFormatStr(form.live_rolling_rate) + '%' }}</span>
           </label>
         </el-col>
       </el-row>
       <el-row>
-        <label>{{ $t('__limit') }}</label>
+        <label>{{ $t('_handicapLimit') }}</label>
         <el-table :data="selectHandicaps" tooltip-effect="dark" max-height="200px">
           <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
@@ -247,9 +247,9 @@ export default {
     const validateCommissionRate = (rule, value, callback) => {
       if (!value && value !== 0) {
         callback(new Error(this.$t('__requiredField')))
-      } else if (this.form.commission_rate > this.agentInfo.commission_rate) {
+      } else if (this.form.live_commission_rate > this.agentInfo.live_commission_rate) {
         callback(new Error(this.$t('__overMax')))
-      } else if (this.form.commission_rate < 0) {
+      } else if (this.form.live_commission_rate < 0) {
         callback(new Error(this.$t('__lowerMin')))
       } else {
         callback()
@@ -258,9 +258,9 @@ export default {
     const validateRollingRate = (rule, value, callback) => {
       if (!value && value !== 0) {
         callback(new Error(this.$t('__requiredField')))
-      } else if (this.form.rolling_rate > this.agentInfo.rolling_rate) {
+      } else if (this.form.live_rolling_rate > this.agentInfo.live_rolling_rate) {
         callback(new Error(this.$t('__overMax')))
-      } else if (this.form.rolling_rate < 0) {
+      } else if (this.form.live_rolling_rate < 0) {
         callback(new Error(this.$t('__lowerMin')))
       } else {
         callback()
@@ -285,8 +285,8 @@ export default {
         confirmPassword: [{ required: true, trigger: 'blur', validator: validateConfirmPassword }]
       },
       step2Rules: {
-        commission_rate: [{ required: true, trigger: 'blur', validator: validateCommissionRate }],
-        rolling_rate: [{ required: true, trigger: 'blur', validator: validateRollingRate }]
+        live_commission_rate: [{ required: true, trigger: 'blur', validator: validateCommissionRate }],
+        live_rolling_rate: [{ required: true, trigger: 'blur', validator: validateRollingRate }]
       },
       step4Rules: {
         balance: [{ required: true, trigger: 'blur', validator: validateBlance }]
@@ -309,10 +309,10 @@ export default {
       'agentAccountStatusType'
     ]),
     commissionRateTip() {
-      return this.$t('__range') + '0%-' + this.agentInfo.commission_rate + '%'
+      return this.$t('__range') + '0%-' + this.agentInfo.live_commission_rate + '%'
     },
     rollingRateTip() {
-      return this.$t('__range') + '0%-' + this.agentInfo.rolling_rate + '%'
+      return this.$t('__range') + '0%-' + this.agentInfo.live_rolling_rate + '%'
     },
     previousBtnVisible() {
       return this.curIndex > this.stepEnum.agentInfo
@@ -375,9 +375,9 @@ export default {
           }
         })
       } else if (this.curIndex === this.stepEnum.balanceConfig) {
-        const agentId = this.operationType === this.operationEnum.create ? this.agentInfo.id : this.form.id
+        const id = this.operationType === this.operationEnum.create ? this.agentInfo.id : this.form.id
         this.dialogLoading = true
-        agentGetSetBalanceInfo({ agentId: agentId }).then((res) => {
+        agentGetSetBalanceInfo({ agentId: id }).then((res) => {
           this.agentBalanceInfo = res.rows
           this.dialogLoading = false
         })

@@ -8,6 +8,22 @@ export function memberSearch(data) {
   })
 }
 
+export function memberCreate(data) {
+  return request({
+    url: '/member/create',
+    method: 'post',
+    data: data
+  })
+}
+
+export function memberEdit(data) {
+  return request({
+    url: '/member/edit',
+    method: 'post',
+    data: data
+  })
+}
+
 export function memberModPassword(data) {
   return request({
     url: '/member/modPassword',
@@ -37,5 +53,12 @@ export function memberWithdrawBalance(data) {
     url: '/member/withdrawBalance',
     method: 'post',
     data: data
+  })
+}
+
+export function memberCreateAccount() {
+  return request({
+    url: '/member/createAccount',
+    method: 'post'
   })
 }

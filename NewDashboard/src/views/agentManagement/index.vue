@@ -12,15 +12,15 @@
       </label>
       <label>
         <el-button class="labelButton" type="primary" size="mini" @click="onLimitBtnClick(agentInfo.handicaps)">
-          {{ $t("__limit") }}
+          {{ $t("_handicapLimit") }}
         </el-button>
       </label>
       <br>
       <label class="labelTitle">{{ $t('__commissionRate') + ':' }}
-        <span class="labelContent">{{ numberFormatStr(agentInfo.commission_rate) + '%' }}</span>
+        <span class="labelContent">{{ numberFormatStr(agentInfo.live_commission_rate) + '%' }}</span>
       </label>
       <label class="labelTitle">{{ $t('__rollingRate') + ':' }}
-        <span class="labelContent">{{ numberFormatStr(agentInfo.rolling_rate) + '%' }}</span>
+        <span class="labelContent">{{ numberFormatStr(agentInfo.live_rolling_rate) + '%' }}</span>
       </label>
       <label class="labelTitle">{{ $t('__accountStatus') + ':' }}
         <span class="labelContent" :class="{'enable':accountStatusEnable, 'disEnable':!accountStatusEnable}">{{ $t(agentInfo.accountStatus) }}</span>
@@ -75,7 +75,7 @@
     />
 
     <LimitDialog
-      :title="$t('__limit')"
+      :title="$t('_handicapLimit')"
       :visible="curDialogIndex === dialogEnum.limit"
       :handicaps="handicaps"
       :pc-width="'35%'"
@@ -177,11 +177,11 @@ export default {
     },
     handleAgentRespone(res) {
       this.handleRespone(res)
-      this.$refs.agent.setAgentTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
+      this.$refs.agent.setTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
     },
     handleMemberRespone(res) {
       this.handleRespone(res)
-      this.$refs.member.setMemberTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
+      this.$refs.member.setTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
     },
     handleSubAccountRespone(res) {
       this.handleRespone(res)
@@ -226,11 +226,11 @@ export default {
       this.dataLoading = true
       switch (this.curTableIndex) {
         case this.tableEnum.agent: {
-          await this.$refs.agent.agentCreate()
+          await this.$refs.agent.create()
           break
         }
         case this.tableEnum.member: {
-          this.$refs.member.memberCreate()
+          await this.$refs.member.create()
           break
         }
         case this.tableEnum.subAccount: {

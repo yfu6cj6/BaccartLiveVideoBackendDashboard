@@ -4,13 +4,13 @@
       <span>{{ agentInfo.fullName }}</span>
     </label>
     <el-steps :active="curIndex" align-center finish-status="success">
-      <el-step v-if="hasStep('agentInfo')" :description="$t('__agentInfo')" />
-      <el-step v-if="hasStep('rate')" :description="$t('__rate')" />
-      <el-step v-if="hasStep('limit')" :description="$t('__limit')" />
+      <el-step v-if="hasStep('memberInfo')" :description="$t('__memberInfo')" />
+      <el-step v-if="hasStep('rate')" :description="$t('__rollingRateAndLimit')" />
+      <el-step v-if="hasStep('limit')" :description="$t('_handicapLimit')" />
       <el-step v-if="hasStep('balanceConfig')" :description="$t('__balanceConfig')" />
       <el-step v-if="hasStep('confirm')" :description="$t('__confirm')" />
     </el-steps>
-    <el-form v-show="curIndex === stepEnum.agentInfo" ref="step1" :model="form" :rules="step1Rules">
+    <el-form v-show="curIndex === stepEnum.memberInfo" ref="step1" :model="form" :rules="step1Rules">
       <el-form-item :label="$t('__accountGenerateMode')">
         <el-switch
           v-model="autoGenerateAccount"
@@ -20,11 +20,11 @@
           :inactive-text="$t('__manual')"
         />
       </el-form-item>
-      <el-form-item :label="$t('__agentAccount')" prop="account">
-        <el-input v-model="form.account" />
+      <el-form-item :label="$t('__memberAccount')" prop="name">
+        <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item :label="$t('__agentNickname')" prop="nickname">
-        <el-input v-model="form.nickname" />
+      <el-form-item :label="$t('__memberNickname')" prop="nick_name">
+        <el-input v-model="form.nick_name" />
       </el-form-item>
       <el-form-item v-if="operationType===operationEnum.create&&visible" :label="$t('__password')" prop="password">
         <el-input v-model="form.password" show-password />
@@ -47,23 +47,22 @@
           <el-option v-for="item in time_zone" :key="item.id" :label="item.city_name" :value="item.id" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="showCurrency" :label="$t('__currency')" prop="currency">
-        <el-select v-model="form.currency">
-          <el-option v-for="item in currency" :key="item.id" :label="item.name" :value="item.id" />
-        </el-select>
-      </el-form-item>
       <el-form-item :label="$t('__remark')" prop="remark">
         <el-input v-model="form.remark" type="textarea" :rows="2" />
       </el-form-item>
     </el-form>
     <el-form v-show="curIndex === stepEnum.rate" ref="step2" :model="form" :rules="step2Rules">
-      <el-form-item :label="$t('__commissionRate')" prop="commission_rate">
-        <el-input v-model="form.commission_rate" type="number" :disabled="agentInfo.commission_rate === 0" min="0" :max="agentInfo.commission_rate" />
-        <span class="step2Tip">{{ commissionRateTip }}</span>
-      </el-form-item>
-      <el-form-item :label="$t('__rollingRate')" prop="rolling_rate">
-        <el-input v-model="form.rolling_rate" type="number" :disabled="agentInfo.rolling_rate === 0" min="0" :max="agentInfo.rolling_rate" />
+      <el-form-item :label="$t('__liveRollingRate')" prop="live_rolling_rate">
+        <el-input v-model="form.live_rolling_rate" type="number" :disabled="agentInfo.live_rolling_rate === 0" min="0" :max="agentInfo.live_rolling_rate" />
         <span class="step2Tip">{{ rollingRateTip }}</span>
+      </el-form-item>
+      <el-form-item :label="$t('__maxWinAmountLimit')" prop="max_win_amount_limit">
+        <el-input v-model="form.max_win_amount_limit" type="number" min="0" />
+        <span class="step2Tip">{{ $t('__zeroMeansNoLimit') }}</span>
+      </el-form-item>
+      <el-form-item :label="$t('__maxLoseAmountLimit')" prop="max_lose_amount_limit">
+        <el-input v-model="form.max_lose_amount_limit" type="number" min="0" />
+        <span class="step2Tip">{{ $t('__zeroMeansNoLimit') }}</span>
       </el-form-item>
     </el-form>
     <el-table v-show="curIndex === stepEnum.limit" ref="handicapsTable" :data="agentInfo.handicaps" tooltip-effect="dark" @selection-change="handleSelectionHandicaps">
@@ -76,19 +75,19 @@
     </el-table>
     <el-form v-show="curIndex === stepEnum.balanceConfig" ref="step4" :model="form" :rules="step4Rules">
       <label>{{ $t('__superiorAgent') + ': ' }}
-        <span>{{ agentBalanceInfo.parent }}</span>
+        <span>{{ agentInfo.fullName }}</span>
       </label>
       <br>
-      <label>{{ $t('__balance') + ': ' }}
+      <label>{{ $t('__agentBalance') + ': ' }}
         <span>{{ parentBalance }}</span>
       </label>
       <br>
-      <label>{{ $t('__agentAccount') + ': ' }}
-        <span>{{ agentBalanceInfo.agent }}</span>
+      <label>{{ $t('__member') + ': ' }}
+        <span>{{ form.nick_name }}</span>
       </label>
       <br>
-      <label>{{ $t('__balance') + ': ' }}
-        <span>{{ agentBalanceInfo.agentBalance }}</span>
+      <label>{{ $t('__memberBalance') + ': ' }}
+        <span>{{ numberFormatStr(0) }}</span>
       </label>
       <el-form-item :label="$t('__depositBalance')" prop="balance">
         <el-input v-model="form.balance" type="number" :disabled="balanceDisable" min="0" />
@@ -97,26 +96,20 @@
     <el-form v-show="curIndex === stepEnum.confirm" ref="step5" :model="form" :rules="step5Rules">
       <el-row>
         <el-col :span="12">
-          <label>{{ $t('__agentInfo') }}</label>
+          <label>{{ $t('__memberInfo') }}</label>
           <br>
-          <label>{{ $t('__agentAccount') }}
-            <span>{{ form.account }}</span>
+          <label>{{ $t('__memberAccount') }}
+            <span>{{ form.name }}</span>
           </label>
           <br>
-          <label>{{ $t('__agentNickname') }}
-            <span>{{ form.nickname }}</span>
+          <label>{{ $t('__memberNickname') }}
+            <span>{{ form.nick_name }}</span>
           </label>
           <br>
           <label>{{ $t('__timeZone') }}
             <span>{{ timeZoneCityName }}</span>
           </label>
           <br>
-          <template v-if="showCurrency">
-            <label>{{ $t('__currency') }}
-              <span>{{ currencyName }}</span>
-            </label>
-            <br>
-          </template>
           <template v-if="operationType===operationEnum.create">
             <label>{{ $t('__balance') }}
               <span>{{ numberFormatStr(form.balance) }}</span>
@@ -128,19 +121,23 @@
           </label>
         </el-col>
         <el-col :span="12">
-          <label>{{ $t('__rate') }}</label>
+          <label>{{ $t('__rollingRateAndLimit') }}</label>
           <br>
-          <label>{{ $t('__commissionRate') }}
-            <span>{{ numberFormatStr(form.commission_rate) + '%' }}</span>
+          <label>{{ $t('__liveRollingRate') }}
+            <span>{{ numberFormatStr(form.live_rolling_rate) + '%' }}</span>
           </label>
           <br>
-          <label>{{ $t('__rollingRate') }}
-            <span>{{ numberFormatStr(form.rolling_rate) + '%' }}</span>
+          <label>{{ $t('__maxWinAmountLimit') }}
+            <span>{{ numberFormatStr(form.max_win_amount_limit) + '%' }}</span>
+          </label>
+          <br>
+          <label>{{ $t('__maxLoseAmountLimit') }}
+            <span>{{ numberFormatStr(form.max_lose_amount_limit) + '%' }}</span>
           </label>
         </el-col>
       </el-row>
       <el-row>
-        <label>{{ $t('__limit') }}</label>
+        <label>{{ $t('_handicapLimit') }}</label>
         <el-table :data="selectHandicaps" tooltip-effect="dark" max-height="200px">
           <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
@@ -163,7 +160,7 @@
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
-import { agentCreateAccount, agentGetSetBalanceInfo, agentCreate, agentEdit } from '@/api/agentManagement/agentList'
+import { memberCreateAccount, memberCreate, memberEdit } from '@/api/agentManagement/memberList'
 import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
 
@@ -244,23 +241,21 @@ export default {
         callback()
       }
     }
-    const validateCommissionRate = (rule, value, callback) => {
+    const validateRollingRate = (rule, value, callback) => {
       if (!value && value !== 0) {
         callback(new Error(this.$t('__requiredField')))
-      } else if (this.form.commission_rate > this.agentInfo.commission_rate) {
+      } else if (this.form.live_rolling_rate > this.agentInfo.live_rolling_rate) {
         callback(new Error(this.$t('__overMax')))
-      } else if (this.form.commission_rate < 0) {
+      } else if (this.form.live_rolling_rate < 0) {
         callback(new Error(this.$t('__lowerMin')))
       } else {
         callback()
       }
     }
-    const validateRollingRate = (rule, value, callback) => {
+    const validateAmountLimit = (rule, value, callback) => {
       if (!value && value !== 0) {
         callback(new Error(this.$t('__requiredField')))
-      } else if (this.form.rolling_rate > this.agentInfo.rolling_rate) {
-        callback(new Error(this.$t('__overMax')))
-      } else if (this.form.rolling_rate < 0) {
+      } else if (this.form.live_rolling_rate < 0) {
         callback(new Error(this.$t('__lowerMin')))
       } else {
         callback()
@@ -271,7 +266,7 @@ export default {
         callback(new Error(this.$t('__requiredField')))
       } else if (this.form.balance < 0) {
         callback(new Error(this.$t('__lowerMin')))
-      } else if (this.agentBalanceInfo.parentId !== 1 && Number(this.form.balance) > Number(this.agentBalanceInfo.parentBalance)) {
+      } else if (this.agentInfo.id !== 1 && Number(this.form.balance) > Number(this.agentInfo.balance)) {
         callback(new Error(this.$t('__overMax')))
       } else {
         callback()
@@ -279,14 +274,15 @@ export default {
     }
     return {
       step1Rules: {
-        account: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        nickname: [{ required: true, trigger: 'blur', validator: validate }],
+        name: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        nick_name: [{ required: true, trigger: 'blur', validator: validate }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
         confirmPassword: [{ required: true, trigger: 'blur', validator: validateConfirmPassword }]
       },
       step2Rules: {
-        commission_rate: [{ required: true, trigger: 'blur', validator: validateCommissionRate }],
-        rolling_rate: [{ required: true, trigger: 'blur', validator: validateRollingRate }]
+        live_rolling_rate: [{ required: true, trigger: 'blur', validator: validateRollingRate }],
+        max_win_amount_limit: [{ required: true, trigger: 'blur', validator: validateAmountLimit }],
+        max_lose_amount_limit: [{ required: true, trigger: 'blur', validator: validateAmountLimit }]
       },
       step4Rules: {
         balance: [{ required: true, trigger: 'blur', validator: validateBlance }]
@@ -299,7 +295,6 @@ export default {
       curIndex: 0,
       time_zone: [],
       currency: [],
-      agentBalanceInfo: {},
       dialogLoading: false,
       selectHandicaps: []
     }
@@ -308,14 +303,11 @@ export default {
     ...mapGetters([
       'agentAccountStatusType'
     ]),
-    commissionRateTip() {
-      return this.$t('__range') + '0%-' + this.agentInfo.commission_rate + '%'
-    },
     rollingRateTip() {
-      return this.$t('__range') + '0%-' + this.agentInfo.rolling_rate + '%'
+      return this.$t('__range') + '0%-' + this.agentInfo.live_rolling_rate + '%'
     },
     previousBtnVisible() {
-      return this.curIndex > this.stepEnum.agentInfo
+      return this.curIndex > this.stepEnum.memberInfo
     },
     nextBtnVisible() {
       if (this.curIndex === this.stepEnum.limit) {
@@ -326,14 +318,11 @@ export default {
     confirmBtnVisible() {
       return this.curIndex >= this.stepEnum.confirm
     },
-    showCurrency() {
-      return this.operationType === this.operationEnum.create && this.agentInfo.id === 1
-    },
     balanceDisable() {
-      if (this.agentBalanceInfo.parentId === 1) {
+      if (this.agentInfo.id === 1) {
         return false
       }
-      return Number(this.agentBalanceInfo.parentBalance) === 0
+      return Number(this.agentInfo.balance) === 0
     },
     timeZoneCityName() {
       const timeZoneData = this.time_zone.find(timezone => this.form.time_zone === timezone.id)
@@ -344,13 +333,13 @@ export default {
       return currencyData ? currencyData.name : ''
     },
     parentBalance() {
-      return this.agentBalanceInfo.parentId === 1 ? '∞' : this.agentBalanceInfo.parentBalance
+      return this.agentInfo.id === 1 ? '∞' : this.agentInfo.balance
     }
   },
   watch: {
     visible() {
       if (this.visible) {
-        this.curIndex = this.stepEnum.agentInfo
+        this.curIndex = this.stepEnum.memberInfo
       } else {
         this.autoGenerateAccount = false
         this.$refs.step1.clearValidate()
@@ -361,8 +350,8 @@ export default {
     },
     autoGenerateAccount() {
       if (this.autoGenerateAccount) {
-        agentCreateAccount().then((res) => {
-          this.form.account = res.account
+        memberCreateAccount().then((res) => {
+          this.form.name = res.account
           this.$refs.step1.clearValidate()
         })
       }
@@ -373,13 +362,6 @@ export default {
           if (this.form.handicaps.some(formHandicaps => formHandicaps.id === agentInfoHandicap.id)) {
             this.$refs.handicapsTable.toggleRowSelection(agentInfoHandicap, true)
           }
-        })
-      } else if (this.curIndex === this.stepEnum.balanceConfig) {
-        const agentId = this.operationType === this.operationEnum.create ? this.agentInfo.id : this.form.id
-        this.dialogLoading = true
-        agentGetSetBalanceInfo({ agentId: agentId }).then((res) => {
-          this.agentBalanceInfo = res.rows
-          this.dialogLoading = false
         })
       }
     }
@@ -401,7 +383,7 @@ export default {
     },
     onNextBtnClick() {
       let next = false
-      if (this.curIndex === this.stepEnum.agentInfo) {
+      if (this.curIndex === this.stepEnum.memberInfo) {
         this.$refs.step1.validate((valid) => {
           next = valid
         })
@@ -437,8 +419,8 @@ export default {
             data.handicaps.push(element.id)
           })
           if (this.operationType === this.operationEnum.create) {
-            data.parent = this.agentInfo.id
-            agentCreate(data).then((res) => {
+            data.agent_id = this.agentInfo.id
+            memberCreate(data).then((res) => {
               this.$emit('editSuccess', res)
               this.dialogLoading = false
             }).catch(() => {
@@ -446,7 +428,7 @@ export default {
             })
           } else if (this.operationType === this.operationEnum.edit) {
             this.$confirm(this.$t('__confirmChanges')).then(_ => {
-              agentEdit(data).then((res) => {
+              memberEdit(data).then((res) => {
                 this.$emit('editSuccess', res)
                 this.dialogLoading = false
               }).catch(() => {
