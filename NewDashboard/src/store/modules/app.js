@@ -4,7 +4,9 @@ const state = {
     withoutAnimation: false
   },
   device: 'desktop',
-  agentLevelSidebar: localStorage.getItem('agentLevelSidebarStatus') ? localStorage.getItem('agentLevelSidebarStatus') : true
+  agentLevelSidebar: localStorage.getItem('agentLevelSidebarStatus') ? localStorage.getItem('agentLevelSidebarStatus') : true,
+  agentLevel: [],
+  agentId: 0
 }
 
 const mutations = {
@@ -28,6 +30,12 @@ const mutations = {
   CLOSE_AGENTLEVEL_SIDEBAR: state => {
     localStorage.setItem('agentLevelSidebarStatus', false)
     state.agentLevelSidebar = false
+  },
+  SET_AGENT_LEVEL: (state, agentLevel) => {
+    state.agentLevel = agentLevel
+  },
+  SET_AGENT_ID: (state, agentId) => {
+    state.agentId = agentId
   }
 }
 
@@ -47,6 +55,12 @@ const actions = {
   },
   closeAgentLevelSideBar({ commit }) {
     commit('CLOSE_AGENTLEVEL_SIDEBAR')
+  },
+  setAgentLevel({ commit }, agentLevel) {
+    commit('SET_AGENT_LEVEL', agentLevel)
+  },
+  setAgentId({ commit }, agentId) {
+    commit('SET_AGENT_ID', agentId)
   }
 }
 

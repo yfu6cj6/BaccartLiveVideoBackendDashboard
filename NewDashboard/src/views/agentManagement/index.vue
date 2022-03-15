@@ -96,7 +96,6 @@ import SubAccount from './subAccount/index'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
-import { sendData, register, unRegister } from '@/utils/sendTool'
 
 export default {
   name: 'AgentManagement',
@@ -124,7 +123,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'agentAccountStatusType'
+      'agentAccountStatusType',
+      'agentId'
     ]),
     addSubLabel() {
       switch (this.curTableIndex) {
@@ -141,22 +141,17 @@ export default {
       return ''
     }
   },
+  watch: {
+    agentId() {
+      this.onTableBtnClick(this.curTableIndex, this.agentId)
+    }
+  },
   created() {
     this.dataLoading = true
-    register('agentLevel_AgentId', this.agentLevel_AgentId)
+    this.onTableBtnClick(this.curTableIndex, this.$route.query?.agentId)
     this.setHeight()
   },
-  mounted() {
-    sendData('agentLevel_Inited', true)
-  },
-  beforeDestroy() {
-    sendData('agentLevel_Inited', false)
-    unRegister('agentLevel_AgentId', this.agentLevel_AgentId)
-  },
   methods: {
-    agentLevel_AgentId(id) {
-      this.onTableBtnClick(this.curTableIndex, id)
-    },
     numberFormatStr(number) {
       return numberFormat(number)
     },
@@ -164,7 +159,7 @@ export default {
       this.dataLoading = dataLoading
     },
     handleRespone(res) {
-      sendData('agentLevelInfo', res.agentLevel)
+      this.$store.dispatch('app/setAgentLevel', res.agentLevel)
       this.agentInfo = res.agentInfo
       this.agentInfo.currency = this.agentInfo.currency.code
       this.agentInfo.fullName = this.agentInfo.nickname + '(' + this.agentInfo.account + ')'

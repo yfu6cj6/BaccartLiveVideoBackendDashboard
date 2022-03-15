@@ -28,7 +28,6 @@
 <script>
 import { agentSearch } from '@/api/agentManagement/agentList'
 import { mapGetters } from 'vuex'
-import { sendData, register, unRegister } from '@/utils/sendTool'
 
 export default {
   name: 'AgentLevel',
@@ -38,15 +37,14 @@ export default {
         children: 'SubAgentLevelInfos',
         label: 'AgentName'
       },
-      agentLevel: [],
       agentInfo: {},
-      dataLoading: false,
-      agentLevelInited: false
+      dataLoading: false
     }
   },
   computed: {
     ...mapGetters([
-      'agentLevelSidebar'
+      'agentLevelSidebar',
+      'agentLevel'
     ]),
     treeDefaultExpandedKeys() {
       return this.agentLevel.length === 0 ? [] : [this.agentInfo.id]
@@ -55,50 +53,16 @@ export default {
   watch: {
     agentLevelSidebar(value) {
       if (value) {
-        this.addEventClick()
         this.dataLoading = true
         agentSearch().then((res) => {
-          this.agentLevel = res.agentLevel
+          this.$store.dispatch('app/setAgentLevel', res.agentLevel)
           this.agentInfo = res.agentInfo
           this.dataLoading = false
         })
       }
     }
   },
-  created() {
-    register('agentLevel_Inited', this.agentLevel_Inited)
-    register('agentLevelInfo', this.agentLevelInfo)
-  },
-  mounted() {
-    this.insertToBody()
-  },
-  beforeDestroy() {
-    const elx = this.$refs.agentLevel
-    elx.remove()
-    unRegister('agentLevel_Inited', this.agentLevel_Inited)
-    unRegister('agentLevelInfo', this.agentLevelInfo)
-  },
   methods: {
-    agentLevelInfo(agentLevel) {
-      this.agentLevel = agentLevel
-    },
-    agentLevel_Inited(inited) {
-      this.agentLevelInited = inited
-    },
-    addEventClick() {
-      window.addEventListener('click', this.closeSidebar)
-    },
-    closeSidebar(evt) {
-      const parent = evt.target.closest('.agentLevel')
-      if (!parent) {
-        window.removeEventListener('click', this.closeSidebar)
-      }
-    },
-    insertToBody() {
-      const elx = this.$refs.agentLevel
-      const body = document.querySelector('body')
-      body.insertBefore(elx, body.firstChild)
-    },
     onHandleBtnClick() {
       this.$store.dispatch('app/closeAgentLevelSideBar')
     },
@@ -111,17 +75,9 @@ export default {
     },
     async handleNodeClick(data) {
       this.dataLoading = true
-      this.$router.push({ path: '/agentManagement/agentManagement' })
-      while (!this.agentLevelInited) {
-        await this.delay(100)
-      }
-      sendData('agentLevel_AgentId', data.AgentId)
+      this.$store.dispatch('app/setAgentId', data.AgentId)
+      await this.$router.push({ path: '/agentManagement/agentManagement', query: { agentId: data.AgentId }})
       this.dataLoading = false
-    },
-    delay(n) {
-      return new Promise(function(resolve) {
-        setTimeout(resolve, n)
-      })
     }
   }
 }
