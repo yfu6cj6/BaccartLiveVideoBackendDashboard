@@ -47,7 +47,7 @@ export default {
   },
   created() {
     this.$store.dispatch('settings/changeSetting', defaultSettings)
-    this.$store.dispatch('agentManagement/setAgentManagementSideBarVisable', false)
+    this.$store.dispatch('app/closeAgentLevelSideBar')
   },
   methods: {
     handleClickOutside() {

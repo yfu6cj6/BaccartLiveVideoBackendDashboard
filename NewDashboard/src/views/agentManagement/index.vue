@@ -144,9 +144,11 @@ export default {
   created() {
     this.dataLoading = true
     register('agentLevel_AgentId', this.agentLevel_AgentId)
+    sendData('agentLevel_Inited', true)
     this.setHeight()
   },
   beforeDestroy() {
+    sendData('agentLevel_Inited', false)
     unRegister('agentLevel_AgentId', this.agentLevel_AgentId)
   },
   methods: {

@@ -165,7 +165,7 @@ export const asyncRoutes = [
       name: 'AgentManagement',
       component: () => import('@/views/agentManagement/index'),
       meta: { title: '__agentManagement' },
-      click: () => { store.dispatch('agentManagement/setAgentManagementSideBarVisable', true) }
+      click: () => { store.dispatch('app/toggleAgentLevelSideBar') }
     }]
   },
 

@@ -1,5 +1,5 @@
 <template>
-  <div ref="agentLevel" :class="{show:agentLevelVisable}" class="agentLevel-container">
+  <div ref="agentLevel" :class="{show:agentLevelSidebar}" class="agentLevel-container">
     <div class="agentLevel">
       <div class="agentLevel-items">
         <div class="handle-button" @click="show=onHandleBtnClick()">
@@ -40,21 +40,20 @@ export default {
       },
       agentLevel: [],
       agentInfo: {},
-      dataLoading: false
+      dataLoading: false,
+      agentLevelInited: false
     }
   },
   computed: {
     ...mapGetters([
-      'agentLevelVisable',
-      'visitedViews',
-      'cachedViews'
+      'agentLevelSidebar'
     ]),
     treeDefaultExpandedKeys() {
       return this.agentLevel.length === 0 ? [] : [this.agentInfo.id]
     }
   },
   watch: {
-    agentLevelVisable(value) {
+    agentLevelSidebar(value) {
       if (value) {
         this.addEventClick()
         this.dataLoading = true
@@ -67,6 +66,7 @@ export default {
     }
   },
   created() {
+    register('agentLevel_Inited', this.agentLevel_Inited)
     register('agentLevelInfo', this.agentLevelInfo)
   },
   mounted() {
@@ -75,11 +75,15 @@ export default {
   beforeDestroy() {
     const elx = this.$refs.agentLevel
     elx.remove()
+    unRegister('agentLevel_Inited', this.agentLevel_Inited)
     unRegister('agentLevelInfo', this.agentLevelInfo)
   },
   methods: {
     agentLevelInfo(agentLevel) {
       this.agentLevel = agentLevel
+    },
+    agentLevel_Inited(inited) {
+      this.agentLevelInited = inited
     },
     addEventClick() {
       window.addEventListener('click', this.closeSidebar)
@@ -96,7 +100,7 @@ export default {
       body.insertBefore(elx, body.firstChild)
     },
     onHandleBtnClick() {
-      this.$store.dispatch('agentManagement/setAgentManagementSideBarVisable', false)
+      this.$store.dispatch('app/closeAgentLevelSideBar')
     },
     renderContent(h, { node, data, store }) {
       return (
@@ -107,10 +111,9 @@ export default {
     },
     async handleNodeClick(data) {
       this.dataLoading = true
-      const awaitTime = !this.cachedViews.some(v => v.name === 'AgentManagement')
       this.$router.push({ path: '/agentManagement/agentManagement' })
-      if (awaitTime) {
-        await this.delay(1000)
+      while (!this.agentLevelInited) {
+        await this.delay(100)
       }
       sendData('agentLevel_AgentId', data.AgentId)
       this.dataLoading = false

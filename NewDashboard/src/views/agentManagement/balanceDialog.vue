@@ -1,13 +1,13 @@
 <template>
   <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
     <el-form ref="form" label-width="auto" :model="form" :rules="rules">
-      <el-form-item :label="$t('__agent') + ': '">
+      <el-form-item :label="$t('__superiorAgent') + ': '">
         <span>{{ agentBalanceInfo.parent }}</span>
       </el-form-item>
       <el-form-item :label="$t('__balance') + ': '">
         <span>{{ parentBalance }}</span>
       </el-form-item>
-      <el-form-item :label="$t('__agentAccount') + ': '">
+      <el-form-item :label="$t('__agent') + ': '">
         <span>{{ agentBalanceInfo.agent }}</span>
       </el-form-item>
       <el-form-item :label="$t('__balance') + ': '">

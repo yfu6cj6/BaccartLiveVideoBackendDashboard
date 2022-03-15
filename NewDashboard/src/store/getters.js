@@ -1,6 +1,7 @@
 const getters = {
   sidebar: state => state.app.sidebar,
   device: state => state.app.device,
+  agentLevelSidebar: state => state.app.agentLevelSidebar,
   fixedHeader: state => state.settings.fixedHeader,
   sidebarLogo: state => state.settings.sidebarLogo,
   tagsView: state => state.settings.tagsView,
@@ -21,7 +22,6 @@ const getters = {
   gameAnnouncements: state => state.backstageManagement.gameAnnouncements,
   agentAnnouncements: state => state.backstageManagement.agentAnnouncements,
   memberBetTimeType: state => state.memberBet.memberBetTimeType,
-  gameResultTimeType: state => state.gameResult.gameResultTimeType,
-  agentLevelVisable: state => state.agentManagement.agentLevelVisable
+  gameResultTimeType: state => state.gameResult.gameResultTimeType
 }
 export default getters

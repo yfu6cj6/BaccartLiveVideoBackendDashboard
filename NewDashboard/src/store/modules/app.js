@@ -3,7 +3,8 @@ const state = {
     opened: localStorage.getItem('sidebarStatus') ? localStorage.getItem('sidebarStatus') : true,
     withoutAnimation: false
   },
-  device: 'desktop'
+  device: 'desktop',
+  agentLevelSidebar: localStorage.getItem('agentLevelSidebarStatus') ? localStorage.getItem('agentLevelSidebarStatus') : true
 }
 
 const mutations = {
@@ -19,6 +20,14 @@ const mutations = {
   },
   TOGGLE_DEVICE: (state, device) => {
     state.device = device
+  },
+  TOGGLE_AGENTLEVEL_SIDEBAR: state => {
+    state.agentLevelSidebar = !state.agentLevelSidebar
+    localStorage.getItem('agentLevelSidebarStatus', state.agentLevelSidebar)
+  },
+  CLOSE_AGENTLEVEL_SIDEBAR: state => {
+    localStorage.setItem('agentLevelSidebarStatus', false)
+    state.agentLevelSidebar = false
   }
 }
 
@@ -26,11 +35,18 @@ const actions = {
   toggleSideBar({ commit }) {
     commit('TOGGLE_SIDEBAR')
   },
-  closeSideBar({ commit }, { withoutAnimation }) {
+  closeSideBar({ dispatch, commit }, { withoutAnimation }) {
     commit('CLOSE_SIDEBAR', withoutAnimation)
+    dispatch('closeAgentLevelSideBar')
   },
   toggleDevice({ commit }, device) {
     commit('TOGGLE_DEVICE', device)
+  },
+  toggleAgentLevelSideBar({ commit }) {
+    commit('TOGGLE_AGENTLEVEL_SIDEBAR')
+  },
+  closeAgentLevelSideBar({ commit }) {
+    commit('CLOSE_AGENTLEVEL_SIDEBAR')
   }
 }
 
