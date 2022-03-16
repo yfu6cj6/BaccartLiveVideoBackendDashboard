@@ -164,11 +164,8 @@ export default {
       })
       this.allDataByClient = res.rows
       this.allDataByClient.forEach(element => {
-        if (element.status === 0) {
-          element.statusLabel = this.$t('__close')
-        } else {
-          element.statusLabel = this.$t('__open')
-        }
+        const statusNickname = this.accountStatusType.find(statusType => statusType.key === element.status).nickname
+        element.statusLabel = this.$t(statusNickname)
       })
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)

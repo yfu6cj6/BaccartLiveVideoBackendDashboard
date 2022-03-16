@@ -1,7 +1,7 @@
 const state = {
   accountStatusType: accountStatusType,
   announcementMarqueeStatusType: announcementMarqueeStatusType,
-  agentAccountStatusType: agentAccountStatusType
+  roles: roles
 }
 
 const accountStatusType = [{
@@ -22,20 +22,20 @@ const announcementMarqueeStatusType = [{
   nickname: '__open'
 }]
 
-const agentAccountStatusType = [{
-  key: '0',
-  nickname: '__close'
+const roles = [{
+  key: 'AgentSubAccountAdmin',
+  nickname: '__admin'
 },
 {
-  key: '1',
-  nickname: '__open'
+  key: 'AgentSubAccount',
+  nickname: '__visitor'
 }]
 
 const mutations = {
   SET_COMMON_TYPE(state) {
     state.accountStatusType = accountStatusType
     state.announcementMarqueeStatusType = announcementMarqueeStatusType
-    state.agentAccountStatusType = agentAccountStatusType
+    state.roles = roles
   }
 }
 const actions = {

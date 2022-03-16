@@ -123,7 +123,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'agentAccountStatusType',
+      'accountStatusType',
       'agentId'
     ]),
     addSubLabel() {
@@ -163,8 +163,8 @@ export default {
       this.agentInfo = res.agentInfo
       this.agentInfo.currency = this.agentInfo.currency.code
       this.agentInfo.fullName = this.agentInfo.nickname + '(' + this.agentInfo.account + ')'
-      this.agentInfo.accountStatus = this.agentAccountStatusType.find(element => element.key === this.agentInfo.status).nickname
-      this.agentInfo.betStatus = this.agentAccountStatusType.find(element => element.key === this.agentInfo.bet_status).nickname
+      this.agentInfo.accountStatus = this.accountStatusType.find(element => element.key === this.agentInfo.status).nickname
+      this.agentInfo.betStatus = this.accountStatusType.find(element => element.key === this.agentInfo.bet_status).nickname
 
       this.accountStatusEnable = this.agentInfo.status === '1'
       this.betStatusEnable = this.agentInfo.bet_status === '1'

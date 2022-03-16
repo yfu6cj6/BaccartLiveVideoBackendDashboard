@@ -28,7 +28,7 @@
         </el-form-item>
         <el-form-item :label="$t('__accountStatus')" prop="status">
           <el-select v-model="form.status">
-            <el-option v-for="item in agentAccountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+            <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('__timeZone')" prop="timeZone">
@@ -145,7 +145,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'agentAccountStatusType'
+      'accountStatusType'
     ])
   },
   watch: {

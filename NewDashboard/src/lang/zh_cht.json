@@ -171,5 +171,6 @@
     "__lastLoginIP": "最後登入IP",
     "__effectAgentLine": "保持所有下線權限",
     "__admin": "管理員",
-    "__editSubAccount": "編輯子帳號"
+    "__editSubAccount": "編輯子帳號",
+    "__visitor": "訪客"
 }

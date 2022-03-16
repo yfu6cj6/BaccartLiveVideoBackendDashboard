@@ -9,7 +9,7 @@
           <el-button class="iconButton" type="primary" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
         </template>
       </el-table-column>
-      <el-table-column prop="status" :label="$t('__accountStatus')" align="center" />
+      <el-table-column prop="statusLabel" :label="$t('__accountStatus')" align="center" />
       <el-table-column prop="roles" :label="$t('__role')" align="center" />
       <el-table-column prop="creator" :label="$t('__creator')" align="center" />
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
@@ -22,7 +22,7 @@
 
     <el-pagination
       layout="prev, pager, next, jumper"
-      class="member-pagination"
+      class="subAccount-pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
@@ -81,7 +81,7 @@ import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import SubAccountEditDialog from './subAccountEditDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
-import { numberFormat } from '@/utils/numberFormat'
+import { mapGetters } from 'vuex'
 
 const defaultForm = {
   account: '',
@@ -122,6 +122,12 @@ export default {
       curDialogIndex: 0
     }
   },
+  computed: {
+    ...mapGetters([
+      'accountStatusType',
+      'roles'
+    ])
+  },
   methods: {
     // 父物件呼叫
     async create() {
@@ -137,12 +143,17 @@ export default {
       this.allDataByClient = rows
       this.allDataByClient.forEach(element => {
         element.fullName = element.nickname + '(' + element.account + ')'
+        const statusNickname = this.accountStatusType.find(statusType => statusType.key === element.status).nickname
+        element.statusLabel = this.$t(statusNickname)
+        const newRoles = []
+        element.roles.forEach(role => {
+          const roleNickname = this.roles.find(item => item.key === role).nickname
+          newRoles.push(this.$t(roleNickname))
+        })
+        element.roles = newRoles
       })
       this.totalCount = rows.length
       this.handlePageChangeByClient(this.currentPage)
-    },
-    numberFormatStr(number) {
-      return numberFormat(number)
     },
     setDataLoading(dataLoading) {
       this.$emit('setDataLoading', dataLoading)
@@ -184,7 +195,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.member {
+.subAccount {
   &-pagination {
     padding: 1em;
     display: flex;

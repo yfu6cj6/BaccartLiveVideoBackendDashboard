@@ -35,12 +35,12 @@
         </el-form-item>
         <el-form-item :label="$t('__accountStatus')" prop="status">
           <el-select v-model="form.status">
-            <el-option v-for="item in agentAccountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+            <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('__betStatus')" prop="bet_status">
           <el-select v-model="form.bet_status">
-            <el-option v-for="item in agentAccountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+            <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('__timeZone')" prop="time_zone">
@@ -303,7 +303,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'agentAccountStatusType'
+      'accountStatusType'
     ]),
     rollingRateTip() {
       return this.$t('__range') + '0%-' + this.agentInfo.live_rolling_rate + '%'
