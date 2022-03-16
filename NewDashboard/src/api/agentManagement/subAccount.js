@@ -38,3 +38,19 @@ export function subAccountCreateAccount() {
     method: 'post'
   })
 }
+
+export function subAccountModStatus(data) {
+  return request({
+    url: '/agent/subAccount/modStatus',
+    method: 'post',
+    data: data
+  })
+}
+
+export function subAccountModEffectAgentLine(data) {
+  return request({
+    url: '/agent/subAccount/modEffectAgentLine',
+    method: 'post',
+    data: data
+  })
+}

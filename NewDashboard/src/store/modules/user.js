@@ -1,5 +1,6 @@
 import { getInfo } from '@/api/user'
 import { removeToken, removeTokenType } from '@/utils/auth'
+import store from '@/store'
 
 const getDefaultState = () => {
   return {
@@ -61,6 +62,7 @@ const actions = {
       removeToken() // must remove  token  first
       removeTokenType()
       commit('RESET_STATE')
+      store.dispatch('tagsView/delAllViews')
       resolve()
     })
   }

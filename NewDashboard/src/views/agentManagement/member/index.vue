@@ -1,6 +1,15 @@
 <template>
   <div>
     <el-table :data="tableData" border :max-height="viewHeight">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-form label-position="left" inline>
+            <el-form-item :label="$t('__remark')">
+              <span>{{ props.row.remark }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('__member')" align="center">
         <template slot-scope="scope">
           <span class="scope-content">{{ scope.row.name }}</span>
@@ -29,7 +38,10 @@
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
       <el-table-column prop="lastLoginAt" :label="$t('__lastLoginAt')" align="center" />
       <el-table-column :label="$t('__operate')" align="center" width="auto">
-        <span>123</span>
+        <template slot-scope="scope">
+          <el-checkbox v-model="scope.row.lockLogin" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row.id)" />
+          <el-checkbox v-model="scope.row.debarBet" :label="$t('__debarBet')" @mousedown.native="onOperateCheckboxClick(dialogEnum.debarBet, scope.row.id)" />
+        </template>
       </el-table-column>
     </el-table>
 
@@ -122,11 +134,29 @@
       @close="closeDialogEven"
       @editSuccess="editSuccess"
     />
+
+    <OperateDialog
+      :visible="curDialogIndex === dialogEnum.lockLogin"
+      :content="'確定要改變狀態嗎?'"
+      :form="editForm"
+      :submit-fun="onOperateSubmitFun"
+      @close="closeDialogEven"
+      @editSuccess="editSuccess"
+    />
+
+    <OperateDialog
+      :visible="curDialogIndex === dialogEnum.debarBet"
+      :content="'確定要改變狀態嗎?'"
+      :form="editForm"
+      :submit-fun="onOperateSubmitFun"
+      @close="closeDialogEven"
+      @editSuccess="editSuccess"
+    />
   </div>
 </template>
 
 <script>
-import { memberModPassword, memberGetSetBalanceInfo, memberDepositBalance, memberWithdrawBalance } from '@/api/agentManagement/memberList'
+import { memberModPassword, memberGetSetBalanceInfo, memberDepositBalance, memberWithdrawBalance, memberModStatus, memberModBetStatus } from '@/api/agentManagement/memberList'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
@@ -134,6 +164,7 @@ import MemberEditDialog from './memberEditDialog'
 import LimitDialog from '@/views/agentManagement/limitDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
 import BalanceDialog from '@/views/agentManagement/balanceDialog'
+import OperateDialog from '@/views/agentManagement/operateDialog'
 import { numberFormat } from '@/utils/numberFormat'
 
 const defaultForm = {
@@ -159,7 +190,7 @@ const editFormStepEnum = Object.freeze({ 'memberInfo': 0, 'rate': 1, 'limit': 2,
 
 export default {
   name: 'Member',
-  components: { MemberEditDialog, LimitDialog, ModPasswordDialog, BalanceDialog },
+  components: { MemberEditDialog, LimitDialog, ModPasswordDialog, BalanceDialog, OperateDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -179,7 +210,9 @@ export default {
         'modPassword': 3,
         'limit': 4,
         'depositBalance': 5,
-        'withdrawBalance': 6
+        'withdrawBalance': 6,
+        'lockLogin': 7,
+        'debarBet': 8
       }),
       agentInfo: {},
       handicaps: [],
@@ -189,6 +222,33 @@ export default {
     }
   },
   methods: {
+    onOperateSubmitFun(data) {
+      switch (this.curDialogIndex) {
+        case this.dialogEnum.lockLogin: {
+          return memberModStatus(data).then((res) => {
+            return res
+          })
+        }
+        case this.dialogEnum.debarBet: {
+          return memberModBetStatus(data).then((res) => {
+            return res
+          })
+        }
+      }
+    },
+    onOperateCheckboxClick(operateType, id) {
+      this.editForm = { memberId: id }
+      switch (operateType) {
+        case this.dialogEnum.lockLogin: {
+          this.curDialogIndex = this.dialogEnum.lockLogin
+          break
+        }
+        case this.dialogEnum.debarBet: {
+          this.curDialogIndex = this.dialogEnum.debarBet
+          break
+        }
+      }
+    },
     // 父物件呼叫
     async create() {
       const timezone = await timezoneSearch({})
@@ -205,6 +265,8 @@ export default {
       this.allDataByClient.forEach(element => {
         element.currency = element.currency.code
         element.time_zone = element.timeZone.id
+        element.lockLogin = element.status === '0'
+        element.debarBet = element.bet_status === '0'
       })
       this.totalCount = rows.length
       this.handlePageChangeByClient(this.currentPage)

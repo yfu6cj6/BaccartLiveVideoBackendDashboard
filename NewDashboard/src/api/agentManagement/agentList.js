@@ -86,3 +86,27 @@ export function agentWithdrawBalance(data) {
     data: data
   })
 }
+
+export function agentModTotallyDisabled(data) {
+  return request({
+    url: '/agent/modTotallyDisabled',
+    method: 'post',
+    data: data
+  })
+}
+
+export function agentModStatus(data) {
+  return request({
+    url: '/agent/modStatus',
+    method: 'post',
+    data: data
+  })
+}
+
+export function agentModBetStatus(data) {
+  return request({
+    url: '/agent/modBetStatus',
+    method: 'post',
+    data: data
+  })
+}

@@ -62,3 +62,19 @@ export function memberCreateAccount() {
     method: 'post'
   })
 }
+
+export function memberModStatus(data) {
+  return request({
+    url: '/member/modStatus',
+    method: 'post',
+    data: data
+  })
+}
+
+export function memberModBetStatus(data) {
+  return request({
+    url: '/member/modBetStatus',
+    method: 'post',
+    data: data
+  })
+}

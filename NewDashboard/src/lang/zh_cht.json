@@ -172,5 +172,9 @@
     "__effectAgentLine": "保持所有下線權限",
     "__admin": "管理員",
     "__editSubAccount": "編輯子帳號",
-    "__visitor": "訪客"
+    "__visitor": "訪客",
+    "__totallyDisabled": "完全禁用",
+    "__lockLogin": "鎖定登入",
+    "__debarBet": "禁止投注",
+    "__allPermission": "所有權限"
 }

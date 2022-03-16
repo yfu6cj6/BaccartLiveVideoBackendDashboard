@@ -1,33 +1,31 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
-    <div v-loading="dialogLoading">
-      <el-form ref="form" label-width="auto" :model="form" :rules="rules">
-        <el-form-item :label="$t('__superiorAgent') + ': '">
-          <span>{{ agentBalanceInfo.parent }}</span>
-        </el-form-item>
-        <el-form-item :label="$t('__superiorBalance') + ': '">
-          <span>{{ parentBalance }}</span>
-        </el-form-item>
-        <el-form-item v-if="modeType===modeEnum.agent" :label="$t('__agent') + ': '">
-          <span>{{ agentBalanceInfo.agent }}</span>
-        </el-form-item>
-        <el-form-item v-if="modeType===modeEnum.agent" :label="$t('__agentBalance') + ': '">
-          <span>{{ agentBalanceInfo.agentBalance }}</span>
-        </el-form-item>
-        <el-form-item v-if="modeType===modeEnum.member" :label="$t('__member') + ': '">
-          <span>{{ agentBalanceInfo.member }}</span>
-        </el-form-item>
-        <el-form-item v-if="modeType===modeEnum.member" :label="$t('__memberBalance') + ': '">
-          <span>{{ agentBalanceInfo.memberBalance }}</span>
-        </el-form-item>
-        <el-form-item :label="balanceLabelTitle" prop="amount">
-          <el-input v-model="form.amount" type="number" :disabled="balanceDisable" min="0" />
-        </el-form-item>
-        <el-form-item v-if="visible" :label="$t('__userPassword')" prop="userPassword">
-          <el-input v-model="form.userPassword" show-password />
-        </el-form-item>
-      </el-form>
-    </div>
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
+    <el-form ref="form" label-width="auto" :model="form" :rules="rules">
+      <el-form-item :label="$t('__superiorAgent') + ': '">
+        <span>{{ agentBalanceInfo.parent }}</span>
+      </el-form-item>
+      <el-form-item :label="$t('__superiorBalance') + ': '">
+        <span>{{ parentBalance }}</span>
+      </el-form-item>
+      <el-form-item v-if="modeType===modeEnum.agent" :label="$t('__agent') + ': '">
+        <span>{{ agentBalanceInfo.agent }}</span>
+      </el-form-item>
+      <el-form-item v-if="modeType===modeEnum.agent" :label="$t('__agentBalance') + ': '">
+        <span>{{ agentBalanceInfo.agentBalance }}</span>
+      </el-form-item>
+      <el-form-item v-if="modeType===modeEnum.member" :label="$t('__member') + ': '">
+        <span>{{ agentBalanceInfo.member }}</span>
+      </el-form-item>
+      <el-form-item v-if="modeType===modeEnum.member" :label="$t('__memberBalance') + ': '">
+        <span>{{ agentBalanceInfo.memberBalance }}</span>
+      </el-form-item>
+      <el-form-item :label="balanceLabelTitle" prop="amount">
+        <el-input v-model="form.amount" type="number" :disabled="balanceDisable" min="0" />
+      </el-form-item>
+      <el-form-item v-if="visible" :label="$t('__userPassword')" prop="userPassword">
+        <el-input v-model="form.userPassword" show-password />
+      </el-form-item>
+    </el-form>
     <span v-show="!dialogLoading" slot="footer">
       <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
     </span>

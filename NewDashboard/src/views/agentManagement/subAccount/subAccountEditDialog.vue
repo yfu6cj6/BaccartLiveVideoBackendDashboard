@@ -1,53 +1,51 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
-    <div v-loading="dialogLoading">
-      <label class="agentName">{{ $t('__superiorAgent') + ': ' }}
-        <span>{{ agentInfo.fullName }}</span>
-      </label>
-      <el-form ref="form" :model="form" :rules="rules">
-        <el-form-item :label="$t('__accountGenerateMode')">
-          <el-switch
-            v-model="autoGenerateAccount"
-            active-color="blue"
-            inactive-color="blue"
-            :active-text="$t('__auto')"
-            :inactive-text="$t('__manual')"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('__account')" prop="account">
-          <el-input v-model="form.account" />
-        </el-form-item>
-        <el-form-item :label="$t('__nickname')" prop="nickname">
-          <el-input v-model="form.nickname" />
-        </el-form-item>
-        <el-form-item v-if="operationType===operationEnum.create&&visible" :label="$t('__password')" prop="password">
-          <el-input v-model="form.password" show-password />
-        </el-form-item>
-        <el-form-item v-if="operationType===operationEnum.create&&visible" :label="$t('__confirmPassword')" prop="confirmPassword">
-          <el-input v-model="form.confirmPassword" show-password />
-        </el-form-item>
-        <el-form-item :label="$t('__accountStatus')" prop="status">
-          <el-select v-model="form.status">
-            <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('__timeZone')" prop="timeZone">
-          <el-select v-model="form.timeZone">
-            <el-option v-for="item in time_zone" :key="item.id" :label="item.city_name" :value="item.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-checkbox v-model="form.effectAgentLine" :label="$t('__effectAgentLine')" />
-          <el-checkbox v-model="form.isAdmin" :label="$t('__admin')" />
-        </el-form-item>
-        <el-form-item :label="$t('__remark')" prop="remark">
-          <el-input v-model="form.remark" type="textarea" :rows="2" />
-        </el-form-item>
-        <el-form-item v-if="visible" :label="$t('__userPassword')" prop="userPassword">
-          <el-input v-model="form.userPassword" show-password />
-        </el-form-item>
-      </el-form>
-    </div>
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
+    <label class="agentName">{{ $t('__superiorAgent') + ': ' }}
+      <span>{{ agentInfo.fullName }}</span>
+    </label>
+    <el-form ref="form" :model="form" :rules="rules">
+      <el-form-item :label="$t('__accountGenerateMode')">
+        <el-switch
+          v-model="autoGenerateAccount"
+          active-color="blue"
+          inactive-color="blue"
+          :active-text="$t('__auto')"
+          :inactive-text="$t('__manual')"
+        />
+      </el-form-item>
+      <el-form-item :label="$t('__account')" prop="account">
+        <el-input v-model="form.account" />
+      </el-form-item>
+      <el-form-item :label="$t('__nickname')" prop="nickname">
+        <el-input v-model="form.nickname" />
+      </el-form-item>
+      <el-form-item v-if="operationType===operationEnum.create&&visible" :label="$t('__password')" prop="password">
+        <el-input v-model="form.password" show-password />
+      </el-form-item>
+      <el-form-item v-if="operationType===operationEnum.create&&visible" :label="$t('__confirmPassword')" prop="confirmPassword">
+        <el-input v-model="form.confirmPassword" show-password />
+      </el-form-item>
+      <el-form-item :label="$t('__accountStatus')" prop="status">
+        <el-select v-model="form.status">
+          <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('__timeZone')" prop="timeZone">
+        <el-select v-model="form.timeZone">
+          <el-option v-for="item in time_zone" :key="item.id" :label="item.city_name" :value="item.id" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-checkbox v-model="form.effectAgentLine" :label="$t('__effectAgentLine')" />
+        <el-checkbox v-model="form.isAdmin" :label="$t('__admin')" />
+      </el-form-item>
+      <el-form-item :label="$t('__remark')" prop="remark">
+        <el-input v-model="form.remark" type="textarea" :rows="2" />
+      </el-form-item>
+      <el-form-item v-if="visible" :label="$t('__userPassword')" prop="userPassword">
+        <el-input v-model="form.userPassword" show-password />
+      </el-form-item>
+    </el-form>
     <span v-show="!dialogLoading" slot="footer">
       <el-button type="primary" @click="onSubmit">{{ confirm }}</el-button>
     </span>

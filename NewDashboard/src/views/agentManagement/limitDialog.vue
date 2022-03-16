@@ -1,16 +1,12 @@
 <template>
   <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
-    <el-row>
-      <el-col :span="24">
-        <el-table :data="handicaps" tooltip-effect="dark" max-height="400px">
-          <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
-          <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
-          <el-table-column prop="bet_min" :label="$t('__betMin')" align="center" :show-overflow-tooltip="true" />
-          <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" :show-overflow-tooltip="true" />
-          <el-table-column prop="currency" :label="$t('__currency')" align="center" :show-overflow-tooltip="true" />
-        </el-table>
-      </el-col>
-    </el-row>
+    <el-table :data="handicaps" tooltip-effect="dark" max-height="400px">
+      <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="bet_min" :label="$t('__betMin')" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" :show-overflow-tooltip="true" />
+      <el-table-column prop="currency" :label="$t('__currency')" align="center" :show-overflow-tooltip="true" />
+    </el-table>
   </el-dialog>
 </template>
 

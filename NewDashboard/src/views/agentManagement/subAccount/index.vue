@@ -1,6 +1,15 @@
 <template>
   <div>
     <el-table :data="tableData" border :max-height="viewHeight">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-form label-position="left" inline>
+            <el-form-item :label="$t('__remark')">
+              <span>{{ props.row.remark }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column prop="agent.nickname" :label="$t('__mainAccount')" align="center" />
       <el-table-column :label="$t('__subAccount')" align="center">
         <template slot-scope="scope">
@@ -10,13 +19,20 @@
         </template>
       </el-table-column>
       <el-table-column prop="statusLabel" :label="$t('__accountStatus')" align="center" />
-      <el-table-column prop="roles" :label="$t('__role')" align="center" />
+      <el-table-column :label="$t('__role')" align="center">
+        <template slot-scope="scope">
+          <span v-for="(item, index) in scope.row.rolesLabel" :key="index" :class="{'role-admin':scope.row.roles[index]==='AgentSubAccountAdmin', 'role-visitor':scope.row.roles[index]==='AgentSubAccount'}">{{ item + ((index + 1 === scope.row.rolesLabel.length) ? '' : '、') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="creator" :label="$t('__creator')" align="center" />
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
       <el-table-column prop="lastLoginAt" :label="$t('__lastLoginAt')" align="center" />
       <el-table-column prop="lastLoginIp" :label="$t('__lastLoginIP')" align="center" />
       <el-table-column :label="$t('__operate')" align="center" width="auto">
-        <span>123</span>
+        <template slot-scope="scope">
+          <el-checkbox v-model="scope.row.lockLogin" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row.id)" />
+          <el-checkbox v-model="scope.row.allPermission" :label="$t('__allPermission')" @mousedown.native="onOperateCheckboxClick(dialogEnum.effectAgentLine, scope.row.id)" />
+        </template>
       </el-table-column>
     </el-table>
 
@@ -71,16 +87,34 @@
       @editSuccess="editSuccess"
     />
 
+    <OperateDialog
+      :visible="curDialogIndex === dialogEnum.lockLogin"
+      :content="'確定要改變狀態嗎?'"
+      :form="editForm"
+      :submit-fun="onOperateSubmitFun"
+      @close="closeDialogEven"
+      @editSuccess="editSuccess"
+    />
+
+    <OperateDialog
+      :visible="curDialogIndex === dialogEnum.effectAgentLine"
+      :content="'確定要改變狀態嗎?'"
+      :form="editForm"
+      :submit-fun="onOperateSubmitFun"
+      @close="closeDialogEven"
+      @editSuccess="editSuccess"
+    />
   </div>
 </template>
 
 <script>
-import { subAccountModPassword } from '@/api/agentManagement/subAccount'
+import { subAccountModPassword, subAccountModStatus, subAccountModEffectAgentLine } from '@/api/agentManagement/subAccount'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import SubAccountEditDialog from './subAccountEditDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
+import OperateDialog from '@/views/agentManagement/operateDialog'
 import { mapGetters } from 'vuex'
 
 const defaultForm = {
@@ -98,7 +132,7 @@ const defaultForm = {
 
 export default {
   name: 'Member',
-  components: { SubAccountEditDialog, ModPasswordDialog },
+  components: { SubAccountEditDialog, ModPasswordDialog, OperateDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -115,7 +149,9 @@ export default {
         'none': 0,
         'create': 1,
         'edit': 2,
-        'modPassword': 3
+        'modPassword': 3,
+        'lockLogin': 7,
+        'effectAgentLine': 8
       }),
       agentInfo: {},
       editForm: {},
@@ -129,6 +165,33 @@ export default {
     ])
   },
   methods: {
+    onOperateSubmitFun(data) {
+      switch (this.curDialogIndex) {
+        case this.dialogEnum.lockLogin: {
+          return subAccountModStatus(data).then((res) => {
+            return res
+          })
+        }
+        case this.dialogEnum.effectAgentLine: {
+          return subAccountModEffectAgentLine(data).then((res) => {
+            return res
+          })
+        }
+      }
+    },
+    onOperateCheckboxClick(operateType, id) {
+      this.editForm = { id: id }
+      switch (operateType) {
+        case this.dialogEnum.lockLogin: {
+          this.curDialogIndex = this.dialogEnum.lockLogin
+          break
+        }
+        case this.dialogEnum.effectAgentLine: {
+          this.curDialogIndex = this.dialogEnum.effectAgentLine
+          break
+        }
+      }
+    },
     // 父物件呼叫
     async create() {
       const timezone = await timezoneSearch({})
@@ -150,7 +213,9 @@ export default {
           const roleNickname = this.roles.find(item => item.key === role).nickname
           newRoles.push(this.$t(roleNickname))
         })
-        element.roles = newRoles
+        element.rolesLabel = newRoles
+        element.lockLogin = element.status === '0'
+        element.allPermission = element.effectAgentLine === '1'
       })
       this.totalCount = rows.length
       this.handlePageChangeByClient(this.currentPage)
@@ -208,6 +273,16 @@ export default {
 
 .scope-content {
   margin-right: 2px;
+}
+
+.role-admin {
+  color: red;
+  font-weight: bolder;
+}
+
+.role-visitor {
+  color: blue;
+  font-weight: bolder;
 }
 
 .iconButton {

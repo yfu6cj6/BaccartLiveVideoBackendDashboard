@@ -1,6 +1,15 @@
 <template>
   <div>
     <el-table :data="tableData" border :max-height="viewHeight">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-form label-position="left" inline>
+            <el-form-item :label="$t('__remark')">
+              <span>{{ props.row.remark }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('__agent')" align="center">
         <template slot-scope="scope">
           <span class="scope-content">{{ scope.row.fullName }}</span>
@@ -39,7 +48,11 @@
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
       <el-table-column prop="lastLoginAt" :label="$t('__lastLoginAt')" align="center" />
       <el-table-column :label="$t('__operate')" align="center" width="auto">
-        <span>123</span>
+        <template slot-scope="scope">
+          <el-checkbox v-model="scope.row.totallyDisabled" :label="$t('__totallyDisabled')" @mousedown.native="onOperateCheckboxClick(dialogEnum.totallyDisabled, scope.row.id)" />
+          <el-checkbox v-model="scope.row.lockLogin" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row.id)" />
+          <el-checkbox v-model="scope.row.debarBet" :label="$t('__debarBet')" @mousedown.native="onOperateCheckboxClick(dialogEnum.debarBet, scope.row.id)" />
+        </template>
       </el-table-column>
     </el-table>
 
@@ -152,11 +165,40 @@
       @close="closeDialogEven"
       @editSuccess="editSuccess"
     />
+
+    <OperateDialog
+      :visible="curDialogIndex === dialogEnum.totallyDisabled"
+      :content="'確定要改變狀態嗎?'"
+      :form="editForm"
+      :submit-fun="onOperateSubmitFun"
+      @close="closeDialogEven"
+      @editSuccess="editSuccess"
+    />
+
+    <OperateDialog
+      :visible="curDialogIndex === dialogEnum.lockLogin"
+      :content="'確定要改變狀態嗎?'"
+      :form="editForm"
+      :submit-fun="onOperateSubmitFun"
+      @close="closeDialogEven"
+      @editSuccess="editSuccess"
+    />
+
+    <OperateDialog
+      :visible="curDialogIndex === dialogEnum.debarBet"
+      :content="'確定要改變狀態嗎?'"
+      :form="editForm"
+      :submit-fun="onOperateSubmitFun"
+      @close="closeDialogEven"
+      @editSuccess="editSuccess"
+    />
   </div>
 </template>
 
 <script>
-import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword, agentGetSetBalanceInfo, agentDepositBalance, agentWithdrawBalance } from '@/api/agentManagement/agentList'
+import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword,
+  agentGetSetBalanceInfo, agentDepositBalance, agentWithdrawBalance, agentModTotallyDisabled,
+  agentModStatus, agentModBetStatus } from '@/api/agentManagement/agentList'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import { currencySearch } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
@@ -166,6 +208,7 @@ import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
 import LimitDialog from '@/views/agentManagement/limitDialog'
 import AgentRateLogDialog from './agentRateLogDialog'
 import BalanceDialog from '@/views/agentManagement/balanceDialog'
+import OperateDialog from '@/views/agentManagement/operateDialog'
 import { numberFormat } from '@/utils/numberFormat'
 
 const defaultForm = {
@@ -192,7 +235,7 @@ const editFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 
 
 export default {
   name: 'Agent',
-  components: { AgentEditDialog, ModPasswordDialog, LimitDialog, AgentRateLogDialog, BalanceDialog },
+  components: { AgentEditDialog, ModPasswordDialog, LimitDialog, AgentRateLogDialog, BalanceDialog, OperateDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -214,7 +257,10 @@ export default {
         'liveCommissionRate': 5,
         'liveRollingRate': 6,
         'depositBalance': 7,
-        'withdrawBalance': 8
+        'withdrawBalance': 8,
+        'totallyDisabled': 9,
+        'lockLogin': 10,
+        'debarBet': 11
       }),
       handicaps: [],
       agentInfo: {},
@@ -225,6 +271,42 @@ export default {
     }
   },
   methods: {
+    onOperateSubmitFun(data) {
+      switch (this.curDialogIndex) {
+        case this.dialogEnum.totallyDisabled: {
+          return agentModTotallyDisabled(data).then((res) => {
+            return res
+          })
+        }
+        case this.dialogEnum.lockLogin: {
+          return agentModStatus(data).then((res) => {
+            return res
+          })
+        }
+        case this.dialogEnum.debarBet: {
+          return agentModBetStatus(data).then((res) => {
+            return res
+          })
+        }
+      }
+    },
+    onOperateCheckboxClick(operateType, id) {
+      this.editForm = { id: id }
+      switch (operateType) {
+        case this.dialogEnum.totallyDisabled: {
+          this.curDialogIndex = this.dialogEnum.totallyDisabled
+          break
+        }
+        case this.dialogEnum.lockLogin: {
+          this.curDialogIndex = this.dialogEnum.lockLogin
+          break
+        }
+        case this.dialogEnum.debarBet: {
+          this.curDialogIndex = this.dialogEnum.debarBet
+          break
+        }
+      }
+    },
     // 父物件呼叫
     async create() {
       const timezone = await timezoneSearch({})
@@ -246,6 +328,9 @@ export default {
         element.fullName = element.nickname + '(' + element.account + ')'
         element.currency = element.currency.code
         element.time_zone = element.timeZone.id
+        element.totallyDisabled = element.totally_disabled === '1'
+        element.lockLogin = element.status === '0'
+        element.debarBet = element.bet_status === '0'
       })
       this.totalCount = rows.length
       this.handlePageChangeByClient(this.currentPage)
