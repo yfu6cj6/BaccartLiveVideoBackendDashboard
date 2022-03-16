@@ -1,20 +1,23 @@
 <template>
   <div>
     <el-table :data="tableData" border :max-height="viewHeight">
-      <el-table-column :label="$t('__member')" align="center">
+      <el-table-column prop="agent.nickname" :label="$t('__mainAccount')" align="center" />
+      <el-table-column :label="$t('__subAccount')" align="center">
         <template slot-scope="scope">
-          <span class="scope-content">{{ scope.row.name }}</span>
+          <span class="scope-content">{{ scope.row.fullName }}</span>
           <el-button class="iconButton" type="primary" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
           <el-button class="iconButton" type="primary" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
         </template>
       </el-table-column>
-      <el-table-column prop="currency" :label="$t('__currency')" align="center" />
-      <el-table-column prop="max_win_amount_limit" :label="$t('__maxWinAmountLimit')" align="center" />
-      <el-table-column prop="max_lose_amount_limit" :label="$t('__maxLoseAmountLimit')" align="center" />
-      <el-table-column prop="total_payout" :label="$t('__totalPayout')" align="center" />
-      <el-table-column prop="total_valid_bet_amount" :label="$t('__totalValidBetAmount')" align="center" />
+      <el-table-column prop="status" :label="$t('__accountStatus')" align="center" />
+      <el-table-column prop="roles" :label="$t('__role')" align="center" />
+      <el-table-column prop="creator" :label="$t('__creator')" align="center" />
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
       <el-table-column prop="lastLoginAt" :label="$t('__lastLoginAt')" align="center" />
+      <el-table-column prop="lastLoginIp" :label="$t('__lastLoginIP')" align="center" />
+      <el-table-column :label="$t('__operate')" align="center" width="auto">
+        <span>123</span>
+      </el-table-column>
     </el-table>
 
     <el-pagination
@@ -28,33 +31,74 @@
     />
 
     <ModPasswordDialog
-      ref="memberModPasswordDialog"
+      ref="modPasswordDialog"
       :title="$t('__modPassword')"
-      :visible="curDialogIndex === dialogEnum.subAccountModPassword"
+      :visible="curDialogIndex === dialogEnum.modPassword"
       :confirm="$t('__revise')"
-      :name-label="$t('__member')"
+      :name-label="$t('__subAccount')"
       :form="editForm"
       :pc-width="'35%'"
       :mobile-width="'40%'"
       @close="closeDialogEven"
       @modPassword="modPassword"
     />
+
+    <SubAccountEditDialog
+      ref="editDialog"
+      :title="$t('__editSubAccount')"
+      :visible="curDialogIndex === dialogEnum.edit"
+      :operation-type="2"
+      :confirm="$t('__revise')"
+      :agent-info="agentInfo"
+      :form="editForm"
+      :pc-width="'30%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @editSuccess="editSuccess"
+    />
+
+    <SubAccountEditDialog
+      ref="createDialog"
+      :title="$t('__addSubAccount')"
+      :visible="curDialogIndex === dialogEnum.create"
+      :operation-type="1"
+      :confirm="$t('__confirm')"
+      :agent-info="agentInfo"
+      :form="editForm"
+      :pc-width="'30%'"
+      :mobile-width="'40%'"
+      @close="closeDialogEven"
+      @editSuccess="editSuccess"
+    />
+
   </div>
 </template>
 
 <script>
 import { subAccountModPassword } from '@/api/agentManagement/subAccount'
+import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
+import SubAccountEditDialog from './subAccountEditDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
 import { numberFormat } from '@/utils/numberFormat'
 
-const createFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 'balanceConfig': 3, 'confirm': 4 })
-const editFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 'confirm': 3 })
+const defaultForm = {
+  account: '',
+  nickname: '',
+  password: '',
+  confirmPassword: '',
+  status: '1',
+  timeZone: 1,
+  effectAgentLine: false,
+  isAdmin: false,
+  remark: '',
+  userPassword: ''
+}
 
 export default {
-  name: 'SubAccount',
-  components: { ModPasswordDialog },
+  name: 'Member',
+  components: { SubAccountEditDialog, ModPasswordDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -69,31 +113,30 @@ export default {
     return {
       dialogEnum: Object.freeze({
         'none': 0,
-        'subAccountCreate': 1,
-        'subAccountEdit': 2,
-        'subAccountModPassword': 3
+        'create': 1,
+        'edit': 2,
+        'modPassword': 3
       }),
       agentInfo: {},
       editForm: {},
-      editStepEnum: {},
       curDialogIndex: 0
     }
   },
   methods: {
     // 父物件呼叫
-    subAccountCreate() {
-      this.editForm = {}
-      this.editStepEnum = createFormStepEnum
-      this.curDialogIndex = this.dialogEnum.memberCreate
+    async create() {
+      const timezone = await timezoneSearch({})
+      this.$refs.createDialog.setTimeZone(timezone)
+      this.editForm = JSON.parse(JSON.stringify(defaultForm))
+      this.curDialogIndex = this.dialogEnum.create
     },
     // 父物件呼叫
-    setSubAccountTableData(rows, agentInfo) {
+    setTableData(rows, agentInfo) {
       this.agentInfo = agentInfo
 
       this.allDataByClient = rows
       this.allDataByClient.forEach(element => {
-        element.currency = element.currency.code
-        element.time_zone = element.timeZone.id
+        element.fullName = element.nickname + '(' + element.account + ')'
       })
       this.totalCount = rows.length
       this.handlePageChangeByClient(this.currentPage)
@@ -104,25 +147,34 @@ export default {
     setDataLoading(dataLoading) {
       this.$emit('setDataLoading', dataLoading)
     },
-    onEditBtnClick(rowData) {
+    async onEditBtnClick(rowData) {
       this.setDataLoading(true)
+      const timezone = await timezoneSearch({})
+      this.$refs.editDialog.setTimeZone(timezone)
+
       this.editForm = JSON.parse(JSON.stringify(rowData))
-      this.editStepEnum = editFormStepEnum
-      this.curDialogIndex = this.dialogEnum.memberEdit
+      this.editForm.effectAgentLine = this.editForm.effectAgentLine === '1'
+      this.editForm.isAdmin = this.editForm.isAdmin === '1'
+      this.editForm.timeZone = this.editForm.timeZone.id
+      this.curDialogIndex = this.dialogEnum.edit
       this.setDataLoading(false)
     },
     onModPasswordBtnClick(rowData) {
-      this.editForm = { id: rowData.id, fullName: rowData.name }
-      this.curDialogIndex = this.dialogEnum.subAccountModPassword
+      this.editForm = { id: rowData.id, fullName: rowData.fullName }
+      this.curDialogIndex = this.dialogEnum.modPassword
     },
     modPassword(data) {
       subAccountModPassword(data).then((res) => {
-        this.$refs.memberModPasswordDialog.setDialogLoading(false)
+        this.$refs.modPasswordDialog.setDialogLoading(false)
         this.$emit('serverResponse', res)
         this.closeDialogEven()
       }).catch(() => {
-        this.$refs.memberModPasswordDialog.setDialogLoading(false)
+        this.$refs.modPasswordDialog.setDialogLoading(false)
       })
+    },
+    editSuccess(res) {
+      this.$emit('serverResponse', res)
+      this.closeDialogEven()
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none

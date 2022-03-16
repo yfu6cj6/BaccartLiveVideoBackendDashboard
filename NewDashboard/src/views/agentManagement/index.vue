@@ -110,7 +110,7 @@ export default {
       }),
       dialogEnum: Object.freeze({
         'none': 0,
-        '1imit': 1
+        'limit': 1
       }),
       agentInfo: {},
       handicaps: [],
@@ -180,7 +180,7 @@ export default {
     },
     handleSubAccountRespone(res) {
       this.handleRespone(res)
-      this.$refs.subAccount.setSubAccountTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
+      this.$refs.subAccount.setTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
     },
     onLimitBtnClick(handicaps) {
       this.handicaps = JSON.parse(JSON.stringify(handicaps))
@@ -229,6 +229,7 @@ export default {
           break
         }
         case this.tableEnum.subAccount: {
+          await this.$refs.subAccount.create()
           break
         }
       }

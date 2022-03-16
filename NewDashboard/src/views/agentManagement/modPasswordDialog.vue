@@ -1,20 +1,22 @@
 <template>
-  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
-    <el-form ref="form" label-width="auto" :model="form" :rules="rules">
-      <el-form-item :label="nameLabel + ': '">
-        <span>{{ form.fullName }}</span>
-      </el-form-item>
-      <el-form-item v-if="visible" :label="$t('__newPassword')" prop="newPassword">
-        <el-input v-model="form.newPassword" show-password />
-      </el-form-item>
-      <el-form-item v-if="visible" :label="$t('__confirmPassword')" prop="newPassword_confirmation">
-        <el-input v-model="form.newPassword_confirmation" show-password />
-      </el-form-item>
-      <el-form-item v-if="visible" :label="$t('__userPassword')" prop="userPassword">
-        <el-input v-model="form.userPassword" show-password />
-      </el-form-item>
-    </el-form>
-    <span slot="footer">
+  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
+    <div v-loading="dialogLoading">
+      <el-form ref="form" label-width="auto" :model="form" :rules="rules">
+        <el-form-item :label="nameLabel + ': '">
+          <span>{{ form.fullName }}</span>
+        </el-form-item>
+        <el-form-item v-if="visible" :label="$t('__newPassword')" prop="newPassword">
+          <el-input v-model="form.newPassword" show-password />
+        </el-form-item>
+        <el-form-item v-if="visible" :label="$t('__confirmPassword')" prop="newPassword_confirmation">
+          <el-input v-model="form.newPassword_confirmation" show-password />
+        </el-form-item>
+        <el-form-item v-if="visible" :label="$t('__userPassword')" prop="userPassword">
+          <el-input v-model="form.userPassword" show-password />
+        </el-form-item>
+      </el-form>
+    </div>
+    <span v-show="!dialogLoading" slot="footer">
       <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>

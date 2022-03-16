@@ -165,5 +165,11 @@
     "__rollingRateAndLimit": "洗碼比與限額",
     "__zeroMeansNoLimit": "0為不限制",
     "__editSubAgent": "編輯下線代理",
-    "__editMember": "編輯玩家"
+    "__editMember": "編輯玩家",
+    "__mainAccount": "主帳號",
+    "__creator": "創建者",
+    "__lastLoginIP": "最後登入IP",
+    "__effectAgentLine": "保持所有下線權限",
+    "__admin": "管理員",
+    "__editSubAccount": "編輯子帳號"
 }

@@ -28,6 +28,9 @@
       <el-table-column prop="total_valid_bet_amount" :label="$t('__totalValidBetAmount')" align="center" />
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
       <el-table-column prop="lastLoginAt" :label="$t('__lastLoginAt')" align="center" />
+      <el-table-column :label="$t('__operate')" align="center" width="auto">
+        <span>123</span>
+      </el-table-column>
     </el-table>
 
     <el-pagination
