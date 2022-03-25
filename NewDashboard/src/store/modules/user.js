@@ -1,11 +1,10 @@
 import { getInfo } from '@/api/user'
 import { removeToken, removeTokenType } from '@/utils/auth'
-import store from '@/store'
 
 const getDefaultState = () => {
   return {
     account: '',
-    agent_id: undefined,
+    agent_id: 0,
     agentName: '',
     nickname: '',
     permissions: [],
@@ -50,7 +49,7 @@ const actions = {
   },
 
   // user logout
-  logout({ commit, state }) {
+  logout({ commit }) {
     removeToken() // must remove  token  first
     removeTokenType()
     commit('RESET_STATE')
@@ -62,7 +61,6 @@ const actions = {
       removeToken() // must remove  token  first
       removeTokenType()
       commit('RESET_STATE')
-      store.dispatch('tagsView/delAllViews')
       resolve()
     })
   }

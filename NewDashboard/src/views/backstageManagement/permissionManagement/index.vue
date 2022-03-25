@@ -1,36 +1,36 @@
 <template>
-  <div class="permissionManagement-container">
-    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
+  <div v-loading="dataLoading" class="view-container">
+    <el-form :inline="true" :model="searchForm">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
-      <el-form-item class="inputTitle" label="ID">
-        <el-input v-model="searchForm.id" type="number" />
+      <el-form-item>
+        <el-input v-model="searchForm.id" type="number" placeholder="ID" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__name')">
-        <el-input v-model="searchForm.name" />
+      <el-form-item>
+        <el-input v-model="searchForm.name" :placeholder="$t('__name')" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__nickname')">
-        <el-input v-model="searchForm.nickname" />
+      <el-form-item>
+        <el-input v-model="searchForm.nickname" :placeholder="$t('__nickname')" />
       </el-form-item>
-      <el-form-item class="inputTitle" label="Uri">
-        <el-input v-model="searchForm.uri" />
+      <el-form-item>
+        <el-input v-model="searchForm.uri" placeholder="Uri" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__method')">
-        <el-select v-model="searchForm.methodType" multiple>
+      <el-form-item>
+        <el-select v-model="searchForm.methodType" multiple filterable :placeholder="$t('__method')">
           <el-option v-for="item in searchMethodType" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        <el-button type="info" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+        <el-button type="primary" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+        <el-button type="primary" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
       </el-form-item>
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
+    <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-form label-position="left">
@@ -43,32 +43,35 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column prop="id" min-width="25px" label="ID" align="center" />
-      <el-table-column prop="name" min-width="120px" :label="$t('__name')" align="center" />
-      <el-table-column prop="nickname" min-width="40px" :label="$t('__nickname')" align="center" />
-      <el-table-column prop="uri" min-width="80px" label="Uri" align="center" />
+      <el-table-column prop="id" min-width="25px" label="ID" align="center" sortable />
+      <el-table-column prop="name" min-width="120px" :label="$t('__name')" align="center" sortable />
+      <el-table-column prop="nickname" min-width="40px" :label="$t('__nickname')" align="center" sortable />
+      <el-table-column prop="uri" min-width="80px" label="Uri" align="center" sortable />
       <el-table-column prop="method" min-width="40px" :label="$t('__method')" align="center" />
       <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
-          <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
+          <el-button type="primary" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button type="danger" size="mini" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-pagination
-      layout="prev, pager, next, jumper"
-      class="permissionManagement-pagination"
+      layout="prev, pager, next, jumper, sizes"
+      class="pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
+      :page-sizes="pageSizes"
       :current-page.sync="currentPage"
+      @size-change="handleSizeChange"
       @current-change="handlePageChangeByClient"
     />
 
-    <PermissionManagementDialog
+    <editDialog
+      ref="editDialog"
       :title="$t('__edit')"
-      :visible="editDialogVisible"
+      :visible="curDialogIndex === dialogEnum.edit"
       :confirm="$t('__revise')"
       :form="selectForm"
       :method-type="methodType"
@@ -76,9 +79,10 @@
       @confirm="editDialogConfirmEven"
     />
 
-    <PermissionManagementDialog
+    <editDialog
+      ref="createDialog"
       :title="$t('__create')"
-      :visible="createDialogVisible"
+      :visible="curDialogIndex === dialogEnum.create"
       :confirm="$t('__confirm')"
       :form="selectForm"
       :method-type="methodType"
@@ -93,26 +97,29 @@ import { permissionSearch, permissionCreate, permissionEdit, permissionDelete } 
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
-import PermissionManagementDialog from './permissionManagementDialog'
+import EditDialog from './editDialog'
 
 export default {
   name: 'PermissionManagement',
-  components: { PermissionManagementDialog },
+  components: { EditDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
+      dialogEnum: Object.freeze({
+        'none': 0,
+        'create': 1,
+        'edit': 2
+      }),
       searchForm: {},
       selectForm: {},
       searchMethodType: [],
       methodType: [],
-      editDialogVisible: false,
-      createDialogVisible: false
+      curDialogIndex: 0
     }
   },
   computed: {
   },
   created() {
-    this.setHeight()
     this.handleCurrentChange(1)
   },
   methods: {
@@ -127,9 +134,13 @@ export default {
       this.methodType.push('None')
       this.methodType = this.methodType.concat(res.methodType)
       this.handlePageChangeByClient(this.currentPage)
-      this.dataLoading = false
+
+      this.closeDialogEven()
+      this.closeLoading()
     },
-    handleResponeError() {
+    closeLoading() {
+      this.$refs.createDialog.setDialogLoading(false)
+      this.$refs.editDialog.setDialogLoading(false)
       this.dataLoading = false
     },
     onSubmit() {
@@ -144,24 +155,24 @@ export default {
       }
       permissionSearch(data).then((res) => {
         this.handleRespone(res)
+      }).catch(() => {
+        this.closeLoading()
       })
     },
     onCreateBtnClick() {
       this.selectForm = {}
       this.selectForm.method = this.methodType[0]
-      this.createDialogVisible = true
-      this.editDialogVisible = false
+      this.curDialogIndex = this.dialogEnum.create
     },
     createDialogConfirmEven(data) {
-      this.createDialogVisible = false
-      this.dataLoading = true
+      this.$refs.createDialog.setDialogLoading(true)
       if (data.method !== 'None') {
         data.methodType = data.method
       }
       permissionCreate(data).then((res) => {
         this.handleRespone(res)
       }).catch(() => {
-        this.handleResponeError()
+        this.closeLoading()
       })
     },
     onEditBtnClick(item) {
@@ -169,72 +180,44 @@ export default {
       if (!this.selectForm.method) {
         this.selectForm.method = this.methodType[0]
       }
-      this.createDialogVisible = false
-      this.editDialogVisible = true
+      this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(this.$t('__confirmChanges')).then(_ => {
-        this.editDialogVisible = false
-        this.dataLoading = true
+      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+        this.$refs.editDialog.setDialogLoading(true)
         if (data.method !== 'None') {
           data.methodType = data.method
         }
         permissionEdit(data).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
-          this.handleResponeError()
+          this.closeLoading()
         })
       }).catch(_ => {})
     },
     onDeleteBtnClick(item) {
-      this.$confirm(this.$t('__confirmDeletion')).then(_ => {
+      this.$confirm(`${this.$t('__confirmDeletion')}?`).then(_ => {
         this.dataLoading = true
         permissionDelete(item.id).then((res) => {
           this.handleRespone(res)
+        }).catch(() => {
+          this.closeLoading()
         })
       }).catch(_ => {})
     },
     closeDialogEven() {
-      this.createDialogVisible = false
-      this.editDialogVisible = false
+      this.curDialogIndex = this.dialogEnum.none
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.permissionManagement {
-  &-container {
-    margin: 5px;
-  }
-  &-pagination {
-    padding: 1em;
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-  }
-}
-
-.filterForm {
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-.el-form-item {
-  margin-bottom: 0px;
-}
-
-.inputTitle {
-  padding: 0px 0px 0px 5px;
-}
-
-.el-input {
-  width: 140px;
+.view-container .el-form .el-form-item .el-input {
+  width: 160px;
 }
 
 .el-select {
-  width: 180px;
+  width: 190px;
 }
 </style>

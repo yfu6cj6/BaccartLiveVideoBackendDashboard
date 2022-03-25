@@ -15,13 +15,253 @@
   display: none;
 }
 
+.bg-black_table_header,
+.bg-black_table_header:hover,
+.bg-black_table_col {
+  color: #fff !important;
+  background-color: black !important;
+}
 
-// to fixed https://github.com/ElemeFE/element/issues/2461
+.bg-black_table_col:hover {
+  color: black !important;
+  background-color: #fff !important;
+}
+
+.el-checkbox.red-tick .is-checked .el-checkbox__inner:after {
+  transform: rotate(45deg) scale(1.5);
+  border: 0.16667rem solid #ff473d;
+  width: 0.25rem;
+  height: 0.75rem;
+  top: -0.35rem;
+  left: 0.4rem;
+  border-left: 0;
+  border-top: 0;
+}
+
+.el-table-column--selection .el-checkbox__input.is-checked .el-checkbox__inner::after {
+  transform: rotate(45deg) scale(1.5);
+  border: 0.16667rem solid #ff473d;
+  width: 0.25rem;
+  height: 0.75rem;
+  top: -0.35rem;
+  left: 0.4rem;
+  border-left: 0;
+  border-top: 0;
+}
+
+.el-form .el-form-item .el-checkbox .el-checkbox__inner,
+.el-form .el-form-item .el-checkbox .is-checked .el-checkbox__inner {
+  background-color: transparent;
+  border-color: #f9c901;
+}
+
+.el-form .el-form-item .el-checkbox__input+.el-checkbox__label,
+.el-form .el-form-item .el-checkbox__input.is-checked+.el-checkbox__label {
+  color: #f9c901;
+}
+
+.el-dialog .el-dialog__body .el-checkbox .el-checkbox__inner,
+.el-dialog .el-dialog__body .el-checkbox .is-checked .el-checkbox__inner {
+  background-color: transparent;
+  border-color: #f9c901;
+}
+
+.el-dialog .el-dialog__body .el-checkbox__input.is-checked+.el-checkbox__label {
+  color: #f9c901;
+}
+
+.el-table .el-table__body-wrapper .el-checkbox .el-checkbox__inner,
+.el-table .el-table__body-wrapper .el-checkbox .is-checked .el-checkbox__inner {
+  background-color: transparent;
+  border-color: #DCDFE6;
+}
+
+.el-table .el-table__body-wrapper .el-checkbox__input.is-checked+.el-checkbox__label {
+  color: #606266;
+}
+
 .el-dialog {
-  transform: none;
-  left: 0;
-  position: relative;
-  margin: 0 auto;
+  border: 2px solid #f9c901;
+  display: flex;
+  display: -ms-flex; /* 兼容IE */
+  flex-direction: column;
+  -ms-flex-direction: column; /* 兼容IE */
+  margin:0 !important;
+  position:absolute;
+  top:40px;
+  left:50%;
+  transform:translate(-50%,0);
+  max-height:calc(100% - 50px);
+  max-width:calc(100% - 30px);
+  background: black;
+}
+
+.el-dialog .el-dialog__body {
+  max-height: 100%;
+  flex: 1;
+  -ms-flex: 1 1 auto; /* 兼容IE */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.el-dialog__wrapper {
+  /*隐藏ie和edge中遮罩的滚动条*/
+  overflow: hidden;
+}
+
+.el-dialog__header {
+  color: #fff;
+  text-align: center;
+}
+
+.el-dialog__footer {
+  text-align: center;
+}
+
+.el-dialog__title,
+.el-switch__label {
+  color: #fff;
+}
+
+.el-switch__label.is-active {
+  color: #f9c901;
+}
+
+.el-input.is-disabled .el-input__inner {
+  color: black;
+  background: #a3a3a3;
+}
+
+div::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: black;
+}
+
+div::-webkit-scrollbar {
+  width: 12px;
+  background-color: black;
+}
+
+div::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #f9c901;
+}
+
+.bg-yellow,
+.bg-yellow:hover,
+.bg-yellow:focus {
+  color: black;
+  background: #f9c901;
+  border-color: #f9c901;
+  font-weight: 700;
+}
+
+.bg-yellow.is-disabled,
+.bg-yellow.is-disabled:focus,
+.bg-yellow.is-disabled:hover {
+  color: black;
+  cursor: not-allowed;
+  background-image: none;
+  background-color: #a3a3a3;
+  border-color: #a3a3a3;
+}
+
+.bg-gray,
+.bg-gray:hover,
+.bg-gray:focus {
+  color: #fff;
+  background: #4e4e4e;
+  border-color: #4e4e4e;
+  font-weight: 700;
+}
+
+.bg-gray.is-disabled,
+.bg-gray.is-disabled:focus,
+.bg-gray.is-disabled:hover {
+  color: black;
+  cursor: not-allowed;
+  background-image: none;
+  background-color: #a3a3a3;
+  border-color: #a3a3a3;
+}
+
+.bg-red,
+.bg-red:hover,
+.bg-red:focus {
+  color: black;
+  background: #f56c6c;
+  border-color: #f56c6c;
+  font-weight: 700;
+}
+
+.bg-red.is-disabled,
+.bg-red.is-disabled:focus,
+.bg-red.is-disabled:hover {
+  color: black;
+  cursor: not-allowed;
+  background-image: none;
+  background-color: #a3a3a3;
+  border-color: #a3a3a3;
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: black;
+  color: #f9c901;
+  border-radius: 50%;
+}
+
+.el-pagination.is-background .el-pager li {
+  background-color: #fff;
+  color: black;
+}
+
+.el-message-box {
+  border: 1px solid #f9c901;
+  background: black;
+}
+
+.el-message-box__message {
+  color: #f9c901;
+}
+
+.el-step__icon-inner {
+  font-weight: 1000;
+}
+
+.el-step__description.is-process {
+  color: #f9c901;
+}
+
+.el-step__head.is-process {
+  .el-step__icon{
+    background: #f9c901;
+  }
+  color: black;
+  border-color: black;
+}
+
+.el-step__head.is-wait {
+  .el-step__icon{
+    background: #a3a3a3;
+  }
+  color: black;
+  border-color: black;
+}
+
+.el-step__head.is-success {
+  .el-step__icon{
+    background: #f9c901;
+  }
+  .el-step__line {
+    background-color: #f9c901;
+    border-color: #f9c901;
+  }
+  color: black;
+  border-color: black;
+}
+
+.el-step__description.is-success {
+  color: #f9c901;
 }
 
 // refine element ui upload

@@ -54,3 +54,19 @@ export function subAccountModEffectAgentLine(data) {
     data: data
   })
 }
+
+export function subAccountGetAgentLine(data) {
+  return request({
+    url: '/agent/subAccount/getAgentLine',
+    method: 'post',
+    data: data
+  })
+}
+
+export function subAccountSetHasAgents(data) {
+  return request({
+    url: '/agent/subAccount/setHasAgents',
+    method: 'post',
+    data: data
+  })
+}

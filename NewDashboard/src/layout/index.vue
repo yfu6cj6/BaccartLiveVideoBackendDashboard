@@ -2,13 +2,13 @@
   <div :class="classObj" class="app-wrapper">
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
     <sidebar class="sidebar-container" />
+    <agent-level />
     <div class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
         <navbar />
         <tags-view v-if="tagsView" />
       </div>
       <app-main />
-      <agent-level />
     </div>
   </div>
 </template>
@@ -47,7 +47,7 @@ export default {
   },
   created() {
     this.$store.dispatch('settings/changeSetting', defaultSettings)
-    this.$store.dispatch('app/closeAgentLevelSideBar')
+    this.$store.dispatch('agentManagement/closeAgentLevelSideBar')
   },
   methods: {
     handleClickOutside() {

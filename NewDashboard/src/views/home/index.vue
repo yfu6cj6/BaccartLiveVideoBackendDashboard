@@ -1,8 +1,8 @@
 <template>
   <div class="home-container">
-    <el-tag class="home-tags" type="info">{{ $t('__agencyAnnouncement') }}</el-tag>
-    <el-tag class="home-tags" type="info">{{ $t('__gameAnnouncement') }}</el-tag>
-    <el-collapse v-if="showAgentAnnouncements" class="home-collapse">
+    <el-tag type="info">{{ $t('__agencyAnnouncement') }}</el-tag>
+    <el-tag type="info">{{ $t('__gameAnnouncement') }}</el-tag>
+    <el-collapse v-if="showAgentAnnouncements">
       <el-collapse-item
         v-for="item in agentAnnouncements"
         :key="item.id"
@@ -13,8 +13,8 @@
         </template>
       </el-collapse-item>
     </el-collapse>
-    <el-tag v-else class="home-noMore" type="info">{{ $t('__noMore') }}</el-tag>
-    <el-collapse v-if="showGameAnnouncements" class="home-collapse">
+    <el-tag v-else type="info">{{ $t('__noMore') }}</el-tag>
+    <el-collapse v-if="showGameAnnouncements">
       <el-collapse-item
         v-for="item in gameAnnouncements"
         :key="item.id"
@@ -25,7 +25,7 @@
         </template>
       </el-collapse-item>
     </el-collapse>
-    <el-tag v-else class="home-noMore" type="info">{{ $t('__noMore') }}</el-tag>
+    <el-tag v-else type="info">{{ $t('__noMore') }}</el-tag>
   </div>
 </template>
 
@@ -60,36 +60,27 @@ export default {
 <style lang="scss" scoped>
 .home {
   &-container {
-    margin: 30px;
+    margin: 10px;
   }
+}
 
-  &-tags {
-    padding: 0 15px;
-    width: 50%;
-    display: inline-block;
-    vertical-align: top;
-    text-align: center;
-    color: #e6a23c;
-    font-size: 16px;
-    font-weight: bold;
-    background-color: white;
-  }
+.el-collapse {
+  padding: 5px 15px 0 15px;
+  width: 50%;
+  display: inline-block;
+  vertical-align: top;
+}
 
-  &-collapse {
-    padding: 5px 15px 0 15px;
-    width: 50%;
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  &-noMore {
-    padding: 0 15px;
-    width: 50%;
-    display: inline-block;
-    vertical-align: top;
-    text-align: center;
-    font-size: 16px;
-    background-color: white;
-  }
+.el-tag {
+  padding: 0 15px;
+  width: 50%;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  color: #e6a23c;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: white;
+  border: none;
 }
 </style>

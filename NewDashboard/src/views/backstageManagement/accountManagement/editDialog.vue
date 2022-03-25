@@ -1,47 +1,43 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="25%" :before-close="onClose">
-    <el-row>
-      <el-col :span="24">
-        <el-form ref="editForm" label-width="auto" :model="editForm" :rules="rules">
-          <el-form-item :label="$t('__account')" prop="account">
-            <el-input v-model="editForm.account" />
-          </el-form-item>
-          <el-form-item v-if="hasPassword" :label="$t('__password')" prop="password">
-            <el-input v-model="editForm.password" show-password />
-          </el-form-item>
-          <el-form-item v-if="hasPassword" :label="$t('__confirmPassword')" prop="confirmPassword">
-            <el-input v-model="confirmPassword" show-password />
-          </el-form-item>
-          <el-form-item :label="$t('__nickname')" prop="nickname">
-            <el-input v-model="editForm.nickname" />
-          </el-form-item>
-          <el-form-item :label="$t('__timeZone')" prop="timeZone">
-            <el-select v-model="editForm.timeZone">
-              <el-option v-for="item in timeZones" :key="item.key" :label="item.cityName" :value="item.key" />
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="$t('__role')" prop="roles">
-            <el-select v-model="editForm.roles" multiple>
-              <el-option v-for="item in roles" :key="item.key" :label="item.nickname" :value="item.key" />
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="$t('__agentName')" prop="agentId">
-            <el-select v-model="editForm.agentId">
-              <el-option v-for="item in agents" :key="item.key" :label="item.nickname" :value="item.key" />
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="$t('__accountStatus')" prop="status">
-            <el-select v-model="editForm.status">
-              <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="$t('__remark')" prop="remark">
-            <el-input v-model="editForm.remark" type="textarea" :rows="2" />
-          </el-form-item>
-        </el-form>
-      </el-col>
-    </el-row>
-    <span slot="footer">
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" width="25%" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form ref="editForm" :model="editForm" :rules="rules">
+      <el-form-item :label="$t('__account')" prop="account">
+        <el-input v-model="editForm.account" />
+      </el-form-item>
+      <el-form-item v-if="hasPassword" :label="$t('__password')" prop="password">
+        <el-input v-model="editForm.password" show-password />
+      </el-form-item>
+      <el-form-item v-if="hasPassword" :label="$t('__confirmPassword')" prop="confirmPassword">
+        <el-input v-model="confirmPassword" show-password />
+      </el-form-item>
+      <el-form-item :label="$t('__nickname')" prop="nickname">
+        <el-input v-model="editForm.nickname" />
+      </el-form-item>
+      <el-form-item :label="$t('__timeZone')" prop="timeZone">
+        <el-select v-model="editForm.timeZone">
+          <el-option v-for="item in timeZones" :key="item.key" :label="item.cityName" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('__role')" prop="roles">
+        <el-select v-model="editForm.roles" multiple>
+          <el-option v-for="item in roles" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('__agentName')" prop="agentId">
+        <el-select v-model="editForm.agentId">
+          <el-option v-for="item in agents" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('__accountStatus')" prop="status">
+        <el-select v-model="editForm.status">
+          <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('__remark')" prop="remark">
+        <el-input v-model="editForm.remark" type="textarea" :rows="2" />
+      </el-form-item>
+    </el-form>
+    <span v-show="!dialogLoading" slot="footer">
       <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
       <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
     </span>
@@ -50,7 +46,7 @@
 
 <script>
 export default {
-  name: 'AccountManagementDialog',
+  name: 'EditDialog',
   props: {
     'title': {
       type: String,
@@ -125,7 +121,7 @@ export default {
       if (!this.confirmPassword.length) {
         callback(new Error(this.$t('__requiredField')))
       } else if (this.confirmPassword !== this.editForm.password) {
-        callback(new Error(this.$t('__confirmPassword') + this.$t('__and') + this.$t('__password') + this.$t('__inconsistent')))
+        callback(new Error(`${this.$t('__confirmPassword')}${this.$t('__and')}${this.$t('__password')}${this.$t('__inconsistent')}`))
       } else {
         callback()
       }
@@ -139,7 +135,8 @@ export default {
         roles: [{ required: true, trigger: 'blur', validator: validate }]
       },
       editForm: {},
-      confirmPassword: ''
+      confirmPassword: '',
+      dialogLoading: false
     }
   },
   computed: {
@@ -158,7 +155,7 @@ export default {
     onSubmit() {
       this.$refs.editForm.validate((valid) => {
         if (valid) {
-          this.$emit('confirm', this.editForm)
+          this.$emit('confirm', JSON.parse(JSON.stringify(this.editForm)))
         }
       })
     },
@@ -167,6 +164,9 @@ export default {
     },
     onReset() {
       this.editForm = JSON.parse(JSON.stringify(this.form))
+    },
+    setDialogLoading(dialogLoading) {
+      this.dialogLoading = dialogLoading
     }
   }
 }

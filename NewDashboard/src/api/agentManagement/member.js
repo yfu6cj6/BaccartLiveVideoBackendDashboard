@@ -78,3 +78,11 @@ export function memberModBetStatus(data) {
     data: data
   })
 }
+
+export function memberGetLastBetTime(data) {
+  return request({
+    url: '/member/bet/lastBetTime',
+    method: 'post',
+    data: data
+  })
+}

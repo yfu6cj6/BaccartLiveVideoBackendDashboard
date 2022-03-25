@@ -1,10 +1,8 @@
 <template>
-  <div class="passwordReset-container">
+  <div v-loading="submitLoading" class="passwordReset-container">
     <el-form
       ref="form"
-      v-loading="submitLoading"
       class="filterForm"
-      style="margin: 0 auto;"
       label-width="110px"
       :model="form"
       :rules="rules"
@@ -18,8 +16,8 @@
       <el-form-item class="passwordReset-item" :label="$t('__confirmPassword')" prop="newPassword_confirmation">
         <el-input v-model="form.newPassword_confirmation" show-password />
       </el-form-item>
-      <div clsss="row">
-        <el-button type="primary" style="margin: 0 auto; display: block" :disabled="checkInput" @click="onSubmit">{{ $t("__confirm") }}</el-button>
+      <div>
+        <el-button class="bg-yellow" :disabled="checkInput" @click="onSubmit">{{ $t("__confirm") }}</el-button>
       </div>
     </el-form>
   </div>
@@ -50,7 +48,7 @@ export default {
       if (!value) {
         callback(new Error(this.$t('__requiredField')))
       } else if (this.form.newPassword !== this.form.newPassword_confirmation) {
-        callback(new Error(this.$t('__confirmPassword') + this.$t('__and') + this.$t('__password') + this.$t('__inconsistent')))
+        callback(new Error(`${this.$t('__confirmPassword')}${this.$t('__and')}${this.$t('__password')}${this.$t('__inconsistent')}`))
       } else {
         callback()
       }
@@ -133,5 +131,14 @@ export default {
   &-item {
     padding-right: 15px;
   }
+}
+
+.el-form {
+  background: #333;
+}
+
+.el-button {
+  margin: 0 auto;
+  display: block;
 }
 </style>

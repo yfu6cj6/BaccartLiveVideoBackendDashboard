@@ -1,9 +1,9 @@
 <template>
-  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
-    <el-form ref="form" label-width="auto" :model="form" :rules="rules">
-      <el-form-item :label="nameLabel + ': '">
-        <span>{{ form.fullName }}</span>
-      </el-form-item>
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <label class="agentNameLabel">{{ nameLabel }}
+      <span class="agentNameSpan">{{ form.fullName }}</span>
+    </label>
+    <el-form ref="form" :model="form" :rules="rules" label-width="80px" label-position="left">
       <el-form-item v-if="visible" :label="$t('__newPassword')" prop="newPassword">
         <el-input v-model="form.newPassword" show-password />
       </el-form-item>
@@ -15,7 +15,7 @@
       </el-form-item>
     </el-form>
     <span v-show="!dialogLoading" slot="footer">
-      <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
+      <el-button class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>
 </template>
@@ -81,7 +81,7 @@ export default {
       if (!value) {
         callback(new Error(this.$t('__requiredField')))
       } else if (this.form.newPassword !== this.form.newPassword_confirmation) {
-        callback(new Error(this.$t('__confirmPassword') + this.$t('__and') + this.$t('__password') + this.$t('__inconsistent')))
+        callback(new Error(`${this.$t('__confirmPassword')}${this.$t('__and')}${this.$t('__password')}${this.$t('__inconsistent')}`))
       } else {
         callback()
       }
@@ -99,8 +99,6 @@ export default {
     visible() {
       if (!this.visible) {
         this.$refs.form.clearValidate()
-      } else {
-        this.dialogLoading = true
       }
     }
   },
@@ -108,8 +106,7 @@ export default {
     onSubmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.$confirm(this.$t('__confirmChanges')).then(_ => {
-            this.dialogLoading = true
+          this.confirmMsg(`${this.$t('__confirmChanges')}?`, () => {
             const data = JSON.parse(JSON.stringify(this.form))
             this.$emit('modPassword', data)
           })
@@ -129,5 +126,14 @@ export default {
 <style scoped>
 .el-table--fit {
   padding: 0 0 10px 0
+}
+
+.agentNameLabel {
+  font-size: 14px;
+  color: #fff
+}
+
+.agentNameSpan {
+  color: #f9c901;
 }
 </style>

@@ -1,94 +1,100 @@
 <template>
-  <div v-loading="dataLoading" class="agentManagement-container">
-    <el-row>
-      <label class="labelTitle">{{ $t('__agent') + ':' }}
-        <span class="labelContent">{{ agentInfo.fullName }}</span>
+  <div v-loading="dataLoading" class="view-container">
+    <el-row class="agentInfoFormData">
+      <label>{{ `${$t('__agent')}:` }}
+        <span>{{ agentInfo.fullName }}</span>
       </label>
-      <label class="labelTitle">{{ $t('__currency') + ':' }}
-        <span class="labelContent">{{ agentInfo.currency }}</span>
+      <label>{{ `${$t('__currency')}:` }}
+        <span>{{ agentInfo.currency }}</span>
       </label>
-      <label class="labelTitle">{{ $t('__balance') + ':' }}
-        <span class="labelContent">{{ agentInfo.balance }}</span>
+      <label>{{ `${$t('__balance')}:` }}
+        <span>{{ agentInfo.balance }}</span>
       </label>
       <label>
-        <el-button class="labelButton" type="primary" size="mini" @click="onLimitBtnClick(agentInfo.handicaps)">
+        <el-button class="bg-yellow" size="mini" @click="onLimitBtnClick(agentInfo.handicaps)">
           {{ $t("_handicapLimit") }}
         </el-button>
       </label>
       <br>
-      <label class="labelTitle">{{ $t('__commissionRate') + ':' }}
-        <span class="labelContent">{{ numberFormatStr(agentInfo.live_commission_rate) + '%' }}</span>
+      <label>{{ `${$t('__commissionRate')}:` }}
+        <span>{{ numberFormatStr(agentInfo.live_commission_rate) + '%' }}</span>
       </label>
-      <label class="labelTitle">{{ $t('__rollingRate') + ':' }}
-        <span class="labelContent">{{ numberFormatStr(agentInfo.live_rolling_rate) + '%' }}</span>
+      <label>{{ `${$t('__rollingRate')}:` }}
+        <span>{{ numberFormatStr(agentInfo.live_rolling_rate) + '%' }}</span>
       </label>
-      <label class="labelTitle">{{ $t('__accountStatus') + ':' }}
-        <span class="labelContent" :class="{'enable':accountStatusEnable, 'disEnable':!accountStatusEnable}">{{ $t(agentInfo.accountStatus) }}</span>
+      <label>{{ `${$t('__accountStatus')}:` }}
+        <span :class="{'enable':agentInfo.status === '1', 'disEnable':agentInfo.status !== '1'}">{{ $t(agentInfo.accountStatus) }}</span>
       </label>
-      <label class="labelTitle">{{ $t('__betStatus') + ':' }}
-        <span class="labelContent" :class="{'enable':betStatusEnable, 'disEnable':!betStatusEnable}">{{ $t(agentInfo.betStatus) }}</span>
+      <label>{{ `${$t('__betStatus')}:` }}
+        <span :class="{'enable':agentInfo.bet_status === '1', 'disEnable':agentInfo.bet_status !== '1'}">{{ $t(agentInfo.betStatus) }}</span>
       </label>
-      <label class="labelTitle">{{ $t('__directAgentCount') + ':' }}
-        <span class="labelContent">{{ agentInfo.directAgentCount }}</span>
+      <label>{{ `${$t('__directAgentCount')}:` }}
+        <span>{{ agentInfo.directAgentCount }}</span>
       </label>
-      <label class="labelTitle">{{ $t('__directPlayerCount') + ':' }}
-        <span class="labelContent">{{ agentInfo.directPlayerCount }}</span>
+      <label>{{ `${$t('__directPlayerCount')}:` }}
+        <span>{{ agentInfo.directPlayerCount }}</span>
       </label>
       <label>
-        <el-button class="labelButton" type="primary" size="mini" @click="onTotalPlayerBtnClick()">
+        <el-button class="bg-yellow" size="mini" @click="onTotalPlayerBtnClick()">
           {{ $t("__totalPlayerCount") + ':' }}
           <span>{{ agentInfo.totalPlayerCount }}</span>
         </el-button>
       </label>
-      <label class="labelTitle">{{ $t('__createdAt') + ':' }}
-        <span class="labelContent">{{ agentInfo.created_at }}</span>
+      <label>{{ $t('__createdAt') + ':' }}
+        <span>{{ agentInfo.created_at }}</span>
       </label>
-      <label class="labelTitle">{{ $t('__lastLoginAt') + ':' }}
-        <span class="labelContent">{{ agentInfo.lastLoginAt }}</span>
+      <label>{{ $t('__lastLoginAt') + ':' }}
+        <span>{{ agentInfo.lastLoginAt }}</span>
       </label>
     </el-row>
-    <el-button type="primary" size="mini" @click="onTableBtnClick(tableEnum.agent, agentInfo.id)">{{ $t("__agent") }}</el-button>
-    <el-button type="primary" size="mini" @click="onTableBtnClick(tableEnum.member, agentInfo.id)">{{ $t("__member") }}</el-button>
-    <el-button type="primary" size="mini" @click="onTableBtnClick(tableEnum.subAccount, agentInfo.id)">{{ $t("__subAccount") }}</el-button>
-    <el-button type="primary" size="mini" @click="onAddSubBtnClick()">{{ addSubLabel }}</el-button>
-    <Agent
+    <el-row class="agentInfoForm">
+      <el-col :span="5">
+        <el-button class="agentInfoFormBtn" :class="{'focus': curTableIndex === tableEnum.agent}" size="mini" @click="onTableBtnClick(tableEnum.agent)">{{ $t("__agent") }}</el-button>
+      </el-col>
+      <el-col :span="5">
+        <el-button class="agentInfoFormBtn" :class="{'focus': curTableIndex === tableEnum.member}" size="mini" @click="onTableBtnClick(tableEnum.member)">{{ $t("__member") }}</el-button>
+      </el-col>
+      <el-col :span="5">
+        <el-button class="agentInfoFormBtn" :class="{'focus': curTableIndex === tableEnum.subAccount}" size="mini" @click="onTableBtnClick(tableEnum.subAccount)">{{ $t("__subAccount") }}</el-button>
+      </el-col>
+      <el-col :span="9" class="agentInfoFormOther">
+        <el-button class="bg-yellow" size="mini" @click="onAddSubBtnClick()">{{ addSubLabel }}</el-button>
+      </el-col>
+    </el-row>
+    <agent
       v-show="curTableIndex === tableEnum.agent"
       ref="agent"
       :view-height="viewHeight"
-      @serverResponse="handleAgentRespone"
+      @serverResponse="handleRespone"
       @setDataLoading="setDataLoading"
     />
-    <Member
+    <member
       v-show="curTableIndex === tableEnum.member"
       ref="member"
       :view-height="viewHeight"
-      @serverResponse="handleMemberRespone"
+      @serverResponse="handleRespone"
       @setDataLoading="setDataLoading"
     />
 
-    <SubAccount
+    <subAccount
       v-show="curTableIndex === tableEnum.subAccount"
       ref="subAccount"
       :view-height="viewHeight"
-      @serverResponse="handleSubAccountRespone"
+      @serverResponse="handleRespone"
       @setDataLoading="setDataLoading"
     />
 
-    <LimitDialog
+    <limitDialog
       :title="$t('_handicapLimit')"
       :visible="curDialogIndex === dialogEnum.limit"
       :handicaps="handicaps"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
     />
   </div>
 </template>
 
 <script>
-import { agentSearch, agentTotalPlayerCount } from '@/api/agentManagement/agentList'
-import { memberSearch } from '@/api/agentManagement/memberList'
-import { subAccountSearch } from '@/api/agentManagement/subAccount'
+import { agentTotalPlayerCount } from '@/api/agentManagement/agent'
 import LimitDialog from '@/views/agentManagement/limitDialog'
 import Agent from './agent/index'
 import Member from './member/index'
@@ -115,16 +121,14 @@ export default {
       agentInfo: {},
       handicaps: [],
       curTableIndex: 0,
-      accountStatusEnable: false,
-      betStatusEnable: false,
       dataLoading: false,
-      curDialogIndex: 0
+      curDialogIndex: 0,
+      tempRoute: {}
     }
   },
   computed: {
     ...mapGetters([
-      'accountStatusType',
-      'agentId'
+      'accountStatusType'
     ]),
     addSubLabel() {
       switch (this.curTableIndex) {
@@ -141,17 +145,20 @@ export default {
       return ''
     }
   },
-  watch: {
-    agentId() {
-      this.onTableBtnClick(this.curTableIndex, this.agentId)
-    }
-  },
   created() {
-    this.dataLoading = true
-    this.onTableBtnClick(this.curTableIndex, this.$route.query?.agentId)
-    this.setHeight()
+    this.tempRoute = Object.assign({}, this.$route)
+    this.formClassName = ['agentInfoFormData', 'agentInfoForm']
+    this.$nextTick(() => {
+      this.agentInfo.id = this.$route.params && this.$route.params.id
+      this.onTableBtnClick(this.tableEnum.agent)
+    })
   },
   methods: {
+    setTagsViewTitle() {
+      const title = this.$t(this.tempRoute.meta.title)
+      const route = Object.assign({}, this.tempRoute, { title: `${title}-${this.agentInfo.fullName}` })
+      this.$store.dispatch('tagsView/updateVisitedView', route)
+    },
     numberFormatStr(number) {
       return numberFormat(number)
     },
@@ -159,28 +166,15 @@ export default {
       this.dataLoading = dataLoading
     },
     handleRespone(res) {
-      this.$store.dispatch('app/setAgentLevel', res.agentLevel)
+      this.$store.dispatch('agentManagement/setAgentLevel', res.agentLevel)
       this.agentInfo = res.agentInfo
       this.agentInfo.currency = this.agentInfo.currency.code
       this.agentInfo.fullName = this.agentInfo.nickname + '(' + this.agentInfo.account + ')'
       this.agentInfo.accountStatus = this.accountStatusType.find(element => element.key === this.agentInfo.status).nickname
       this.agentInfo.betStatus = this.accountStatusType.find(element => element.key === this.agentInfo.bet_status).nickname
 
-      this.accountStatusEnable = this.agentInfo.status === '1'
-      this.betStatusEnable = this.agentInfo.bet_status === '1'
+      this.setTagsViewTitle()
       this.dataLoading = false
-    },
-    handleAgentRespone(res) {
-      this.handleRespone(res)
-      this.$refs.agent.setTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
-    },
-    handleMemberRespone(res) {
-      this.handleRespone(res)
-      this.$refs.member.setTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
-    },
-    handleSubAccountRespone(res) {
-      this.handleRespone(res)
-      this.$refs.subAccount.setTableData(res.rows, JSON.parse(JSON.stringify(this.agentInfo)))
     },
     onLimitBtnClick(handicaps) {
       this.handicaps = JSON.parse(JSON.stringify(handicaps))
@@ -191,34 +185,28 @@ export default {
       agentTotalPlayerCount({ agentId: this.agentInfo.id }).then((res) => {
         this.agentInfo.totalPlayerCount = res.totalPlayerCount
         this.dataLoading = false
+      }).catch(() => {
+        this.dataLoading = false
       })
     },
-    onTableBtnClick(tableEnum, id) {
+    onTableBtnClick(tableEnum) {
       this.curTableIndex = tableEnum
-      this.dataLoading = true
       switch (this.curTableIndex) {
         case this.tableEnum.agent: {
-          agentSearch({ agentId: id }).then((res) => {
-            this.handleAgentRespone(res)
-          })
+          this.$refs.agent.onSearch(this.agentInfo.id)
           break
         }
         case this.tableEnum.member: {
-          memberSearch({ agentId: id }).then((res) => {
-            this.handleMemberRespone(res)
-          })
+          this.$refs.member.onSearch(this.agentInfo.id)
           break
         }
         case this.tableEnum.subAccount: {
-          subAccountSearch({ agentId: id }).then((res) => {
-            this.handleSubAccountRespone(res)
-          })
+          this.$refs.subAccount.onSearch(this.agentInfo.id)
           break
         }
       }
     },
     async onAddSubBtnClick() {
-      this.dataLoading = true
       switch (this.curTableIndex) {
         case this.tableEnum.agent: {
           await this.$refs.agent.create()
@@ -233,7 +221,6 @@ export default {
           break
         }
       }
-      this.dataLoading = false
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none
@@ -243,36 +230,57 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.agentManagement {
-  &-container {
-    margin: 5px;
-  }
-}
-
 label {
   font-size: 14px;
   display: inline-block;
   margin-right: 5px;
-}
-
-.labelTitle {
   font-weight: normal;
 }
 
-.labelButton {
+.agentInfoFormData {
+  margin: 10px 0 5px 0;
+}
+
+.agentInfoForm {
+  background: #333;
+  height: 44px;
+  .agentInfoFormBtn {
+    background: #333;
+    color: #fff;
+    border: 1px solid #d8dce5;
+    height: 44px;
+    width: 100%;
+    padding: 14px 5px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .agentInfoFormBtn:hover,
+  .focus {
+    color: #f9c901;
+  }
+  .agentInfoFormOther {
+    height: 44px;
+    line-height: 44px;
+  }
+}
+
+.el-button {
   padding-left: 5px;
   padding-right: 5px;
 }
 
-.labelContent {
+span {
   font-weight: bold;
 }
 
-.labelContent.enable {
+.enable {
   color: rgb(35, 179, 35);
 }
 
-.labelContent.disEnable {
+.disEnable {
   color: red;
+}
+.el-button+.el-button {
+  margin: 0 0 0 5px;
 }
 </style>

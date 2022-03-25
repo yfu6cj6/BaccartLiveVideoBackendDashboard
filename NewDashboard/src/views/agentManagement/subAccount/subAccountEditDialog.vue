@@ -1,14 +1,14 @@
 <template>
-  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
-    <label class="agentName">{{ $t('__superiorAgent') + ': ' }}
-      <span>{{ agentInfo.fullName }}</span>
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <label class="agentNameLabel">{{ `${$t('__superiorAgent')}: ` }}
+      <span class="agentNameSpan">{{ agentInfo.fullName }}</span>
     </label>
-    <el-form ref="form" :model="form" :rules="rules">
+    <el-form ref="form" :model="form" :rules="rules" label-width="80px" label-position="left">
       <el-form-item :label="$t('__accountGenerateMode')">
         <el-switch
           v-model="autoGenerateAccount"
-          active-color="blue"
-          inactive-color="blue"
+          active-color="#f9c901"
+          inactive-color="#f9c901"
           :active-text="$t('__auto')"
           :inactive-text="$t('__manual')"
         />
@@ -36,8 +36,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-checkbox v-model="form.effectAgentLine" :label="$t('__effectAgentLine')" />
-        <el-checkbox v-model="form.isAdmin" :label="$t('__admin')" />
+        <el-checkbox v-model="form.effectAgentLine" class="red-tick" :label="$t('__effectAgentLine')" />
+        <el-checkbox v-model="form.isAdmin" class="red-tick" :label="$t('__admin')" />
       </el-form-item>
       <el-form-item :label="$t('__remark')" prop="remark">
         <el-input v-model="form.remark" type="textarea" :rows="2" />
@@ -47,7 +47,7 @@
       </el-form-item>
     </el-form>
     <span v-show="!dialogLoading" slot="footer">
-      <el-button type="primary" @click="onSubmit">{{ confirm }}</el-button>
+      <el-button class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>
 </template>
@@ -122,7 +122,7 @@ export default {
       if (!value) {
         callback(new Error(this.$t('__requiredField')))
       } else if (this.form.password !== this.form.confirmPassword) {
-        callback(new Error(this.$t('__confirmPassword') + this.$t('__and') + this.$t('__password') + this.$t('__inconsistent')))
+        callback(new Error(`${this.$t('__confirmPassword')}${this.$t('__and')}${this.$t('__password')}${this.$t('__inconsistent')}`))
       } else {
         callback()
       }
@@ -157,6 +157,8 @@ export default {
         subAccountCreateAccount().then((res) => {
           this.form.account = res.account
           this.$refs.form.clearValidate()
+        }).catch(() => {
+          this.autoGenerateAccount = false
         })
       }
     }
@@ -165,29 +167,28 @@ export default {
     onSubmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.dialogLoading = true
           const data = JSON.parse(JSON.stringify(this.form))
           data.effectAgentLine = data.effectAgentLine ? '1' : '0'
           data.isAdmin = data.isAdmin ? '1' : '0'
           if (this.operationType === this.operationEnum.create) {
             data.agentId = this.agentInfo.id
+            this.dialogLoading = true
             subAccountCreate(data).then((res) => {
-              this.$emit('editSuccess', res)
+              this.$emit('editSuccess', JSON.parse(JSON.stringify(res)))
               this.dialogLoading = false
             }).catch(() => {
               this.dialogLoading = false
             })
           } else if (this.operationType === this.operationEnum.edit) {
-            this.$confirm(this.$t('__confirmChanges')).then(_ => {
+            this.confirmMsg(`${this.$t('__confirmChanges')}?`, () => {
+              this.dialogLoading = true
               subAccountEdit(data).then((res) => {
-                this.$emit('editSuccess', res)
+                this.$emit('editSuccess', JSON.parse(JSON.stringify(res)))
                 this.dialogLoading = false
               }).catch(() => {
                 this.dialogLoading = false
               })
             })
-          } else {
-            this.dialogLoading = false
           }
         }
       })
@@ -206,21 +207,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.agentName {
-  font-size: 10px;
+label {
+  font-weight: 300;
 }
 
-.step2Tip {
-  line-height: 10px;
-  display: block;
-  font-size: 10px;
+.agentNameLabel {
+  font-size: 14px;
+  color: #fff
 }
 
-.el-input {
-  width: auto;
+.el-checkbox,
+.agentNameSpan {
+  color: #f9c901;
+}
+
+.el-checkbox+.el-checkbox {
+  margin-left:50px;
 }
 
 .el-steps--horizontal {
   margin: 15px 0
+}
+
+.el-select,
+.el-input,
+.el-textarea{
+  width: 90%;
 }
 </style>

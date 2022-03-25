@@ -1,40 +1,40 @@
 <template>
-  <div class="accountManagement-container">
-    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
+  <div v-loading="dataLoading" class="view-container">
+    <el-form :inline="true" :model="searchForm">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__account')">
-        <el-input v-model="searchForm.account" />
+      <el-form-item>
+        <el-input v-model="searchForm.account" :placeholder="$t('__account')" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__nickname')">
-        <el-input v-model="searchForm.nickname" />
+      <el-form-item>
+        <el-input v-model="searchForm.nickname" :placeholder="$t('__nickname')" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__role')">
-        <el-select v-model="searchForm.roles" multiple style="width: 300px">
+      <el-form-item>
+        <el-select v-model="searchForm.roles" multiple filterable :placeholder="$t('__role')">
           <el-option v-for="item in roles" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__agentName')">
-        <el-select v-model="searchForm.agent" multiple style="width: 200px">
+      <el-form-item>
+        <el-select v-model="searchForm.agent" multiple filterable :placeholder="$t('__agentName')">
           <el-option v-for="item in agents" :key="item.key" :label="item.nickname" :value="item.key" />
         </el-select>
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__accountStatus')">
-        <el-select v-model="searchForm.status" style="width: 120px">
-          <el-option v-for="item in status" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+      <el-form-item>
+        <el-select v-model="searchForm.status" multiple filterable :placeholder="$t('__accountStatus')">
+          <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        <el-button type="info" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+        <el-button type="primary" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+        <el-button type="primary" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
       </el-form-item>
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
+    <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-form label-position="left" inline>
@@ -44,33 +44,40 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column prop="account" min-width="80px" :label="$t('__account')" align="center" />
-      <el-table-column prop="nickname" min-width="80px" :label="$t('__nickname')" align="center" />
-      <el-table-column prop="rolesNickname" min-width="80px" :label="$t('__role')" align="center" />
-      <el-table-column prop="agentName" min-width="80px" :label="$t('__agentName')" align="center" />
-      <el-table-column prop="time_zone.city_name" min-width="80px" :label="$t('__cityName')" align="center" />
-      <el-table-column prop="statusLabel" min-width="80px" :label="$t('__accountStatus')" align="center" />
+      <el-table-column prop="account" min-width="80px" :label="$t('__account')" align="center" sortable />
+      <el-table-column prop="nickname" min-width="80px" :label="$t('__nickname')" align="center" sortable />
+      <el-table-column :label="$t('__role')" align="center">
+        <template slot-scope="scope">
+          <span v-for="(item, index) in scope.row.rolesNickname" :key="index">{{ item + ((index + 1 === scope.row.rolesNickname.length) ? '' : '、') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="agentName" min-width="80px" :label="$t('__agentName')" align="center" sortable />
+      <el-table-column prop="time_zone.cityName" min-width="80px" :label="$t('__cityName')" align="center" sortable />
+      <el-table-column prop="statusLabel" min-width="80px" :label="$t('__accountStatus')" align="center" sortable />
       <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
-          <el-button type="primary" size="mini" icon="el-icon-key" @click="onPasswordResetBtnClick(scope.row)">{{ $t("__resetPassword") }}</el-button>
+          <el-button type="primary" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button type="danger" size="mini" @click="onPasswordResetBtnClick(scope.row)">{{ $t("__resetPassword") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-pagination
-      layout="prev, pager, next, jumper"
-      class="accountManagement-pagination"
+      layout="prev, pager, next, jumper, sizes"
+      class="pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
+      :page-sizes="pageSizes"
       :current-page.sync="currentPage"
+      @size-change="handleSizeChange"
       @current-change="handlePageChangeByClient"
     />
 
-    <AccountManagementDialog
-      :title="$t('__edit')"
-      :visible="editDialogVisible"
+    <editDialog
+      ref="editDialog"
+      :title="`${$t('__edit')} [${selectForm.account}]`"
+      :visible="curDialogIndex === dialogEnum.edit"
       :confirm="$t('__revise')"
       :form="selectForm"
       :roles="roles"
@@ -82,9 +89,10 @@
       @confirm="editDialogConfirmEven"
     />
 
-    <AccountManagementDialog
+    <editDialog
+      ref="createDialog"
       :title="$t('__create')"
-      :visible="createDialogVisible"
+      :visible="curDialogIndex === dialogEnum.create"
       :confirm="$t('__confirm')"
       :form="selectForm"
       :roles="roles"
@@ -96,12 +104,14 @@
       @confirm="createDialogConfirmEven"
     />
 
-    <el-dialog :title="$t('__tip')" :visible.sync="resetDialogVisible" width="30%" :before-close="resetDialogClose">
-      <span>{{ newPassword }}</span>
-      <span slot="footer">
-        <el-button type="primary" @click="resetDialogVisible = false">{{ $t('__confirm') }}</el-button>
-      </span>
-    </el-dialog>
+    <resetPasswordDialog
+      ref="resetDialog"
+      :title="$t('__tip')"
+      :visible="curDialogIndex === dialogEnum.reset"
+      :confirm="$t('__confirm')"
+      :form="selectForm"
+      @close="closeDialogEven"
+    />
   </div>
 </template>
 
@@ -110,31 +120,33 @@ import { accountSearch, accountCreate, accountEdit, resetPassword } from '@/api/
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
-import AccountManagementDialog from './accountManagementDialog'
+import EditDialog from './editDialog'
+import ResetPasswordDialog from './resetPasswordDialog'
 import { mapGetters } from 'vuex'
 
 const defaultForm = {
   roles: [],
-  agent: [],
-  status: 'All'
+  agent: []
 }
 
 export default {
   name: 'AccountManagement',
-  components: { AccountManagementDialog },
+  components: { EditDialog, ResetPasswordDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
+      dialogEnum: Object.freeze({
+        'none': 0,
+        'create': 1,
+        'edit': 2,
+        'reset': 3
+      }),
       searchForm: JSON.parse(JSON.stringify(defaultForm)),
       selectForm: {},
       roles: [],
       agents: [],
-      status: [],
       timeZones: [],
-      newPassword: '',
-      editDialogVisible: false,
-      createDialogVisible: false,
-      resetDialogVisible: false
+      curDialogIndex: 0
     }
   },
   computed: {
@@ -143,9 +155,6 @@ export default {
     ])
   },
   created() {
-    this.status.push({ key: 'All', nickname: '__all' })
-    this.status = this.status.concat(this.accountStatusType)
-    this.setHeight()
     this.handleCurrentChange(1)
   },
   methods: {
@@ -156,22 +165,28 @@ export default {
       this.roles = res.roles
       this.agents = res.agents
       this.timeZones = res.timeZones
-      res.rows.forEach(element => {
-        element.rolesNickname = []
-        element.roles.forEach(role => {
-          element.rolesNickname.push(this.roles.find((el) => role === el.key).nickname)
-        })
-      })
       this.allDataByClient = res.rows
       this.allDataByClient.forEach(element => {
+        element.rolesNickname = []
+        element.roles.forEach(elRole => {
+          const roleObj = this.roles.find((role) => elRole === role.key)
+          if (roleObj) {
+            element.rolesNickname.push(roleObj.nickname)
+          }
+        })
         const statusNickname = this.accountStatusType.find(statusType => statusType.key === element.status).nickname
         element.statusLabel = this.$t(statusNickname)
       })
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
-      this.dataLoading = false
+
+      this.closeDialogEven()
+      this.closeLoading()
     },
-    handleResponeError() {
+    closeLoading() {
+      this.$refs.createDialog.setDialogLoading(false)
+      this.$refs.editDialog.setDialogLoading(false)
+      this.$refs.resetDialog.setDialogLoading(false)
       this.dataLoading = false
     },
     onSubmit() {
@@ -180,12 +195,10 @@ export default {
     },
     onShowAllBtnClick(data) {
       this.dataLoading = true
-      data = JSON.parse(JSON.stringify(data))
-      if (data.status === 'All') {
-        data.status = undefined
-      }
       accountSearch(data).then((res) => {
         this.handleRespone(res)
+      }).catch(() => {
+        this.closeLoading()
       })
     },
     onCreateBtnClick() {
@@ -193,92 +206,60 @@ export default {
       this.selectForm.agentId = this.agents[0].key
       this.selectForm.status = this.accountStatusType[1].key
       this.selectForm.timeZone = this.timeZones[0].key
-      this.createDialogVisible = true
-      this.editDialogVisible = false
+      this.curDialogIndex = this.dialogEnum.create
     },
     createDialogConfirmEven(data) {
-      this.createDialogVisible = false
-      this.dataLoading = true
+      this.$refs.createDialog.setDialogLoading(true)
       accountCreate(data).then((res) => {
         this.handleRespone(res)
+        this.selectForm = { account: data.account, newPassword: data.password }
+        this.curDialogIndex = this.dialogEnum.reset
       }).catch(() => {
-        this.handleResponeError()
+        this.closeLoading()
       })
     },
     onEditBtnClick(item) {
       this.selectForm = JSON.parse(JSON.stringify(item))
       this.selectForm.agentId = this.selectForm.agent_id
-      this.selectForm.timeZone = this.selectForm.time_zone.id
-      this.createDialogVisible = false
-      this.editDialogVisible = true
+      this.selectForm.timeZone = this.selectForm.time_zone.key
+      this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(this.$t('__confirmChanges')).then(_ => {
-        this.editDialogVisible = false
-        this.dataLoading = true
+      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+        this.$refs.editDialog.setDialogLoading(true)
         accountEdit(data).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
-          this.handleResponeError()
+          this.closeLoading()
         })
       }).catch(_ => {})
     },
     onPasswordResetBtnClick(item) {
-      this.$confirm(this.$t('__confirmReset')).then(_ => {
-        this.dataLoading = true
+      this.$confirm(`${this.$t('__confirmReset')}${this.$t('__account')}:${item.account} ${this.$t('__of')}${this.$t('__password')}?`).then(_ => {
+        this.selectForm = { account: item.account }
+        this.$refs.resetDialog.setDialogLoading(true)
         resetPassword(item).then((res) => {
+          this.selectForm.newPassword = res.password
+          this.curDialogIndex = this.dialogEnum.reset
           this.dataLoading = false
-          this.resetDialogVisible = true
-          this.newPassword = this.$t('__newPassword') + ': ' + res.password
         }).catch(() => {
-          this.dataLoading = false
-          this.$message({
-            message: 'Reset failed',
-            type: 'error'
-          })
+          this.closeLoading()
         })
       }).catch(_ => {})
     },
-    resetDialogClose() {
-      this.resetDialogVisible = false
-    },
     closeDialogEven() {
-      this.createDialogVisible = false
-      this.editDialogVisible = false
+      this.curDialogIndex = this.dialogEnum.none
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.accountManagement {
-  &-container {
-    margin: 5px;
-  }
-  &-pagination {
-    padding: 1em;
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-  }
+.view-container .el-form .el-form-item .el-input {
+  width: 160px;
 }
 
-.filterForm {
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-.el-form-item {
-  margin-bottom: 0px;
-}
-
-.inputTitle {
-  padding: 0px 0px 0px 5px;
-}
-
-.el-input {
-  width: 140px;
+.el-select {
+  width: 190px;
 }
 </style>

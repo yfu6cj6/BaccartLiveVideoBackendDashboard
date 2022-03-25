@@ -12,14 +12,13 @@
             <el-dropdown-item @click.native="changeLocale('zh_chs')">{{ $t(getLang('zh_chs')) }}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
+        <span class="language-item">Hi, {{ nickname }}</span>
+        <span class="language-item">{{ $t('__agent') }}: {{ agentFullName }}</span>
         <span class="language-item">
-          Hi, {{ nickname }}
-        </span>
-        <span class="language-item">
-          {{ $t('__agent') }}: {{ agentFullName }}
-        </span>
-        <span class="language-item">
-          {{ $t('__balance') }}: {{ balance }}
+          {{ $t('__balance') }}:
+          <span :class="{'blanceInfo': agent_id === 1}">
+            {{ balanceInfo }}
+          </span>
         </span>
         <span v-if="marqueeMsg.length > 0" class="marquee">
           <p>{{ marqueeMsg }}</p>
@@ -47,10 +46,14 @@ export default {
       'marqueeMsg',
       'agentFullName',
       'nickname',
-      'balance'
+      'balance',
+      'agent_id'
     ]),
     isCollapse() {
       return !this.sidebar.opened
+    },
+    balanceInfo() {
+      return this.agent_id === 1 ? '∞' : this.balance
     }
   },
   created() {
@@ -71,6 +74,11 @@ export default {
     },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
+      this.$nextTick(() => {
+        if (!this.sidebar.opened) {
+          this.$store.dispatch('agentManagement/closeAgentLevelSideBar')
+        }
+      })
     }
   }
 }
@@ -94,14 +102,12 @@ export default {
     cursor: pointer;
     color: #ffffff;
     display: inline-block;
-    height: 50px;
     padding-left: 15px;
   }
   &-item {
     margin: 0 0 0 1.5em;
     color: #fff;
-    line-height: 50px;
-    font-size: .9em;
+    font-size: 16px;
   }
 }
 .el-icon-arrow-down {
@@ -127,5 +133,11 @@ export default {
 @keyframes marquee {
   0%   { transform: translate(0, 0); }
   100% { transform: translate(-100%, 0); }
+}
+
+.blanceInfo {
+  font-size: 24px;
+  display: inline-block;
+  vertical-align: middle;
 }
 </style>

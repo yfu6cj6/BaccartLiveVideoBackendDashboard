@@ -1,34 +1,31 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
-    <el-row>
-      <el-col :span="24">
-        <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
-          <el-form-item label="ID" prop="id">
-            <el-input v-model="editForm.id" :disabled="true" />
-          </el-form-item>
-          <el-form-item v-if="!isEdit" :label="$t('__tableId')" prop="table_id">
-            <el-select v-model="editForm.table_id">
-              <el-option v-for="item in tables" :key="item.key" :label="item.nickname" :value="item.key" />
-            </el-select>
-          </el-form-item>
-          <el-form-item v-if="!isEdit" :label="$t('__liveBetAreaId')" prop="live_bet_area_id">
-            <el-select v-model="editForm.live_bet_area_id">
-              <el-option v-for="item in liveBetArea" :key="item.key" :label="item.nickname" :value="item.key" />
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="$t('__betMin')" prop="bet_min">
-            <el-input v-model="editForm.bet_min" type="number" />
-          </el-form-item>
-          <el-form-item :label="$t('__betMax')" prop="bet_max">
-            <el-input v-model="editForm.bet_max" type="number" />
-          </el-form-item>
-          <el-form-item :label="$t('__totalBetMax')" prop="total_bet_max">
-            <el-input v-model="editForm.total_bet_max" type="number" />
-          </el-form-item>
-        </el-form>
-      </el-col>
-    </el-row>
-    <span slot="footer">
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form ref="editForm" class="row" :model="editForm" :rules="rules">
+      <el-form-item label="ID" prop="id">
+        <el-input v-model="editForm.id" :disabled="true" />
+      </el-form-item>
+      <el-form-item v-if="!isEdit" :label="$t('__tableId')" prop="table_id">
+        <el-select v-model="editForm.table_id">
+          <el-option v-for="item in tables" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="!isEdit" :label="$t('__liveBetAreaId')" prop="live_bet_area_id">
+        <el-select v-model="editForm.live_bet_area_id">
+          <el-option v-for="item in liveBetArea" :key="item.key" :label="item.nickname" :value="item.key" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('__betMin')" prop="bet_min">
+        <el-input v-model="editForm.bet_min" type="number" />
+      </el-form-item>
+      <el-form-item :label="$t('__betMax')" prop="bet_max">
+        <el-input v-model="editForm.bet_max" type="number" />
+      </el-form-item>
+      <el-form-item :label="$t('__totalBetMax')" prop="total_bet_max">
+        <el-input v-model="editForm.total_bet_max" type="number" />
+        <span class="totalBetMax">{{ $t('__zeroMeansNoLimit') }}</span>
+      </el-form-item>
+    </el-form>
+    <span v-show="!dialogLoading" slot="footer">
       <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
       <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
     </span>
@@ -39,7 +36,7 @@
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
 
 export default {
-  name: 'GameTableManagementDialog',
+  name: 'EditDialog',
   mixins: [handleDialogWidth],
   props: {
     'title': {
@@ -100,7 +97,8 @@ export default {
         bet_max: [{ required: true, trigger: 'blur', validator: validate }],
         total_bet_max: [{ required: true, trigger: 'blur', validator: validate }]
       },
-      editForm: {}
+      editForm: {},
+      dialogLoading: false
     }
   },
   computed: {
@@ -118,7 +116,7 @@ export default {
     onSubmit() {
       this.$refs.editForm.validate((valid) => {
         if (valid) {
-          this.$emit('confirm', this.editForm)
+          this.$emit('confirm', JSON.parse(JSON.stringify(this.editForm)))
         }
       })
     },
@@ -127,10 +125,17 @@ export default {
     },
     onReset() {
       this.editForm = JSON.parse(JSON.stringify(this.form))
+    },
+    setDialogLoading(dialogLoading) {
+      this.dialogLoading = dialogLoading
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.totalBetMax {
+  display: block;
+  line-height: 14px;
+}
 </style>

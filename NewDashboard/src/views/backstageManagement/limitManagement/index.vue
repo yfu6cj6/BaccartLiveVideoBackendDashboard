@@ -1,60 +1,64 @@
 <template>
-  <div class="limitManagement-container">
-    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
+  <div v-loading="dataLoading" class="view-container">
+    <el-form :inline="true" :model="searchForm">
       <el-form-item>
-        <el-button type="primary" size="mini" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
       </el-form-item>
-      <el-form-item class="inputTitle" label="ID">
-        <el-input v-model="searchForm.id" type="number" />
+      <el-form-item>
+        <el-input v-model="searchForm.id" type="number" placeholder="ID" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__lowerLimit')">
-        <el-input v-model="searchForm.lower_limit" type="number" />
+      <el-form-item>
+        <el-input v-model="searchForm.lower_limit" type="number" :placeholder="$t('__lowerLimit')" />
       </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__upperLimit')">
-        <el-input v-model="searchForm.upper_limit" type="number" />
+      <el-form-item>
+        <el-input v-model="searchForm.upper_limit" type="number" :placeholder="$t('__upperLimit')" />
       </el-form-item>
-      <el-form-item class="formButton">
-        <el-button icon="el-icon-minus" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+      <el-form-item>
+        <el-button type="info" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+        <el-button type="primary" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+        <el-button type="primary" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
       </el-form-item>
 
     </el-form>
 
-    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
+    <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column prop="id" label="ID" align="center" />
       <el-table-column prop="lower_limit" :label="$t('__lowerLimit')" align="center" />
       <el-table-column prop="upper_limit" :label="$t('__upperLimit')" align="center" />
       <el-table-column :label="$t('__operate')" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button type="primary" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-pagination
-      layout="prev, pager, next, jumper"
-      class="limitManagement-pagination"
+      layout="prev, pager, next, jumper, sizes"
+      class="pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
+      :page-sizes="pageSizes"
       :current-page.sync="currentPage"
+      @size-change="handleSizeChange"
       @current-change="handlePageChangeByClient"
     />
 
-    <LimitManagementDialog
+    <editDialog
+      ref="editDialog"
       :title="$t('__edit')"
-      :visible="editDialogVisible"
+      :visible="curDialogIndex === dialogEnum.edit"
       :confirm="$t('__revise')"
       :form="selectForm"
       @close="closeDialogEven"
       @confirm="editDialogConfirmEven"
     />
 
-    <LimitManagementDialog
+    <editDialog
+      ref="createDialog"
       :title="$t('__create')"
-      :visible="createDialogVisible"
+      :visible="curDialogIndex === dialogEnum.create"
       :confirm="$t('__confirm')"
       :form="selectForm"
       @close="closeDialogEven"
@@ -68,24 +72,27 @@ import { tableLimitSearch, tableLimitCreate, tableLimitEdit } from '@/api/backst
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
-import LimitManagementDialog from './limitManagementDialog'
+import EditDialog from './editDialog'
 
 export default {
   name: 'LimitManagement',
-  components: { LimitManagementDialog },
+  components: { EditDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
+      dialogEnum: Object.freeze({
+        'none': 0,
+        'create': 1,
+        'edit': 2
+      }),
       searchForm: {},
       selectForm: {},
-      editDialogVisible: false,
-      createDialogVisible: false
+      curDialogIndex: 0
     }
   },
   computed: {
   },
   created() {
-    this.setHeight()
     this.handleCurrentChange(1)
   },
   methods: {
@@ -96,9 +103,13 @@ export default {
       this.allDataByClient = res.rows
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
-      this.dataLoading = false
+
+      this.closeDialogEven()
+      this.closeLoading()
     },
-    handleResponeError() {
+    closeLoading() {
+      this.$refs.createDialog.setDialogLoading(false)
+      this.$refs.editDialog.setDialogLoading(false)
       this.dataLoading = false
     },
     onSubmit() {
@@ -109,83 +120,45 @@ export default {
       this.dataLoading = true
       tableLimitSearch(data).then((res) => {
         this.handleRespone(res)
+      }).catch(() => {
+        this.closeLoading()
       })
     },
     onCreateBtnClick() {
       this.selectForm = {}
-      this.createDialogVisible = true
-      this.editDialogVisible = false
+      this.curDialogIndex = this.dialogEnum.create
     },
     createDialogConfirmEven(data) {
-      this.createDialogVisible = false
-      this.dataLoading = true
+      this.$refs.createDialog.setDialogLoading(true)
       tableLimitCreate(data).then((res) => {
         this.handleRespone(res)
       }).catch(() => {
-        this.handleResponeError()
+        this.closeLoading()
       })
     },
     onEditBtnClick(item) {
       this.selectForm = JSON.parse(JSON.stringify(item))
-      this.createDialogVisible = false
-      this.editDialogVisible = true
+      this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(this.$t('__confirmChanges')).then(_ => {
-        this.editDialogVisible = false
-        this.dataLoading = true
+      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+        this.$refs.editDialog.setDialogLoading(true)
         tableLimitEdit(data).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
-          this.handleResponeError()
+          this.closeLoading()
         })
       }).catch(_ => {})
     },
     closeDialogEven() {
-      this.createDialogVisible = false
-      this.editDialogVisible = false
+      this.curDialogIndex = this.dialogEnum.none
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.limitManagement {
-  &-container {
-    margin: 5px;
-  }
-  &-pagination {
-    padding: 1em;
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-  }
-}
-
-.filterForm {
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-.el-form {
-  width: 100%;
-}
-
-.formButton {
-  margin-left: 15px;
-}
-
-.inputTitle {
-  padding: 0px 0px 0px 5px;
-}
-
-.el-input {
-  width: 80px
-}
-
-.el-table {
-  width: 100%;
+.view-container .el-form .el-form-item .el-input {
+  width: 120px;
 }
 </style>

@@ -9,7 +9,42 @@
 .filterForm 
   border: 1px solid #ebebeb
   border-radius: 5px
+  padding-top: 0px
+  padding-bottom: 0px
 
+.view-container
+  .pagination
+    padding: 1em
+    display: flex
+    -webkit-box-align: center
+    align-items: center
+    -webkit-box-pack: center
+    justify-content: center
+  .seachForm
+    background: #333
+    margin: 5px 5px 0 5px
+  .el-form
+    width: 100%
+    margin: 0
+    .el-form-item
+      padding: 0 0 0 5px
+      margin-bottom: 5px
+      .el-button+.el-button
+        margin: 0 0 0 5px
+  .el-table
+    width: 100%
+
+.el-form-item__error
+  top: 32px
+
+.el-form-item__label
+  color: #f9c901
+
+.el-steps--horizontal
+  margin: 10px 0 0px 0 !important
+
+.el-checkbox
+  margin: 0
 
 .pad-l 
   padding-left: .5em
@@ -43,10 +78,15 @@
 
 .el-date-editor--datetimerange.el-input__inner
   width: 100%
+  min-width: 355px
+
+.el-date-editor .el-range-input
+  width: 70%
 
 .el-input__inner
   height: 2em
   line-height: 2em
+  color: black
 
 .el-date-editor .el-range-separator,.el-date-editor .el-range__icon,.el-date-editor .el-range__close-icon
   line-height: 1.5em

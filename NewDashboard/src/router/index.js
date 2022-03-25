@@ -84,14 +84,14 @@ export const asyncRoutes = [
         path: 'limitManagement',
         name: 'LimitManagement',
         component: () => import('@/views/backstageManagement/limitManagement/index'),
-        meta: { title: '__limitManagement', icon: 'el-icon-coin', permission: 'BackStageManage.CurrencyManage' }
+        meta: { title: '__limitManagement', icon: 'el-icon-coin', permission: 'BackStageManage.TableLimitManage' }
       },
       {
         // 遊戲桌管理
         path: 'gameTableManagement',
         name: 'GameTableManagement',
         component: () => import('@/views/backstageManagement/gameTableManagement/index'),
-        meta: { title: '__gameTableManagement', icon: 'user', permission: 'BackStageManage.CurrencyManage' }
+        meta: { title: '__gameTableManagement', icon: 'user', permission: 'BackStageManage.GameTableManage' }
       },
       {
         // 帳號管理
@@ -139,42 +139,32 @@ export const asyncRoutes = [
   },
 
   {
-    // 日誌管理
-    path: '/logManagement',
-    component: Layout,
-    redirect: '/logManagement',
-    meta: { title: '__logManagement', icon: 'el-icon-notebook-2', permission: 'LogManage' },
-    displayChildren: true,
-    children: [{
-      // 操作日誌
-      path: 'operationLog',
-      name: 'OperationLog',
-      component: () => import('@/views/logManagement/operationLog/index'),
-      meta: { title: '__operationLog', icon: 'el-icon-document', permission: 'LogManage.OperationLog' }
-    }]
-  },
-
-  {
     // 代理管理
     path: '/agentManagement',
     component: Layout,
     redirect: '/agentManagement',
-    meta: { title: '__agentManagement', icon: 'tree', permission: 'LogManage' },
+    meta: { title: '__agentManagement', icon: 'tree', permission: 'AgentManage' },
     children: [{
       path: 'agentManagement',
       name: 'AgentManagement',
-      component: () => import('@/views/agentManagement/index'),
       meta: { title: '__agentManagement' },
-      click: () => { store.dispatch('app/toggleAgentLevelSideBar') }
+      click: () => { store.dispatch('agentManagement/agentSearch') }
+    },
+    {
+      path: 'agentManagement/:id(\\d+)',
+      name: 'AgentManagement:id(\\d+)',
+      component: () => import('@/views/agentManagement/index'),
+      meta: { title: '__agentManagement', activeMenu: '/agentManagement/agentManagement' },
+      hidden: true
     }]
   },
 
   {
-    // 投注紀錄
+    // 投注記錄
     path: '/memberBet',
     component: Layout,
     redirect: '/memberBet',
-    meta: { title: '__memberBet', icon: 'el-icon-tickets', permission: 'WhitelistManage' },
+    meta: { title: '__memberBet', icon: 'el-icon-tickets', permission: 'MemberManage.Bet.Record' },
     children: [{
       path: 'memberBet',
       name: 'MemberBet',
@@ -184,11 +174,81 @@ export const asyncRoutes = [
   },
 
   {
+    // 代理額度記錄
+    path: '/agentBalanceRecord',
+    component: Layout,
+    redirect: '/agentBalanceRecord',
+    meta: { title: '__agentBalanceRecord', icon: 'el-icon-star-off', permission: 'AgentManage.Balance.Record' },
+    children: [{
+      path: 'agentBalanceRecord',
+      name: 'AgentBalanceRecord',
+      component: () => import('@/views/agentBalanceRecord/index'),
+      meta: { title: '__agentBalanceRecord' }
+    }]
+  },
+
+  {
+    // 玩家額度記錄
+    path: '/memberBalanceRecord',
+    component: Layout,
+    redirect: '/memberBalanceRecord',
+    meta: { title: '__memberBalanceRecord', icon: 'el-icon-postcard', permission: 'MemberManage.Balance.Record' },
+    children: [{
+      path: 'memberBalanceRecord',
+      name: 'MemberBalanceRecord',
+      component: () => import('@/views/memberBalanceRecord/index'),
+      meta: { title: '__memberBalanceRecord' }
+    }]
+  },
+
+  {
+    // 代理商額度報表
+    path: '/agentBalanceReport',
+    component: Layout,
+    redirect: '/agentBalanceReport',
+    meta: { title: '__agentBalanceReport', icon: 'el-icon-s-marketing', permission: 'AgentManage.Balance.Report' },
+    children: [{
+      path: 'agentBalanceReport',
+      name: 'AgentBalanceReport',
+      component: () => import('@/views/agentBalanceReport/index'),
+      meta: { title: '__agentBalanceReport' }
+    },
+    {
+      path: 'agentBalanceReport/:id(\\d+)',
+      name: 'AgentBalanceReport:id(\\d+)',
+      component: () => import('@/views/agentBalanceReport/index'),
+      meta: { title: '__agentBalanceReport', activeMenu: '/agentBalanceReport/agentBalanceReport' },
+      hidden: true
+    }]
+  },
+
+  {
+    // 輸贏報表
+    path: '/winLossReport',
+    component: Layout,
+    redirect: '/winLossReport',
+    meta: { title: '__winLossReport', icon: 'el-icon-s-data', permission: 'AgentManage.WinLoss.Report' },
+    children: [{
+      path: 'winLossReport',
+      name: 'WinLossReport',
+      component: () => import('@/views/winLossReport/index'),
+      meta: { title: '__winLossReport' }
+    },
+    {
+      path: 'winLossReport/:id(\\d+)',
+      name: 'WinLossReport:id(\\d+)',
+      component: () => import('@/views/winLossReport/index'),
+      meta: { title: '__winLossReport', activeMenu: '/winLossReport/winLossReport' },
+      hidden: true
+    }]
+  },
+
+  {
     // 遊戲結果
     path: '/gameResult',
     component: Layout,
     redirect: '/gameResult',
-    meta: { title: '__gameResult', icon: 'el-icon-c-scale-to-original', permission: 'WhitelistManage' },
+    meta: { title: '__gameResult', icon: 'el-icon-c-scale-to-original', permission: 'GameResult' },
     children: [{
       path: 'gameResult',
       name: 'GameResult',
@@ -222,6 +282,22 @@ export const asyncRoutes = [
       name: 'ModPassword',
       component: () => import('@/views/modPassword/index'),
       meta: { title: '__modPassword' }
+    }]
+  },
+
+  {
+    // 日誌管理
+    path: '/logManagement',
+    component: Layout,
+    redirect: '/logManagement',
+    meta: { title: '__logManagement', icon: 'el-icon-notebook-2', permission: 'LogManage' },
+    displayChildren: true,
+    children: [{
+      // 操作日誌
+      path: 'operationLog',
+      name: 'OperationLog',
+      component: () => import('@/views/logManagement/operationLog/index'),
+      meta: { title: '__operationLog', icon: 'el-icon-document', permission: 'LogManage.OperationLog' }
     }]
   },
 

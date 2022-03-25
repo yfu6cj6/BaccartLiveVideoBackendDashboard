@@ -1,19 +1,16 @@
-import { mapGetters } from 'vuex'
-
 export default {
   props: {
-    'pcWidth': {
-      type: String,
+    'formWidthBreakpoint': {
+      type: Object,
       require: true,
       default() {
-        return '20%'
-      }
-    },
-    'mobileWidth': {
-      type: String,
-      require: true,
-      default() {
-        return '40%'
+        return {
+          'xs': '100%',
+          'sm': '70%',
+          'md': '50%',
+          'lg': '40%',
+          'xl': '30%'
+        }
       }
     }
   },
@@ -22,13 +19,27 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'device'
-    ]),
     formWidth() {
-      return this.device === 'mobile' ? this.mobileWidth : this.pcWidth
+      switch (this.$vuetify.breakpoint.name) {
+        case 'xs': return this.formWidthBreakpoint.xs
+        case 'sm': return this.formWidthBreakpoint.sm
+        case 'md': return this.formWidthBreakpoint.md
+        case 'lg': return this.formWidthBreakpoint.lg
+        case 'xl': return this.formWidthBreakpoint.xl
+        default: return this.formWidthBreakpoint.xl
+      }
     }
   },
   methods: {
+    confirmMsg(msg, callBack) {
+      this.$confirm(msg, {
+        closeOnClickModal: false,
+        closeOnPressEscape: false,
+        confirmButtonClass: 'bg-yellow',
+        cancelButtonClass: 'bg-gray'
+      }).then(_ => {
+        callBack()
+      })
+    }
   }
 }

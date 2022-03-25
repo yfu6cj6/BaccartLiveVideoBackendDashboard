@@ -3,18 +3,11 @@ import { logout } from '@/api/user'
 
 export default {
   created() {
-    logout().then(() => {
+    logout().finally(() => {
+      window.localStorage.clear()
+      window.sessionStorage.clear()
       this.$store.dispatch('user/logout')
-      this.$message({
-        message: 'Logout successfully',
-        type: 'success'
-      })
       this.$router.push({ path: '/login' })
-    }).catch(() => {
-      this.$message({
-        message: 'Logout failed',
-        type: 'error'
-      })
     })
   },
   render: function(h) {

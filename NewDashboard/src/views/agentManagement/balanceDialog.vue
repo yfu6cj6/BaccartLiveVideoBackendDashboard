@@ -1,6 +1,6 @@
 <template>
-  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
-    <el-form ref="form" label-width="auto" :model="form" :rules="rules">
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form ref="form" :model="form" :rules="rules" label-width="80px" label-position="left">
       <el-form-item :label="$t('__superiorAgent') + ': '">
         <span>{{ agentBalanceInfo.parent }}</span>
       </el-form-item>
@@ -27,7 +27,7 @@
       </el-form-item>
     </el-form>
     <span v-show="!dialogLoading" slot="footer">
-      <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
+      <el-button class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>
 </template>
@@ -151,15 +151,12 @@ export default {
     onSubmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.$confirm(this.$t('__confirmOperation')).then(_ => {
-            this.dialogLoading = true
+          this.confirmMsg(`${this.$t('__confirmOperation')}?`, () => {
             const data = JSON.parse(JSON.stringify(this.form))
             if (this.operationType === this.operationEnum.depositBalance) {
               this.$emit('depositBalance', data)
             } else if (this.operationType === this.operationEnum.withdrawBalance) {
               this.$emit('withdrawBalance', data)
-            } else {
-              this.dialogLoading = false
             }
           })
         }
@@ -181,5 +178,9 @@ export default {
 <style scoped>
 .el-table--fit {
   padding: 0 0 10px 0
+}
+
+span {
+  color: #fff;
 }
 </style>

@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { getToken, setToken, removeToken, getTokenType, setTokenType, removeTokenType } from '@/utils/auth'
-import store from '@/store/index'
 import router from '@/router/index'
 import { Message } from 'element-ui'
 import { i18n } from '@/lang/lang'
@@ -47,10 +46,8 @@ service.interceptors.response.use(
   response => {
     const res = response.data
     if (res.code === 401 || res.code === 101) {
-      store.dispatch('user/resetToken').then(() => {
-        router.push({ path: '/logout' })
-        showMsgLog(res.message)
-      })
+      router.push({ path: '/logout' })
+      showMsgLog(res.message)
       return Promise.reject(response)
     }
 
@@ -78,10 +75,8 @@ service.interceptors.response.use(
   },
   error => {
     console.log('errstatus: ' + error.response.status + ' errstatusText: ' + error.response.statusText) // for debug
-    store.dispatch('user/resetToken').then(() => {
-      router.push({ path: '/logout' })
-      Message.error(error.response.statusText || 'Has Error')
-    })
+    router.push({ path: '/logout' })
+    Message.error(error.response.statusText || 'Has Error')
     return Promise.reject(error)
   }
 )

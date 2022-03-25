@@ -14,14 +14,27 @@
       <el-table-column :label="$t('__subAccount')" align="center">
         <template slot-scope="scope">
           <span class="scope-content">{{ scope.row.fullName }}</span>
-          <el-button class="iconButton" type="primary" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
-          <el-button class="iconButton" type="primary" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
+          <br>
+          <el-button class="iconButton" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
+          <el-button class="iconButton" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
         </template>
       </el-table-column>
-      <el-table-column prop="statusLabel" :label="$t('__accountStatus')" align="center" />
+      <el-table-column :label="$t('__accountStatus')" align="center">
+        <template slot-scope="scope">
+          <span :class="{'lock': scope.row.status === '0', 'enable': scope.row.status === '1'}">
+            {{ scope.row.statusLabel }}
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('__role')" align="center">
         <template slot-scope="scope">
-          <span v-for="(item, index) in scope.row.rolesLabel" :key="index" :class="{'role-admin':scope.row.roles[index]==='AgentSubAccountAdmin', 'role-visitor':scope.row.roles[index]==='AgentSubAccount'}">{{ item + ((index + 1 === scope.row.rolesLabel.length) ? '' : '、') }}</span>
+          <span
+            v-for="(item, index) in scope.row.rolesNickname"
+            :key="index"
+            :class="{'role-admin':scope.row.rolesNickname[index].key==='AgentSubAccountAdmin', 'role-visitor':scope.row.rolesNickname[index].key==='AgentSubAccount'}"
+          >
+            {{ item.nickname + ((index + 1 === scope.row.rolesNickname.length) ? '' : '、') }}
+          </span>
         </template>
       </el-table-column>
       <el-table-column prop="creator" :label="$t('__creator')" align="center" />
@@ -30,36 +43,39 @@
       <el-table-column prop="lastLoginIp" :label="$t('__lastLoginIP')" align="center" />
       <el-table-column :label="$t('__operate')" align="center" width="auto">
         <template slot-scope="scope">
-          <el-checkbox v-model="scope.row.lockLogin" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row.id)" />
-          <el-checkbox v-model="scope.row.allPermission" :label="$t('__allPermission')" @mousedown.native="onOperateCheckboxClick(dialogEnum.effectAgentLine, scope.row.id)" />
+          <el-checkbox v-model="scope.row.lockLogin" class="red-tick" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row)" />
+          <br>
+          <el-checkbox v-model="scope.row.allPermission" class="red-tick" :label="$t('__allPermission')" @mousedown.native="onOperateCheckboxClick(dialogEnum.effectAgentLine, scope.row)" />
+          <br>
+          <el-button v-if="!scope.row.allPermission" class="bg-yellow" size="mini" @click="onSubAgentDistribute(scope.row)">{{ $t('__subAgentDistribute') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-pagination
-      layout="prev, pager, next, jumper"
+      layout="prev, pager, next, jumper, sizes"
       class="subAccount-pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
+      :page-sizes="pageSizes"
       :current-page.sync="currentPage"
+      @size-change="handleSizeChange"
       @current-change="handlePageChangeByClient"
     />
 
-    <ModPasswordDialog
+    <modPasswordDialog
       ref="modPasswordDialog"
       :title="$t('__modPassword')"
       :visible="curDialogIndex === dialogEnum.modPassword"
       :confirm="$t('__revise')"
-      :name-label="$t('__subAccount')"
+      :name-label="`${$t('__subAccount')}: `"
       :form="editForm"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
       @modPassword="modPassword"
     />
 
-    <SubAccountEditDialog
+    <subAccountEditDialog
       ref="editDialog"
       :title="$t('__editSubAccount')"
       :visible="curDialogIndex === dialogEnum.edit"
@@ -67,13 +83,11 @@
       :confirm="$t('__revise')"
       :agent-info="agentInfo"
       :form="editForm"
-      :pc-width="'30%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="editSuccess"
+      @editSuccess="handleRespone"
     />
 
-    <SubAccountEditDialog
+    <subAccountEditDialog
       ref="createDialog"
       :title="$t('__addSubAccount')"
       :visible="curDialogIndex === dialogEnum.create"
@@ -81,38 +95,48 @@
       :confirm="$t('__confirm')"
       :agent-info="agentInfo"
       :form="editForm"
-      :pc-width="'30%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="editSuccess"
+      @editSuccess="handleRespone"
     />
 
-    <OperateDialog
+    <operateDialog
+      ref="lockLoginDialog"
       :visible="curDialogIndex === dialogEnum.lockLogin"
-      :content="'確定要改變狀態嗎?'"
+      :content="$stringFormat($t('__subAccountLockLoginMsg'), operateDialogMsgParameter)"
       :form="editForm"
-      :submit-fun="onOperateSubmitFun"
       @close="closeDialogEven"
-      @editSuccess="editSuccess"
+      @onSubmit="operateSubmit"
     />
 
-    <OperateDialog
+    <operateDialog
+      ref="effectAgentLineDialog"
       :visible="curDialogIndex === dialogEnum.effectAgentLine"
-      :content="'確定要改變狀態嗎?'"
+      :content="$stringFormat($t('__subAccountEffectAgentLineMsg'), operateDialogMsgParameter)"
       :form="editForm"
-      :submit-fun="onOperateSubmitFun"
       @close="closeDialogEven"
-      @editSuccess="editSuccess"
+      @onSubmit="operateSubmit"
+    />
+
+    <subAgentDistributeDialog
+      ref="subAgentDistributeDialog"
+      :title="$t('__subAgentDistribute')"
+      :visible="curDialogIndex === dialogEnum.subAgentDistribute"
+      :sub-agents="subAgent"
+      :confirm="$t('__confirm')"
+      :form="editForm"
+      @close="closeDialogEven"
+      @onSubmit="onSubmitSetHasAgents"
     />
   </div>
 </template>
 
 <script>
-import { subAccountModPassword, subAccountModStatus, subAccountModEffectAgentLine } from '@/api/agentManagement/subAccount'
+import { subAccountSearch, subAccountModPassword, subAccountModStatus, subAccountModEffectAgentLine, subAccountGetAgentLine, subAccountSetHasAgents } from '@/api/agentManagement/subAccount'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import SubAccountEditDialog from './subAccountEditDialog'
+import SubAgentDistributeDialog from './subAgentDistributeDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
 import OperateDialog from '@/views/agentManagement/operateDialog'
 import { mapGetters } from 'vuex'
@@ -132,7 +156,7 @@ const defaultForm = {
 
 export default {
   name: 'Member',
-  components: { SubAccountEditDialog, ModPasswordDialog, OperateDialog },
+  components: { SubAccountEditDialog, ModPasswordDialog, OperateDialog, SubAgentDistributeDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -151,43 +175,85 @@ export default {
         'edit': 2,
         'modPassword': 3,
         'lockLogin': 7,
-        'effectAgentLine': 8
+        'effectAgentLine': 8,
+        'subAgentDistribute': 9
       }),
       agentInfo: {},
       editForm: {},
-      curDialogIndex: 0
+      curDialogIndex: 0,
+      subAgent: [],
+      operateDialogMsgParameter: []
     }
   },
   computed: {
     ...mapGetters([
-      'accountStatusType',
+      'statusType',
       'roles'
     ])
   },
   methods: {
-    onOperateSubmitFun(data) {
+    onSubmitSetHasAgents(data) {
+      this.$refs.subAgentDistributeDialog.setDialogLoading(true)
+      subAccountSetHasAgents(data).then((res) => {
+        this.handleRespone(res)
+        this.$refs.subAgentDistributeDialog.setDialogLoading(false)
+      }).catch(() => {
+        this.$refs.subAgentDistributeDialog.setDialogLoading(false)
+      })
+    },
+    onSubAgentDistribute(rowData) {
+      this.curDialogIndex = this.dialogEnum.subAgentDistribute
+      this.editForm = JSON.parse(JSON.stringify(rowData))
+      const searchData = {
+        agentId: this.agentInfo.id,
+        subAccountId: rowData.id
+      }
+      this.$refs.subAgentDistributeDialog.setDialogLoading(true)
+      subAccountGetAgentLine(searchData).then((res) => {
+        this.subAgent = res.rows
+        this.$nextTick(() => {
+          this.$refs.subAgentDistributeDialog.setData(res.boundAgents)
+          this.$refs.subAgentDistributeDialog.setDialogLoading(false)
+        })
+      }).catch(() => {
+        this.$refs.subAgentDistributeDialog.setDialogLoading(false)
+      })
+    },
+    operateSubmit(data) {
       switch (this.curDialogIndex) {
         case this.dialogEnum.lockLogin: {
-          return subAccountModStatus(data).then((res) => {
-            return res
+          this.$refs.lockLoginDialog.setDialogLoading(true)
+          subAccountModStatus(data).then((res) => {
+            this.handleRespone(res)
+            this.$refs.lockLoginDialog.setDialogLoading(false)
+          }).catch(() => {
+            this.$refs.lockLoginDialog.setDialogLoading(false)
           })
+          break
         }
         case this.dialogEnum.effectAgentLine: {
-          return subAccountModEffectAgentLine(data).then((res) => {
-            return res
+          this.$refs.effectAgentLineDialog.setDialogLoading(true)
+          subAccountModEffectAgentLine(data).then((res) => {
+            this.handleRespone(res)
+            this.$refs.effectAgentLineDialog.setDialogLoading(false)
+          }).catch(() => {
+            this.$refs.effectAgentLineDialog.setDialogLoading(false)
           })
+          break
         }
       }
     },
-    onOperateCheckboxClick(operateType, id) {
-      this.editForm = { id: id }
+    onOperateCheckboxClick(operateType, rowData) {
+      this.editForm = JSON.parse(JSON.stringify(rowData))
       switch (operateType) {
         case this.dialogEnum.lockLogin: {
           this.curDialogIndex = this.dialogEnum.lockLogin
+          this.operateDialogMsgParameter = [rowData.fullName]
           break
         }
         case this.dialogEnum.effectAgentLine: {
           this.curDialogIndex = this.dialogEnum.effectAgentLine
+          this.operateDialogMsgParameter = [rowData.fullName]
           break
         }
       }
@@ -200,25 +266,42 @@ export default {
       this.curDialogIndex = this.dialogEnum.create
     },
     // 父物件呼叫
-    setTableData(rows, agentInfo) {
-      this.agentInfo = agentInfo
+    onSearch(agentId) {
+      this.agentInfo.id = agentId
+      this.handleCurrentChange(1)
+    },
+    onSubmit() {
+      this.setDataLoading(true)
+      subAccountSearch({ agentId: this.agentInfo.id }).then((res) => {
+        this.handleRespone(res)
+      }).catch(() => {
+        this.setDataLoading(false)
+      })
+    },
+    handleRespone(res) {
+      this.agentInfo = res.agentInfo
+      this.agentInfo.fullName = this.agentInfo.nickname + '(' + this.agentInfo.account + ')'
 
-      this.allDataByClient = rows
+      this.allDataByClient = res.rows
       this.allDataByClient.forEach(element => {
         element.fullName = element.nickname + '(' + element.account + ')'
-        const statusNickname = this.accountStatusType.find(statusType => statusType.key === element.status).nickname
+        const statusNickname = this.statusType.find(type => type.key === element.status).nickname
         element.statusLabel = this.$t(statusNickname)
-        const newRoles = []
+        element.rolesNickname = []
         element.roles.forEach(role => {
-          const roleNickname = this.roles.find(item => item.key === role).nickname
-          newRoles.push(this.$t(roleNickname))
+          const roleObj = this.roles.find(item => item.key === role)
+          if (roleObj) {
+            element.rolesNickname.push({ key: role, nickname: this.$t(roleObj.nickname) })
+          }
         })
-        element.rolesLabel = newRoles
         element.lockLogin = element.status === '0'
         element.allPermission = element.effectAgentLine === '1'
       })
-      this.totalCount = rows.length
+      this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
+
+      this.closeDialogEven()
+      this.$emit('serverResponse', JSON.parse(JSON.stringify(res)))
     },
     setDataLoading(dataLoading) {
       this.$emit('setDataLoading', dataLoading)
@@ -236,21 +319,17 @@ export default {
       this.setDataLoading(false)
     },
     onModPasswordBtnClick(rowData) {
-      this.editForm = { id: rowData.id, fullName: rowData.fullName }
+      this.editForm = JSON.parse(JSON.stringify(rowData))
       this.curDialogIndex = this.dialogEnum.modPassword
     },
     modPassword(data) {
+      this.$refs.modPasswordDialog.setDialogLoading(true)
       subAccountModPassword(data).then((res) => {
+        this.handleRespone(res)
         this.$refs.modPasswordDialog.setDialogLoading(false)
-        this.$emit('serverResponse', res)
-        this.closeDialogEven()
       }).catch(() => {
         this.$refs.modPasswordDialog.setDialogLoading(false)
       })
-    },
-    editSuccess(res) {
-      this.$emit('serverResponse', res)
-      this.closeDialogEven()
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none
@@ -282,6 +361,16 @@ export default {
 
 .role-visitor {
   color: blue;
+  font-weight: bolder;
+}
+
+.lock {
+  color: red;
+  font-weight: bolder;
+}
+
+.enable {
+  color:  green;
   font-weight: bolder;
 }
 

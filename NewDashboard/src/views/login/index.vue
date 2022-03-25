@@ -68,14 +68,13 @@
 
 <script>
 import { login, generateCaptcha } from '@/api/user'
-import { validLoginAccount } from '@/utils/validate'
 
 export default {
   name: 'Login',
   data() {
     const validateAccount = (rule, value, callback) => {
-      if (!validLoginAccount(value)) {
-        callback(new Error('Please enter the correct user name'))
+      if (!value) {
+        callback(new Error('This field is requiredRequired'))
       } else {
         callback()
       }
@@ -83,13 +82,6 @@ export default {
     const validatePassword = (rule, value, callback) => {
       if (value.length < 5) {
         callback(new Error('The password can not be less than 5 digits'))
-      } else {
-        callback()
-      }
-    }
-    const validateCaptcha = (rule, value, callback) => {
-      if (!value) {
-        callback(new Error(this.$t('__requiredField')))
       } else {
         callback()
       }
@@ -104,7 +96,7 @@ export default {
       loginRules: {
         account: [{ required: true, trigger: 'blur', validator: validateAccount }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        captcha: [{ required: true, trigger: 'blur', validator: validateCaptcha }]
+        captcha: [{ required: true, trigger: 'blur', validator: validateAccount }]
       },
       loading: false,
       passwordType: 'password',
@@ -121,6 +113,9 @@ export default {
     if (this.showCaptcha) {
       this.refreshCaptcha()
     }
+  },
+  mounted() {
+    this.$store.dispatch('tagsView/delAllViews')
   },
   methods: {
     showPwd() {

@@ -2,20 +2,26 @@
   <div ref="agentLevel" :class="{show:agentLevelSidebar}" class="agentLevel-container">
     <div class="agentLevel">
       <div class="agentLevel-items">
-        <div class="handle-button" @click="show=onHandleBtnClick()">
+        <div class="handle-button" @click="onHandleBtnClick()">
           <i class="el-icon-close" />
         </div>
         <el-card shadow="never">
           <el-scrollbar>
+            <el-input
+              v-model="filterText"
+              :placeholder="$t('__enterKeys')"
+            />
             <el-tree
-              v-loading="dataLoading"
+              ref="tree"
+              v-loading="agentLevelLoading"
               :data="agentLevel"
               :props="defaultProps"
               node-key="AgentId"
               :default-expanded-keys="treeDefaultExpandedKeys"
-              :expand-on-click-node="false"
               :render-content="renderContent"
               :indent="14"
+              :filter-node-method="filterNode"
+              highlight-current
               @node-click="handleNodeClick"
             />
           </el-scrollbar>
@@ -26,7 +32,6 @@
 </template>
 
 <script>
-import { agentSearch } from '@/api/agentManagement/agentList'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -37,34 +42,32 @@ export default {
         children: 'SubAgentLevelInfos',
         label: 'AgentName'
       },
-      agentInfo: {},
-      dataLoading: false
+      filterText: ''
     }
   },
   computed: {
     ...mapGetters([
       'agentLevelSidebar',
-      'agentLevel'
+      'agentLevel',
+      'agentLevelLoading',
+      'agentLevelExpandedKeys'
     ]),
     treeDefaultExpandedKeys() {
-      return this.agentLevel.length === 0 ? [] : [this.agentInfo.id]
+      return (!this.agentLevelExpandedKeys || this.agentLevelExpandedKeys.length === 0) ? [] : this.agentLevelExpandedKeys
     }
   },
   watch: {
-    agentLevelSidebar(value) {
-      if (value) {
-        this.dataLoading = true
-        agentSearch().then((res) => {
-          this.$store.dispatch('app/setAgentLevel', res.agentLevel)
-          this.agentInfo = res.agentInfo
-          this.dataLoading = false
-        })
-      }
+    filterText(val) {
+      this.$refs.tree.filter(val)
     }
   },
   methods: {
+    filterNode(value, data) {
+      if (!value) return true
+      return data.AgentName.indexOf(value) !== -1
+    },
     onHandleBtnClick() {
-      this.$store.dispatch('app/closeAgentLevelSideBar')
+      this.$store.dispatch('agentManagement/closeAgentLevelSideBar')
     },
     renderContent(h, { node, data, store }) {
       return (
@@ -74,10 +77,9 @@ export default {
       )
     },
     async handleNodeClick(data) {
-      this.dataLoading = true
-      this.$store.dispatch('app/setAgentId', data.AgentId)
-      await this.$router.push({ path: '/agentManagement/agentManagement', query: { agentId: data.AgentId }})
-      this.dataLoading = false
+      this.$store.dispatch('agentManagement/setAgentLevelLoading', true)
+      await this.$router.push({ path: `/agentManagement/agentManagement/${data.AgentId}` })
+      this.$store.dispatch('agentManagement/setAgentLevelLoading', false)
     }
   }
 }

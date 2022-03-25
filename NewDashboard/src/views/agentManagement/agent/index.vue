@@ -13,22 +13,24 @@
       <el-table-column :label="$t('__agent')" align="center">
         <template slot-scope="scope">
           <span class="scope-content">{{ scope.row.fullName }}</span>
-          <el-button class="iconButton" type="primary" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
-          <el-button class="iconButton" type="primary" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
+          <br>
+          <el-button class="iconButton" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
+          <el-button class="iconButton" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column prop="currency" :label="$t('__currency')" align="center" />
       <el-table-column :label="$t('__balance')" align="center">
         <template slot-scope="scope">
           <span class="scope-content">{{ scope.row.balance }}</span>
-          <el-button class="labelButton" type="primary" size="mini" @click="onDepositBtnClick(scope.row)">{{ $t("__deposit") }}</el-button>
-          <el-button class="labelButton labelWithdrawButton" type="primary" size="mini" @click="onWithdrawBtnClick(scope.row)">{{ $t("__withdraw") }}</el-button>
+          <br>
+          <el-button class="labelButton bg-yellow" size="mini" @click="onDepositBtnClick(scope.row)">{{ $t("__deposit") }}</el-button>
+          <el-button class="labelButton bg-yellow" size="mini" @click="onWithdrawBtnClick(scope.row)">{{ $t("__withdraw") }}</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="timeZone.city_name" :label="$t('__timeZone')" align="center" />
       <el-table-column :label="$t('_handicapLimit')" align="center">
         <template slot-scope="scope">
-          <el-button class="labelButton" type="primary" size="mini" @click="onLimitBtnClick(scope.row.handicaps)">{{ $t("_handicapLimit") }}</el-button>
+          <el-button class="labelButton bg-yellow" size="mini" @click="onLimitBtnClick(scope.row.handicaps)">{{ $t("_handicapLimit") }}</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="directAgentCount" :label="$t('__directAgentCount')" align="center" />
@@ -36,79 +38,75 @@
       <el-table-column :label="$t('__liveCommissionRate')" align="center">
         <template slot-scope="scope">
           <span class="scope-content">{{ numberFormatStr(scope.row.live_commission_rate) + '%' }}</span>
-          <el-button class="iconButton" type="primary" size="mini" icon="el-icon-tickets" @click="onCommissionRateLogBtnClick(scope.row)" />
+          <el-button class="iconButton" size="mini" icon="el-icon-tickets" @click="onCommissionRateLogBtnClick(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column :label="$t('__liveRollingRate')" align="center">
         <template slot-scope="scope">
           <span class="scope-content">{{ numberFormatStr(scope.row.live_rolling_rate) + '%' }}</span>
-          <el-button class="iconButton" type="primary" size="mini" icon="el-icon-tickets" @click="onRollingRateLogBtnClick(scope.row)" />
+          <el-button class="iconButton" size="mini" icon="el-icon-tickets" @click="onRollingRateLogBtnClick(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
       <el-table-column prop="lastLoginAt" :label="$t('__lastLoginAt')" align="center" />
       <el-table-column :label="$t('__operate')" align="center" width="auto">
         <template slot-scope="scope">
-          <el-checkbox v-model="scope.row.totallyDisabled" :label="$t('__totallyDisabled')" @mousedown.native="onOperateCheckboxClick(dialogEnum.totallyDisabled, scope.row.id)" />
-          <el-checkbox v-model="scope.row.lockLogin" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row.id)" />
-          <el-checkbox v-model="scope.row.debarBet" :label="$t('__debarBet')" @mousedown.native="onOperateCheckboxClick(dialogEnum.debarBet, scope.row.id)" />
+          <el-checkbox v-model="scope.row.totallyDisabled" class="red-tick" :label="$t('__totallyDisabled')" @mousedown.native="onOperateCheckboxClick(dialogEnum.totallyDisabled, scope.row)" />
+          <br>
+          <el-checkbox v-model="scope.row.lockLogin" class="red-tick" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row)" />
+          <br>
+          <el-checkbox v-model="scope.row.debarBet" class="red-tick" :label="$t('__debarBet')" @mousedown.native="onOperateCheckboxClick(dialogEnum.debarBet, scope.row)" />
         </template>
       </el-table-column>
     </el-table>
 
     <el-pagination
-      layout="prev, pager, next, jumper"
+      layout="prev, pager, next, jumper, sizes"
       class="agent-pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
+      :page-sizes="pageSizes"
       :current-page.sync="currentPage"
+      @size-change="handleSizeChange"
       @current-change="handlePageChangeByClient"
     />
 
-    <ModPasswordDialog
+    <modPasswordDialog
       ref="modPasswordDialog"
       :title="$t('__modPassword')"
       :visible="curDialogIndex === dialogEnum.modPassword"
       :confirm="$t('__revise')"
-      :name-label="$t('__agent')"
+      :name-label="`${$t('__agent')}: `"
       :form="editForm"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
       @modPassword="modPassword"
     />
 
-    <AgentRateLogDialog
+    <agentRateLogDialog
       :title="$t('__liveCommissionRate')"
       :visible="curDialogIndex === dialogEnum.liveCommissionRate"
       :list-data="rateData"
       :operation-type="1"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
     />
 
-    <AgentRateLogDialog
+    <agentRateLogDialog
       :title="$t('__liveRollingRate')"
       :visible="curDialogIndex === dialogEnum.liveRollingRate"
       :list-data="rateData"
       :operation-type="2"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
     />
 
-    <LimitDialog
+    <limitDialog
       :title="$t('_handicapLimit')"
       :visible="curDialogIndex === dialogEnum.limit"
       :handicaps="handicaps"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
     />
 
-    <BalanceDialog
+    <balanceDialog
       ref="depositBalanceDialog"
       :title="$t('__depositBalance')"
       :visible="curDialogIndex === dialogEnum.depositBalance"
@@ -116,13 +114,11 @@
       :form="editForm"
       :operation-type="1"
       :mode-type="1"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
       @depositBalance="depositBalance"
     />
 
-    <BalanceDialog
+    <balanceDialog
       ref="withdrawBalanceDialog"
       :title="$t('__withdrawBalance')"
       :visible="curDialogIndex === dialogEnum.withdrawBalance"
@@ -130,13 +126,11 @@
       :form="editForm"
       :operation-type="2"
       :mode-type="1"
-      :pc-width="'35%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
       @withdrawBalance="withdrawBalance"
     />
 
-    <AgentEditDialog
+    <agentEditDialog
       ref="editDialog"
       :title="$t('__editSubAgent')"
       :visible="curDialogIndex === dialogEnum.edit"
@@ -145,13 +139,11 @@
       :confirm="$t('__revise')"
       :form="editForm"
       :step-enum="editStepEnum"
-      :pc-width="'30%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="editSuccess"
+      @editSuccess="handleRespone"
     />
 
-    <AgentEditDialog
+    <agentEditDialog
       ref="createDialog"
       :title="$t('__addSubAgent')"
       :visible="curDialogIndex === dialogEnum.create"
@@ -160,37 +152,43 @@
       :confirm="$t('__confirm')"
       :form="editForm"
       :step-enum="editStepEnum"
-      :pc-width="'30%'"
-      :mobile-width="'40%'"
       @close="closeDialogEven"
-      @editSuccess="editSuccess"
+      @editSuccess="createDialogEditSuccess"
     />
 
-    <OperateDialog
+    <operateDialog
+      ref="totallyDisabledDialog"
       :visible="curDialogIndex === dialogEnum.totallyDisabled"
-      :content="'確定要改變狀態嗎?'"
+      :content="$stringFormat($t('__agentTotallyDisabledMsg'), operateDialogMsgParameter)"
       :form="editForm"
-      :submit-fun="onOperateSubmitFun"
       @close="closeDialogEven"
-      @editSuccess="editSuccess"
+      @onSubmit="operateSubmit"
     />
 
-    <OperateDialog
+    <operateDialog
+      ref="lockLoginDialog"
       :visible="curDialogIndex === dialogEnum.lockLogin"
-      :content="'確定要改變狀態嗎?'"
+      :content="$stringFormat($t('__agentLockLoginMsg'), operateDialogMsgParameter)"
       :form="editForm"
-      :submit-fun="onOperateSubmitFun"
       @close="closeDialogEven"
-      @editSuccess="editSuccess"
+      @onSubmit="operateSubmit"
     />
 
-    <OperateDialog
+    <operateDialog
+      ref="debarBetDialog"
       :visible="curDialogIndex === dialogEnum.debarBet"
-      :content="'確定要改變狀態嗎?'"
+      :content="$stringFormat($t('__agentDebarBetMsg'), operateDialogMsgParameter)"
       :form="editForm"
-      :submit-fun="onOperateSubmitFun"
       @close="closeDialogEven"
-      @editSuccess="editSuccess"
+      @onSubmit="operateSubmit"
+    />
+
+    <passwordTipDialog
+      :title="$t('__tip')"
+      :visible="curDialogIndex === dialogEnum.passwordTip"
+      :confirm="$t('__confirm')"
+      :form="editForm"
+      @close="closeDialogEven"
     />
   </div>
 </template>
@@ -198,7 +196,7 @@
 <script>
 import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword,
   agentGetSetBalanceInfo, agentDepositBalance, agentWithdrawBalance, agentModTotallyDisabled,
-  agentModStatus, agentModBetStatus } from '@/api/agentManagement/agentList'
+  agentModStatus, agentModBetStatus } from '@/api/agentManagement/agent'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import { currencySearch } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
@@ -209,6 +207,7 @@ import LimitDialog from '@/views/agentManagement/limitDialog'
 import AgentRateLogDialog from './agentRateLogDialog'
 import BalanceDialog from '@/views/agentManagement/balanceDialog'
 import OperateDialog from '@/views/agentManagement/operateDialog'
+import PasswordTipDialog from '@/views/agentManagement/passwordTipDialog'
 import { numberFormat } from '@/utils/numberFormat'
 
 const defaultForm = {
@@ -235,7 +234,7 @@ const editFormStepEnum = Object.freeze({ 'agentInfo': 0, 'rate': 1, 'limit': 2, 
 
 export default {
   name: 'Agent',
-  components: { AgentEditDialog, ModPasswordDialog, LimitDialog, AgentRateLogDialog, BalanceDialog, OperateDialog },
+  components: { AgentEditDialog, ModPasswordDialog, LimitDialog, AgentRateLogDialog, BalanceDialog, OperateDialog, PasswordTipDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -260,55 +259,76 @@ export default {
         'withdrawBalance': 8,
         'totallyDisabled': 9,
         'lockLogin': 10,
-        'debarBet': 11
+        'debarBet': 11,
+        'passwordTip': 12
       }),
       handicaps: [],
       agentInfo: {},
       editForm: {},
       editStepEnum: {},
       rateData: [],
-      curDialogIndex: 0
+      curDialogIndex: 0,
+      operateDialogMsgParameter: []
     }
   },
   methods: {
-    onOperateSubmitFun(data) {
+    operateSubmit(data) {
       switch (this.curDialogIndex) {
         case this.dialogEnum.totallyDisabled: {
-          return agentModTotallyDisabled(data).then((res) => {
-            return res
+          this.$refs.totallyDisabledDialog.setDialogLoading(true)
+          agentModTotallyDisabled(data).then((res) => {
+            this.handleRespone(res)
+            this.$refs.totallyDisabledDialog.setDialogLoading(false)
+          }).catch(() => {
+            this.$refs.totallyDisabledDialog.setDialogLoading(false)
           })
+          break
         }
         case this.dialogEnum.lockLogin: {
-          return agentModStatus(data).then((res) => {
-            return res
+          this.$refs.lockLoginDialog.setDialogLoading(true)
+          agentModStatus(data).then((res) => {
+            this.handleRespone(res)
+            this.$refs.lockLoginDialog.setDialogLoading(false)
+          }).catch(() => {
+            this.$refs.lockLoginDialog.setDialogLoading(false)
           })
+          break
         }
         case this.dialogEnum.debarBet: {
-          return agentModBetStatus(data).then((res) => {
-            return res
+          this.$refs.debarBetDialog.setDialogLoading(true)
+          agentModBetStatus(data).then((res) => {
+            this.handleRespone(res)
+            this.$refs.debarBetDialog.setDialogLoading(false)
+          }).catch(() => {
+            this.$refs.debarBetDialog.setDialogLoading(false)
           })
+          break
         }
       }
     },
-    onOperateCheckboxClick(operateType, id) {
-      this.editForm = { id: id }
+    onOperateCheckboxClick(operateType, rowData) {
+      this.editForm = { id: rowData.id }
       switch (operateType) {
         case this.dialogEnum.totallyDisabled: {
           this.curDialogIndex = this.dialogEnum.totallyDisabled
+          this.operateDialogMsgParameter = [rowData.fullName]
           break
         }
         case this.dialogEnum.lockLogin: {
           this.curDialogIndex = this.dialogEnum.lockLogin
+          this.operateDialogMsgParameter = [rowData.fullName]
           break
         }
         case this.dialogEnum.debarBet: {
           this.curDialogIndex = this.dialogEnum.debarBet
+          this.operateDialogMsgParameter = [rowData.fullName]
           break
         }
       }
     },
     // 父物件呼叫
     async create() {
+      this.setDataLoading(true)
       const timezone = await timezoneSearch({})
       this.$refs.createDialog.setTimeZone(timezone)
       if (this.agentInfo.id === 1) {
@@ -318,12 +338,13 @@ export default {
       this.editForm = JSON.parse(JSON.stringify(defaultForm))
       this.editStepEnum = createFormStepEnum
       this.curDialogIndex = this.dialogEnum.create
+      this.setDataLoading(false)
     },
-    // 父物件呼叫
-    setTableData(rows, agentInfo) {
-      this.agentInfo = agentInfo
+    handleRespone(res) {
+      this.agentInfo = res.agentInfo
+      this.agentInfo.fullName = this.agentInfo.nickname + '(' + this.agentInfo.account + ')'
 
-      this.allDataByClient = rows
+      this.allDataByClient = res.rows
       this.allDataByClient.forEach(element => {
         element.fullName = element.nickname + '(' + element.account + ')'
         element.currency = element.currency.code
@@ -332,8 +353,17 @@ export default {
         element.lockLogin = element.status === '0'
         element.debarBet = element.bet_status === '0'
       })
-      this.totalCount = rows.length
+      this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)
+
+      this.closeDialogEven()
+      this.$emit('serverResponse', JSON.parse(JSON.stringify(res)))
+    },
+    createDialogEditSuccess(res) {
+      this.handleRespone(res)
+      const data = JSON.parse(JSON.stringify(this.editForm))
+      this.editForm = { account: data.account, newPassword: data.password }
+      this.curDialogIndex = this.dialogEnum.passwordTip
     },
     setDataLoading(dataLoading) {
       this.$emit('setDataLoading', dataLoading)
@@ -341,13 +371,17 @@ export default {
     numberFormatStr(number) {
       return numberFormat(number)
     },
-    onSubmit() {
-      this.searchAgentInfo({})
+    // 父物件呼叫
+    onSearch(agentId) {
+      this.agentInfo.id = agentId
+      this.handleCurrentChange(1)
     },
-    searchAgentInfo(sarchData) {
+    onSubmit() {
       this.setDataLoading(true)
-      agentSearch(sarchData).then((res) => {
-        this.$emit('serverResponse', res)
+      agentSearch({ agentId: this.agentInfo.id }).then((res) => {
+        this.handleRespone(res)
+      }).catch(() => {
+        this.setDataLoading(false)
       })
     },
     onLimitBtnClick(handicaps) {
@@ -360,6 +394,8 @@ export default {
         this.curDialogIndex = this.dialogEnum.liveCommissionRate
         this.rateData = res.rows
         this.setDataLoading(false)
+      }).catch(() => {
+        this.setDataLoading(false)
       })
     },
     onRollingRateLogBtnClick(rowData) {
@@ -367,6 +403,8 @@ export default {
       agentRollingRateLog({ agentId: rowData.id, cate: 'live' }).then((res) => {
         this.curDialogIndex = this.dialogEnum.liveRollingRate
         this.rateData = res.rows
+        this.setDataLoading(false)
+      }).catch(() => {
         this.setDataLoading(false)
       })
     },
@@ -381,6 +419,8 @@ export default {
       agentGetSetBalanceInfo({ agentId: rowData.id }).then((res) => {
         this.$refs.depositBalanceDialog.setBalanceInfo(res.rows)
         this.$refs.depositBalanceDialog.setDialogLoading(false)
+      }).catch(() => {
+        this.$refs.depositBalanceDialog.setDialogLoading(false)
       })
     },
     onWithdrawBtnClick(rowData) {
@@ -389,6 +429,8 @@ export default {
       this.$refs.withdrawBalanceDialog.setDialogLoading(true)
       agentGetSetBalanceInfo({ agentId: rowData.id }).then((res) => {
         this.$refs.withdrawBalanceDialog.setBalanceInfo(res.rows)
+        this.$refs.withdrawBalanceDialog.setDialogLoading(false)
+      }).catch(() => {
         this.$refs.withdrawBalanceDialog.setDialogLoading(false)
       })
     },
@@ -403,35 +445,33 @@ export default {
       this.setDataLoading(false)
     },
     modPassword(data) {
+      this.$refs.modPasswordDialog.setDialogLoading(true)
       agentModPassword(data).then((res) => {
+        this.handleRespone(res)
         this.$refs.modPasswordDialog.setDialogLoading(false)
-        this.$emit('serverResponse', res)
-        this.closeDialogEven()
+        this.editForm = { account: data.account, newPassword: data.newPassword }
+        this.curDialogIndex = this.dialogEnum.passwordTip
       }).catch(() => {
         this.$refs.modPasswordDialog.setDialogLoading(false)
       })
     },
     depositBalance(data) {
+      this.$refs.depositBalanceDialog.setDialogLoading(true)
       agentDepositBalance(data).then((res) => {
+        this.handleRespone(res)
         this.$refs.depositBalanceDialog.setDialogLoading(false)
-        this.$emit('serverResponse', res)
-        this.closeDialogEven()
       }).catch(() => {
         this.$refs.depositBalanceDialog.setDialogLoading(false)
       })
     },
     withdrawBalance(data) {
+      this.$refs.withdrawBalanceDialog.setDialogLoading(true)
       agentWithdrawBalance(data).then((res) => {
+        this.handleRespone(res)
         this.$refs.withdrawBalanceDialog.setDialogLoading(false)
-        this.$emit('serverResponse', res)
-        this.closeDialogEven()
       }).catch(() => {
         this.$refs.withdrawBalanceDialog.setDialogLoading(false)
       })
-    },
-    editSuccess(res) {
-      this.$emit('serverResponse', res)
-      this.closeDialogEven()
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none
@@ -470,7 +510,7 @@ export default {
   padding-right: 5px;
 }
 
-.labelWithdrawButton {
+.el-button+.el-button {
   margin-left: 5px;
 }
 </style>

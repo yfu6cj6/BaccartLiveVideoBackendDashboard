@@ -1,58 +1,63 @@
 <template>
-  <div class="permissionManagement-container">
-    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__account')">
-        <el-input v-model="searchForm.account" />
-      </el-form-item>
-      <el-form-item class="inputTitle" label="IP">
-        <el-input v-model="searchForm.ip" />
-      </el-form-item>
-      <el-form-item>
-        <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-folder-opened" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
-      </el-form-item>
+  <div v-loading="dataLoading" class="view-container">
+    <el-row class="seachForm">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.account" :placeholder="$t('__account')" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.ip" placeholder="IP" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bg-gray" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-row>
 
-    </el-form>
-
-    <el-table v-loading="dataLoading" :data="tableData" border :height="viewHeight">
+    <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column prop="id" width="80" label="ID" align="center" />
       <el-table-column prop="account" :label="$t('__account')" align="center" />
       <el-table-column prop="ip" label="IP" align="center" />
       <el-table-column :label="$t('__operate')" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
-          <el-button type="primary" size="mini" icon="el-icon-delete" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button class="bg-red" size="mini" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-pagination
-      layout="prev, pager, next, jumper"
-      class="permissionManagement-pagination"
+      layout="prev, pager, next, jumper, sizes"
+      class="pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
+      :page-sizes="pageSizes"
       :current-page.sync="currentPage"
+      @size-change="handleSizeChange"
       @current-change="handlePageChangeByClient"
     />
 
-    <IpWhitelistDialog
+    <editDialog
+      ref="editDialog"
       :title="$t('__edit')"
-      :visible="editDialogVisible"
+      :visible="curDialogIndex === dialogEnum.edit"
       :confirm="$t('__revise')"
       :form="selectForm"
       @close="closeDialogEven"
       @confirm="editDialogConfirmEven"
     />
 
-    <IpWhitelistDialog
+    <editDialog
+      ref="createDialog"
       :title="$t('__create')"
-      :visible="createDialogVisible"
+      :visible="curDialogIndex === dialogEnum.create"
       :confirm="$t('__confirm')"
       :form="selectForm"
       @close="closeDialogEven"
@@ -66,24 +71,27 @@ import { whitelistSearch, whitelistCreate, whitelistEdit, whitelistDelete } from
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
-import IpWhitelistDialog from './ipWhitelistDialog'
+import EditDialog from './editDialog'
 
 export default {
   name: 'IpWhitelist',
-  components: { IpWhitelistDialog },
+  components: { EditDialog },
   mixins: [handlePageChange, shared, handleViewResize],
   data() {
     return {
+      dialogEnum: Object.freeze({
+        'none': 0,
+        'create': 1,
+        'edit': 2
+      }),
       searchForm: {},
       selectForm: {},
-      editDialogVisible: false,
-      createDialogVisible: false
+      curDialogIndex: 0
     }
   },
   computed: {
   },
   created() {
-    this.setHeight()
     this.handleCurrentChange(1)
   },
   methods: {
@@ -94,9 +102,13 @@ export default {
       this.allDataByClient = res
       this.totalCount = res.length
       this.handlePageChangeByClient(this.currentPage)
-      this.dataLoading = false
+
+      this.closeDialogEven()
+      this.closeLoading()
     },
-    handleResponeError() {
+    closeLoading() {
+      this.$refs.createDialog.setDialogLoading(false)
+      this.$refs.editDialog.setDialogLoading(false)
       this.dataLoading = false
     },
     onSubmit() {
@@ -107,87 +119,55 @@ export default {
       this.dataLoading = true
       whitelistSearch(data).then((res) => {
         this.handleRespone(res)
+      }).catch(() => {
+        this.closeLoading()
       })
     },
     onCreateBtnClick() {
       this.selectForm = {}
-      this.createDialogVisible = true
-      this.editDialogVisible = false
+      this.curDialogIndex = this.dialogEnum.create
     },
     createDialogConfirmEven(data) {
-      this.createDialogVisible = false
-      this.dataLoading = true
+      this.$refs.createDialog.setDialogLoading(true)
       whitelistCreate(data).then((res) => {
         this.handleRespone(res)
       }).catch(() => {
-        this.handleResponeError()
+        this.closeLoading()
       })
     },
     onEditBtnClick(item) {
       this.selectForm = JSON.parse(JSON.stringify(item))
-      this.createDialogVisible = false
-      this.editDialogVisible = true
+      this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(this.$t('__confirmChanges')).then(_ => {
-        this.editDialogVisible = false
-        this.dataLoading = true
+      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+        this.$refs.editDialog.setDialogLoading(true)
         whitelistEdit(data).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
-          this.handleResponeError()
+          this.closeLoading()
         })
       }).catch(_ => {})
     },
     onDeleteBtnClick(item) {
-      this.$confirm(this.$t('__confirmDeletion')).then(_ => {
+      this.$confirm(`${this.$t('__confirmDeletion')}?`).then(_ => {
         this.dataLoading = true
         whitelistDelete(item.id).then((res) => {
           this.handleRespone(res)
+        }).catch(() => {
+          this.closeLoading()
         })
       }).catch(_ => {})
     },
     closeDialogEven() {
-      this.createDialogVisible = false
-      this.editDialogVisible = false
+      this.curDialogIndex = this.dialogEnum.none
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.permissionManagement {
-  &-container {
-    margin: 5px;
-  }
-  &-pagination {
-    padding: 1em;
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-  }
-}
-
-.filterForm {
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-.el-form-item {
-  margin-bottom: 0px;
-}
-
-.inputTitle {
-  padding: 0px 0px 0px 5px;
-}
-
-.el-input {
-  width: 140px;
-}
-
-.el-select {
-  width: 110px;
+.view-container .el-form .el-form-item .el-input {
+  width: 160px;
 }
 </style>

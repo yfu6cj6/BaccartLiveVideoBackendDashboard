@@ -1,93 +1,94 @@
 <template>
-  <div class="operationLog-container">
-    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
-      </el-form-item>
-      <el-form-item class="inputTitle">
-        <el-select v-model="searchTimeType">
-          <el-option v-for="item in memberBetTimeType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="inputTitle">
-        <el-date-picker
-          v-model="searchTime"
-          type="datetimerange"
-          align="right"
-          unlink-panels
-          :range-separator="$t('__to')"
-          :start-placeholder="$t('__startDate')"
-          :end-placeholder="$t('__endDate')"
-          :picker-options="pickerOptions"
-        />
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__agent')">
-        <el-select v-model="searchForm.agent_id" multiple>
-          <el-option v-for="item in searchItems.agents" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__member')">
-        <el-select v-model="searchForm.member_id" multiple>
-          <el-option v-for="item in searchItems.members" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__orderNumber')">
-        <el-input v-model="searchForm.order_number" type="number" />
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__gameType')">
-        <el-select v-model="searchForm.game_type" multiple>
-          <el-option v-for="item in searchItems.gameType" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__roundId')">
-        <el-input v-model="searchForm.round_id" type="number" />
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__tableId')">
-        <el-select v-model="searchForm.table_id" multiple>
-          <el-option v-for="item in searchItems.tables" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__gameResult')">
-        <el-select v-model="searchForm.gameResult" multiple>
-          <el-option v-for="item in searchItems.gameResult" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__status')">
-        <el-select v-model="searchForm.status" multiple>
-          <el-option v-for="item in searchItems.orderStatus" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__gamePlay')">
-        <el-select v-model="searchForm.game_play" multiple>
-          <el-option v-for="item in searchItems.game_play" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__betAmount')">
-        <el-input v-model="searchForm.bet_amount" type="number" />
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__payout')">
-        <el-input v-model="searchForm.payout" type="number" />
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__validBetAmount')">
-        <el-input v-model="searchForm.valid_bet_amount" type="number" />
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__device')">
-        <el-select v-model="searchForm.device" multiple>
-          <el-option v-for="item in searchItems.deviceType" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item class="inputTitle" label="IP">
-        <el-input v-model="searchForm.user_ip" />
-      </el-form-item>
-      <el-form-item>
-        <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-download" @click="onExportBtnClick()">{{ $t("__export") }}</el-button>
-      </el-form-item>
-    </el-form>
+  <div v-loading="dataLoading" class="view-container">
+    <el-row class="seachForm">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchTimeType" filterable class="memberBetTimeType">
+            <el-option v-for="item in memberBetTimeType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker
+            v-model="searchTime"
+            type="datetimerange"
+            align="right"
+            unlink-panels
+            :range-separator="$t('__to')"
+            :start-placeholder="$t('__startDate')"
+            :end-placeholder="$t('__endDate')"
+            :picker-options="pickerOptions"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.agent_id" multiple filterable :placeholder="$t('__agent')">
+            <el-option v-for="item in searchItems.agents" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.member_id" multiple filterable :placeholder="$t('__member')">
+            <el-option v-for="item in searchItems.members" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.order_number" :placeholder="$t('__orderNumber')" />
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.game_type" multiple filterable :placeholder="$t('__gameType')">
+            <el-option v-for="item in searchItems.gameType" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.round_id" :placeholder="$t('__roundId')" />
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.table_id" multiple filterable :placeholder="$t('__tableId')">
+            <el-option v-for="item in searchItems.tables" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.gameResult" multiple filterable :placeholder="$t('__gameResult')">
+            <el-option v-for="item in searchItems.gameResult" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.status" multiple filterable :placeholder="$t('__status')">
+            <el-option v-for="item in searchItems.orderStatus" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.game_play" multiple filterable :placeholder="$t('__gamePlay')">
+            <el-option v-for="item in searchItems.game_play" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.bet_amount" type="number" :placeholder="$t('__betAmount')" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.payout" type="number" :placeholder="$t('__result')" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.valid_bet_amount" type="number" :placeholder="$t('__validBetAmount')" />
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.device" multiple filterable :placeholder="$t('__device')">
+            <el-option v-for="item in searchItems.deviceType" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.user_ip" placeholder="IP" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bg-gray" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onExportBtnClick()">{{ $t("__searchAndExport") }}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-row>
 
     <el-table
-      v-loading="dataLoading"
       :data="tableData"
       border
       :max-height="viewHeight"
@@ -105,8 +106,16 @@
         <el-table-column prop="round_id" :width="roundIdWidth" :label="$t('__roundId')" align="center" />
         <el-table-column :width="gameResultWidth" :label="$t('__gameResult')" align="center">
           <template slot-scope="scope">
-            {{ scope.row.gameResult.resultLabel }}
-            <span class="gameResultPoints">
+            <span
+              :class="{
+                'banker': scope.row.gameResult.result === 0,
+                'player': scope.row.gameResult.result === 1,
+                'tie': scope.row.gameResult.result === 2,
+              }"
+            >
+              {{ scope.row.gameResult.resultLabel }}
+            </span>
+            <span>
               {{ scope.row.gameResultPoints }}
             </span>
           </template>
@@ -118,7 +127,7 @@
         <el-table-column prop="bet_amount" :width="betAmountWidth" :label="$t('__betAmount')" align="center" />
       </el-table-column>
       <el-table-column :label="totalInfo.payout" align="center">
-        <el-table-column prop="payout" :width="payoutWidth" :label="$t('__payout')" align="center" />
+        <el-table-column prop="payout" :width="payoutWidth" :label="$t('__result')" align="center" />
       </el-table-column>
       <el-table-column :label="totalInfo.valid_bet_amount" align="center">
         <el-table-column prop="valid_bet_amount" :width="validBetAmountWidth" :label="$t('__validBetAmount')" align="center" />
@@ -130,12 +139,14 @@
     </el-table>
 
     <el-pagination
-      layout="prev, pager, next, jumper"
-      class="operationLog-pagination"
+      layout="prev, pager, next, jumper, sizes"
+      class="pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
+      :page-sizes="pageSizes"
       :current-page.sync="currentPage"
+      @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
 
@@ -230,7 +241,7 @@ export default {
       return this.calculateHeaderWidth(this.$t('__betAmount'), 'bet_amount', 8) + 'px'
     },
     payoutWidth() {
-      return this.calculateHeaderWidth(this.$t('__payout'), 'payout', 9.5) + 'px'
+      return this.calculateHeaderWidth(this.$t('__result'), 'payout', 9.5) + 'px'
     },
     validBetAmountWidth() {
       return this.calculateHeaderWidth(this.$t('__validBetAmount'), 'valid_bet_amount', 8) + 'px'
@@ -241,18 +252,11 @@ export default {
   },
   created() {
     this.$store.dispatch('memberBet/setMemberBetTimeType')
-    this.setHeight()
     this.handleCurrentChange(1)
   },
   methods: {
     tableRowClassName({ row, rowIndex }) {
-      if (row.gameResult.result === 0) {
-        return 'bankerWin-member'
-      } else if (row.gameResult.result === 1) {
-        return 'playerWin-member'
-      } else if (row.gameResult.result === 2) {
-        return 'tie-member'
-      } else if (rowIndex >= this.tableData.length - 2) {
+      if (rowIndex >= this.tableData.length - 2) {
         return 'settlement-member'
       }
       return ''
@@ -279,10 +283,10 @@ export default {
     calculateWidth(defaultText, key, charWidth) {
       let width = defaultText.length * 24.5
       for (let i = 0, max = this.tableData.length; i < max; i++) {
-        if (i >= max - 2) {
+        const element = this.tableData[i]
+        if (i >= max - 2 || !element[key]) {
           continue
         }
-        const element = this.tableData[i]
         const str = element[key].toString()
         const fontWidth = str.length * charWidth
         if (width < fontWidth) {
@@ -339,29 +343,34 @@ export default {
         element.gameResultPoints = '[' + pointResult + ']'
         element.game_play = element.game_play.nickname
       }
-      this.currentPage = res.currentPage
       this.totalCount = res.totalCount
       this.dataLoading = false
     },
     onSubmit() {
-      this.searchForm.page = this.currentPage
-      this.searchForm.rowsCount = this.pageSize
-      this.handleRequest(this.searchForm)
-      memberBetSearch(this.searchForm).then((res) => {
+      const data = JSON.parse(JSON.stringify(this.searchForm))
+      data.page = this.currentPage
+      data.rowsCount = this.pageSize
+      this.handleRequest(data)
+      memberBetSearch(data).then((res) => {
         this.handleRespone(res)
+      }).catch(() => {
+        this.dataLoading = false
       })
     },
     onExportBtnClick() {
-      this.handleRequest(this.searchForm)
-      memberBetExport(this.searchForm).then((res) => {
+      const data = JSON.parse(JSON.stringify(this.searchForm))
+      this.handleRequest(data)
+      memberBetExport(data).then((res) => {
         this.searchForm[this.searchTimeType] = undefined
         this.onDataOut(res.rows)
+        this.dataLoading = false
+      }).catch(() => {
         this.dataLoading = false
       })
     },
     onDataOut(tableData) {
       require.ensure([], () => {
-        const { export_json_to_excel } = require('@/vendor/Export2Excel')
+        const { export_json_to_excel, formatJson } = require('@/vendor/Export2Excel')
         const tHeader = []
         const filterVal = []
         for (const item in tableData[0]) {
@@ -370,12 +379,9 @@ export default {
         }
         tableData.splice(0, 1)
         const list = JSON.parse(JSON.stringify(tableData))
-        const data = this.formatJson(filterVal, list)
+        const data = formatJson(filterVal, list)
         export_json_to_excel({ header: tHeader, data: data, filename: 'MemberBet_' + getFullDateString(new Date()) })
       })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map((v) => filterVal.map(j => v[j]))
     }
   }
 }
@@ -395,64 +401,37 @@ export default {
   text-align: right;
   padding-right: 35px !important;
 }
+</style>
 
-.el-table .bankerWin-member td:nth-child(8) {
+<style lang="scss" scoped>
+.view-container .el-form .el-form-item .el-input {
+  width: 160px;
+}
+
+.el-select {
+  width: 190px;
+}
+
+.memberBetTimeType {
+  width: 110px;
+}
+
+.banker {
   color: red;
   font-weight: bolder;
 }
 
-.el-table .playerWin-member td:nth-child(8) {
+.player {
   color: blue;
   font-weight: bolder;
 }
 
-.el-table .tie-member td:nth-child(8) {
+.tie {
   color: green;
   font-weight: bolder;
 }
-</style>
 
-<style lang="scss" scoped>
-.operationLog {
-  &-container {
-    margin: 5px;
-  }
-  &-pagination {
-    padding: 1em;
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-  }
-}
-
-.filterForm {
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-.el-form-item {
-  margin-bottom: 0px;
-}
-
-.inputTitle {
-  padding: 0px 0px 0px 5px;
-}
-
-.el-table {
-  width: 100%;
-}
-
-.el-select {
-  width: 270px;
-}
-
-.el-input {
-  width: 140px;
-}
-
-.gameResultPoints {
+span {
   color: black;
 }
 </style>

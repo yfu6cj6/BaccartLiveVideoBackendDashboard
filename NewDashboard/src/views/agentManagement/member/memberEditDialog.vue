@@ -1,7 +1,7 @@
 <template>
-  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false">
-    <label class="agentName">{{ $t('__superiorAgent') + ': ' }}
-      <span>{{ agentInfo.fullName }}</span>
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <label class="agentNameLabel">{{ `${$t('__superiorAgent')}: ` }}
+      <span class="agentNameSpan">{{ agentInfo.fullName }}</span>
     </label>
     <el-steps v-if="visible" :active="curIndex" align-center finish-status="success">
       <el-step v-if="hasStep('memberInfo')" :description="$t('__memberInfo')" />
@@ -10,12 +10,12 @@
       <el-step v-if="hasStep('balanceConfig')" :description="$t('__balanceConfig')" />
       <el-step v-if="hasStep('confirm')" :description="$t('__confirm')" />
     </el-steps>
-    <el-form v-show="curIndex === stepEnum.memberInfo" ref="step1" :model="form" :rules="step1Rules">
+    <el-form v-show="curIndex === stepEnum.memberInfo" ref="step1" :model="form" :rules="step1Rules" label-width="80px" :label-position="formLabelPosition">
       <el-form-item :label="$t('__accountGenerateMode')">
         <el-switch
           v-model="autoGenerateAccount"
-          active-color="blue"
-          inactive-color="blue"
+          active-color="#f9c901"
+          inactive-color="#f9c901"
           :active-text="$t('__auto')"
           :inactive-text="$t('__manual')"
         />
@@ -51,21 +51,30 @@
         <el-input v-model="form.remark" type="textarea" :rows="2" />
       </el-form-item>
     </el-form>
-    <el-form v-show="curIndex === stepEnum.rate" ref="step2" :model="form" :rules="step2Rules">
+    <el-form v-show="curIndex === stepEnum.rate" ref="step2" :model="form" :rules="step2Rules" label-width="120px" :label-position="formLabelPosition">
       <el-form-item :label="$t('__liveRollingRate')" prop="live_rolling_rate">
-        <el-input v-model="form.live_rolling_rate" type="number" :disabled="agentInfo.live_rolling_rate === 0" min="0" :max="agentInfo.live_rolling_rate" />
-        <span class="step2Tip">{{ rollingRateTip }}</span>
+        <el-input v-model="form.live_rolling_rate" class="step2Input" type="number" :disabled="agentInfo.live_rolling_rate === 0" min="0" :max="agentInfo.live_rolling_rate" />
+        <span class="step2Span">{{ rollingRateTip }}</span>
       </el-form-item>
       <el-form-item :label="$t('__maxWinAmountLimit')" prop="max_win_amount_limit">
-        <el-input v-model="form.max_win_amount_limit" type="number" min="0" />
-        <span class="step2Tip">{{ $t('__zeroMeansNoLimit') }}</span>
+        <el-input v-model="form.max_win_amount_limit" class="step2Input" type="number" min="0" />
+        <span class="step2Span">{{ $t('__zeroMeansNoLimit') }}</span>
       </el-form-item>
       <el-form-item :label="$t('__maxLoseAmountLimit')" prop="max_lose_amount_limit">
-        <el-input v-model="form.max_lose_amount_limit" type="number" min="0" />
-        <span class="step2Tip">{{ $t('__zeroMeansNoLimit') }}</span>
+        <el-input v-model="form.max_lose_amount_limit" class="step2Input" type="number" min="0" />
+        <span class="step2Span">{{ $t('__zeroMeansNoLimit') }}</span>
       </el-form-item>
     </el-form>
-    <el-table v-show="curIndex === stepEnum.limit" ref="handicapsTable" :data="agentInfo.handicaps" tooltip-effect="dark" @selection-change="handleSelectionHandicaps">
+    <el-table
+      v-show="curIndex === stepEnum.limit"
+      ref="handicapsTable"
+      :data="agentInfo.handicaps"
+      tooltip-effect="dark"
+      header-cell-class-name="bg-black_table_header"
+      row-class-name="bg-black_table_col"
+      style="background: black;"
+      @selection-change="handleSelectionHandicaps"
+    >
       <el-table-column type="selection" align="center" />
       <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
@@ -73,94 +82,107 @@
       <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" :show-overflow-tooltip="true" />
       <el-table-column prop="currency" :label="$t('__currency')" align="center" :show-overflow-tooltip="true" />
     </el-table>
-    <el-form v-show="curIndex === stepEnum.balanceConfig" ref="step4" :model="form" :rules="step4Rules">
-      <label>{{ $t('__superiorAgent') + ': ' }}
-        <span>{{ agentInfo.fullName }}</span>
-      </label>
-      <br>
-      <label>{{ $t('__agentBalance') + ': ' }}
-        <span>{{ parentBalance }}</span>
-      </label>
-      <br>
-      <label>{{ $t('__member') + ': ' }}
-        <span>{{ form.nick_name }}</span>
-      </label>
-      <br>
-      <label>{{ $t('__memberBalance') + ': ' }}
-        <span>{{ numberFormatStr(0) }}</span>
-      </label>
+    <el-form v-show="curIndex === stepEnum.balanceConfig" ref="step4" :model="form" :rules="step4Rules" label-width="70px" :label-position="formLabelPosition">
+      <div class="step4Info">
+        <label>{{ $t('__superiorAgent') + ': ' }}
+          <span>{{ agentInfo.fullName }}</span>
+        </label>
+        <br>
+        <label>{{ $t('__agentBalance') + ': ' }}
+          <span>{{ parentBalance }}</span>
+        </label>
+        <br>
+        <label>{{ $t('__member') + ': ' }}
+          <span>{{ form.nick_name }}</span>
+        </label>
+        <br>
+        <label>{{ $t('__memberBalance') + ': ' }}
+          <span>{{ numberFormatStr(0) }}</span>
+        </label>
+      </div>
       <el-form-item :label="$t('__depositBalance')" prop="balance">
         <el-input v-model="form.balance" type="number" :disabled="balanceDisable" min="0" />
       </el-form-item>
     </el-form>
-    <el-form v-show="curIndex === stepEnum.confirm" ref="step5" :model="form" :rules="step5Rules">
+    <el-form v-show="curIndex === stepEnum.confirm" ref="step5" :model="form" :rules="step5Rules" label-width="80px" :label-position="formLabelPosition">
       <el-row>
         <el-col :span="12">
-          <label>{{ $t('__memberInfo') }}</label>
-          <br>
-          <label>{{ $t('__memberAccount') }}
-            <span>{{ form.name }}</span>
-          </label>
-          <br>
-          <label>{{ $t('__memberNickname') }}
-            <span>{{ form.nick_name }}</span>
-          </label>
-          <br>
-          <label>{{ $t('__timeZone') }}
-            <span>{{ timeZoneCityName }}</span>
-          </label>
-          <br>
-          <template v-if="operationType===operationEnum.create">
-            <label>{{ $t('__balance') }}
-              <span>{{ numberFormatStr(form.balance) }}</span>
+          <label class="step5Header">{{ $t('__memberInfo') }}</label>
+          <div class="v-line96" />
+          <div class="step5Info">
+            <label>{{ $t('__memberAccount') }}
+              <span>{{ form.name }}</span>
             </label>
             <br>
-          </template>
-          <label>{{ $t('__remark') }}
-            <span>{{ form.remark }}</span>
-          </label>
+            <label>{{ $t('__memberNickname') }}
+              <span>{{ form.nick_name }}</span>
+            </label>
+            <br>
+            <label>{{ $t('__timeZone') }}
+              <span>{{ timeZoneCityName }}</span>
+            </label>
+            <br>
+            <template v-if="operationType===operationEnum.create">
+              <label>{{ $t('__balance') }}
+                <span>{{ numberFormatStr(form.balance) }}</span>
+              </label>
+              <br>
+            </template>
+            <label>{{ $t('__remark') }}
+              <span>{{ form.remark }}</span>
+            </label>
+          </div>
         </el-col>
         <el-col :span="12">
-          <label>{{ $t('__rollingRateAndLimit') }}</label>
-          <br>
-          <label>{{ $t('__liveRollingRate') }}
-            <span>{{ numberFormatStr(form.live_rolling_rate) + '%' }}</span>
-          </label>
-          <br>
-          <label>{{ $t('__maxWinAmountLimit') }}
-            <span>{{ numberFormatStr(form.max_win_amount_limit) + '%' }}</span>
-          </label>
-          <br>
-          <label>{{ $t('__maxLoseAmountLimit') }}
-            <span>{{ numberFormatStr(form.max_lose_amount_limit) + '%' }}</span>
-          </label>
+          <label class="step5Header">{{ $t('__rollingRateAndLimit') }}</label>
+          <div class="v-line96" />
+          <div class="step5Info">
+            <label>{{ $t('__liveRollingRate') }}
+              <span>{{ numberFormatStr(form.live_rolling_rate) + '%' }}</span>
+            </label>
+            <br>
+            <label>{{ $t('__maxWinAmountLimit') }}
+              <span>{{ numberFormatStr(form.max_win_amount_limit) + '%' }}</span>
+            </label>
+            <br>
+            <label>{{ $t('__maxLoseAmountLimit') }}
+              <span>{{ numberFormatStr(form.max_lose_amount_limit) + '%' }}</span>
+            </label>
+          </div>
         </el-col>
       </el-row>
-      <el-row>
-        <label>{{ $t('_handicapLimit') }}</label>
-        <el-table :data="selectHandicaps" tooltip-effect="dark" max-height="200px">
+      <el-row class="rowStep5LimitTable">
+        <label class="step5Header">{{ $t('_handicapLimit') }}</label>
+        <div class="v-line100" />
+        <el-table
+          :data="selectHandicaps"
+          tooltip-effect="dark"
+          header-cell-class-name="bg-black_table_header"
+          row-class-name="bg-black_table_col"
+          style="background: black;"
+        >
           <el-table-column prop="id" label="ID" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="nickname" :label="$t('__nickname')" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="bet_min" :label="$t('__betMin')" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="bet_max" :label="$t('__betMax')" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="currency" :label="$t('__currency')" align="center" :show-overflow-tooltip="true" />
         </el-table>
+        <el-form-item v-if="visible" :label="$t('__userPassword')" prop="userPassword" style="text-align: left;">
+          <el-input v-model="form.userPassword" show-password />
+        </el-form-item>
       </el-row>
-      <el-form-item v-if="visible" :label="$t('__userPassword')" prop="userPassword">
-        <el-input v-model="form.userPassword" show-password />
-      </el-form-item>
     </el-form>
     <span v-show="!dialogLoading" slot="footer">
-      <el-button v-show="previousBtnVisible" @click="onPreviousBtnClick">{{ $t("__previous") }}</el-button>
-      <el-button v-show="nextBtnVisible" type="primary" @click="onNextBtnClick">{{ $t("__nextStep") }}</el-button>
-      <el-button v-show="confirmBtnVisible" type="primary" @click="onSubmit">{{ confirm }}</el-button>
+      <el-button v-show="previousBtnVisible" class="bg-gray" @click="onPreviousBtnClick">{{ $t("__previous") }}</el-button>
+      <el-button v-show="nextBtnVisible" class="bg-yellow" @click="onNextBtnClick">{{ $t("__nextStep") }}</el-button>
+      <el-button v-show="confirmBtnVisible" class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
-import { memberCreateAccount, memberCreate, memberEdit } from '@/api/agentManagement/memberList'
+import { memberCreateAccount, memberCreate, memberEdit } from '@/api/agentManagement/member'
 import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
 
@@ -236,7 +258,7 @@ export default {
       if (!value) {
         callback(new Error(this.$t('__requiredField')))
       } else if (this.form.password !== this.form.confirmPassword) {
-        callback(new Error(this.$t('__confirmPassword') + this.$t('__and') + this.$t('__password') + this.$t('__inconsistent')))
+        callback(new Error(`${this.$t('__confirmPassword')}${this.$t('__and')}${this.$t('__password')}${this.$t('__inconsistent')}`))
       } else {
         callback()
       }
@@ -303,6 +325,9 @@ export default {
     ...mapGetters([
       'accountStatusType'
     ]),
+    formLabelPosition() {
+      return 'left'
+    },
     rollingRateTip() {
       return this.$t('__range') + '0%-' + this.agentInfo.live_rolling_rate + '%'
     },
@@ -353,6 +378,8 @@ export default {
         memberCreateAccount().then((res) => {
           this.form.name = res.account
           this.$refs.step1.clearValidate()
+        }).catch(() => {
+          this.autoGenerateAccount = false
         })
       }
     },
@@ -412,7 +439,6 @@ export default {
     onSubmit() {
       this.$refs.step5.validate((valid) => {
         if (valid) {
-          this.dialogLoading = true
           const data = JSON.parse(JSON.stringify(this.form))
           data.handicaps = []
           this.selectHandicaps.forEach(element => {
@@ -420,23 +446,23 @@ export default {
           })
           if (this.operationType === this.operationEnum.create) {
             data.agent_id = this.agentInfo.id
+            this.dialogLoading = true
             memberCreate(data).then((res) => {
-              this.$emit('editSuccess', res)
+              this.$emit('editSuccess', JSON.parse(JSON.stringify(res)))
               this.dialogLoading = false
             }).catch(() => {
               this.dialogLoading = false
             })
           } else if (this.operationType === this.operationEnum.edit) {
-            this.$confirm(this.$t('__confirmChanges')).then(_ => {
+            this.confirmMsg(`${this.$t('__confirmChanges')}?`, () => {
+              this.dialogLoading = true
               memberEdit(data).then((res) => {
-                this.$emit('editSuccess', res)
+                this.$emit('editSuccess', JSON.parse(JSON.stringify(res)))
                 this.dialogLoading = false
               }).catch(() => {
                 this.dialogLoading = false
               })
             })
-          } else {
-            this.dialogLoading = false
           }
         }
       })
@@ -452,21 +478,90 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.agentName {
-  font-size: 10px;
+label {
+  font-weight: 300;
 }
 
-.step2Tip {
+.agentNameLabel {
+  font-size: 14px;
+  color: #fff
+}
+
+.agentNameSpan {
+  color: #f9c901;
+}
+
+span {
+  color: #fff;
+}
+
+.step2Input.el-input {
+  width: 70%;
+}
+
+.step2Span {
   line-height: 10px;
-  display: block;
+  display: inline;
   font-size: 10px;
+  padding: 0 0 0 10px;
+  color: #bbb;
 }
 
-.el-input {
-  width: auto;
+.step4Info {
+  margin: 10px 0 0 0;
+  label {
+    color: #f9c901;
+    font-size: 10px;
+    font-weight: 500;
+  }
+}
+
+.step5Header {
+  font-size: 16px;
+  color: #f9c901;
+  font-weight: 600;
+}
+
+.step5Info {
+  label {
+    color: #f9c901;
+    font-size: 10px;
+    font-weight: 500;
+  }
+  span {
+    float: right;
+    margin-right: 20px;
+  }
+}
+
+.rowStep5LimitTable {
+  text-align: center;
+}
+
+.v-line100 {
+  border-bottom: 0.08333rem solid #f9c901;
+  width: 100%;
+  height: 1px;
+}
+
+.v-line96 {
+  border-bottom: 0.08333rem solid #f9c901;
+  width: 96%;
+  height: 1px;
 }
 
 .el-steps--horizontal {
   margin: 15px 0
+}
+
+.el-button {
+  width: 150px;
+  padding: 8px 0;
+}
+
+.el-select,
+.el-input,
+.el-textarea{
+  width: 90%;
 }
 </style>

@@ -1,15 +1,11 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="40%" :before-close="onClose">
-    <el-row>
-      <el-col :span="24">
-        <el-table ref="multipleTable" :data="serverData.allPermissions" tooltip-effect="dark" height="300" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="55" align="center" />
-          <el-table-column prop="name" :label="$t('__name')" align="center" :show-overflow-tooltip="true" />
-          <el-table-column prop="nickname" :label="$t('__nickname')" width="150" align="center" :show-overflow-tooltip="true" />
-        </el-table>
-      </el-col>
-    </el-row>
-    <span slot="footer">
+  <el-dialog v-loading="dialogLoading" :title="`${title} [${form.name}]`" :visible.sync="visible" width="40%" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-table v-if="visible" ref="multipleTable" :data="serverData.allPermissions" tooltip-effect="dark" height="300" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column prop="name" :label="$t('__name')" align="center" :show-overflow-tooltip="true" sortable />
+      <el-table-column prop="nickname" :label="$t('__nickname')" width="150" align="center" :show-overflow-tooltip="true" sortable />
+    </el-table>
+    <span v-show="!dialogLoading" slot="footer">
       <el-button icon="el-icon-minus" @click="cancelSelection">{{ $t('__cancelSelect') }}</el-button>
       <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
     </span>
@@ -37,12 +33,20 @@ export default {
       default() {
         return ''
       }
+    },
+    'form': {
+      type: Object,
+      require: true,
+      default() {
+        return {}
+      }
     }
   },
   data: function() {
     return {
       multipleSelection: [],
-      serverData: {}
+      serverData: {},
+      dialogLoading: false
     }
   },
   methods: {
@@ -55,9 +59,9 @@ export default {
     onSubmit() {
       const administer = this.multipleSelection.find(element => element.name === 'Administer')
       if (administer) {
-        this.$emit('confirm', [administer])
+        this.$emit('confirm', JSON.parse(JSON.stringify([administer])))
       } else {
-        this.$emit('confirm', this.multipleSelection)
+        this.$emit('confirm', JSON.parse(JSON.stringify(this.multipleSelection)))
       }
     },
     onClose() {
@@ -81,6 +85,9 @@ export default {
           })
         }
       })
+    },
+    setDialogLoading(dialogLoading) {
+      this.dialogLoading = dialogLoading
     }
   }
 }

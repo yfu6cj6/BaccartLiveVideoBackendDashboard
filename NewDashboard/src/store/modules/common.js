@@ -1,7 +1,8 @@
 const state = {
   accountStatusType: accountStatusType,
   announcementMarqueeStatusType: announcementMarqueeStatusType,
-  roles: roles
+  roles: roles,
+  statusType: statusType
 }
 
 const accountStatusType = [{
@@ -31,11 +32,21 @@ const roles = [{
   nickname: '__visitor'
 }]
 
+const statusType = [{
+  key: '0',
+  nickname: '__lock'
+},
+{
+  key: '1',
+  nickname: '__enable'
+}]
+
 const mutations = {
   SET_COMMON_TYPE(state) {
     state.accountStatusType = accountStatusType
     state.announcementMarqueeStatusType = announcementMarqueeStatusType
     state.roles = roles
+    state.statusType = statusType
   }
 }
 const actions = {

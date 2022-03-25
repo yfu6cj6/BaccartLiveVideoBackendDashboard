@@ -1,17 +1,20 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="40%" :before-close="onClose" :close-on-click-modal="false">
-    <el-table :data="listData" tooltip-effect="dark" max-height="400px">
-      <el-table-column prop="user" :label="$t('__user')" align="center" />
-      <el-table-column v-if="operationType === operationEnum.liveCommissionRate" prop="live_commission_rate" :label="$t('__liveCommissionRate')" align="center" />
-      <el-table-column v-if="operationType === operationEnum.liveRollingRate" prop="live_rolling_rate" :label="$t('__liveRollingRate')" align="center" />
+  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-table :data="listData" tooltip-effect="dark" header-cell-class-name="bg-black_table_header" row-class-name="bg-black_table_col" style="background: black;">
+      <el-table-column prop="user" :label="$t('__operator')" align="center" />
+      <el-table-column v-if="operationType === operationEnum.liveCommissionRate" prop="commission_rate" :label="$t('__liveCommissionRate')" align="center" />
+      <el-table-column v-if="operationType === operationEnum.liveRollingRate" prop="rolling_rate" :label="$t('__liveRollingRate')" align="center" />
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
     </el-table>
   </el-dialog>
 </template>
 
 <script>
+import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
+
 export default {
   name: 'AgentRateLogDialog',
+  mixins: [handleDialogWidth],
   props: {
     'title': {
       type: String,

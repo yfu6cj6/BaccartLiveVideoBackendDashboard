@@ -1,36 +1,37 @@
 <template>
-  <div class="operationLog-container">
-    <el-form v-loading="dataLoading" class="filterForm" :inline="true" :model="searchForm">
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__createdAt')">
-        <el-date-picker
-          v-model="searchForm.searchTime"
-          type="datetimerange"
-          align="right"
-          unlink-panels
-          :range-separator="$t('__to')"
-          :start-placeholder="$t('__startDate')"
-          :end-placeholder="$t('__endDate')"
-          :picker-options="pickerOptions"
-        />
-      </el-form-item>
-      <el-form-item class="inputTitle" label="IP">
-        <el-input v-model="searchForm.ip" />
-      </el-form-item>
-      <el-form-item class="inputTitle" :label="$t('__description')">
-        <el-input v-model="searchForm.description" />
-      </el-form-item>
-      <el-form-item>
-        <el-button icon="el-icon-minus" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" icon="el-icon-download" @click="onExportBtnClick()">{{ $t("__export") }}</el-button>
-      </el-form-item>
+  <div v-loading="dataLoading" class="view-container">
+    <el-row class="seachForm">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker
+            v-model="searchForm.searchTime"
+            type="datetimerange"
+            align="right"
+            unlink-panels
+            :range-separator="$t('__to')"
+            :start-placeholder="`${$t('__createdAt')}(${$t('__start')})`"
+            :end-placeholder="`${$t('__createdAt')}(${$t('__end')})`"
+            :picker-options="pickerOptions"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.ip" placeholder="IP" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.description" :placeholder="$t('__description')" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bg-gray" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onExportBtnClick()">{{ $t("__searchAndExport") }}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-row>
 
-    </el-form>
-
-    <el-table v-loading="dataLoading" :data="tableData" border :max-height="viewHeight">
+    <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column v-if="showDetail" type="expand">
         <template slot-scope="props">
           <el-form label-position="left">
@@ -40,21 +41,23 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column prop="userNickName" min-width="60px" :label="$t('__nickname')" align="center" sortable />
+      <el-table-column prop="userNickName" min-width="60px" :label="$t('__operator')" align="center" sortable />
       <el-table-column prop="ip" min-width="80px" label="IP" align="center" sortable />
       <el-table-column prop="description" min-width="60px" :label="$t('__description')" align="center" />
-      <el-table-column prop="created_at" min-width="100px" :label="$t('__createdAt')" align="center" sortable />
+      <el-table-column prop="created_at" min-width="100px" :label="$t('__operationTime')" align="center" sortable />
       <el-table-column prop="uri" min-width="120px" label="Uri" align="center" />
       <el-table-column prop="method" min-width="60px" :label="$t('__method')" align="center" />
     </el-table>
 
     <el-pagination
-      layout="prev, pager, next, jumper"
-      class="operationLog-pagination"
+      layout="prev, pager, next, jumper, sizes"
+      class="pagination"
       :total="totalCount"
       background
       :page-size="pageSize"
+      :page-sizes="pageSizes"
       :current-page.sync="currentPage"
+      @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
 
@@ -102,7 +105,6 @@ export default {
   computed: {
   },
   created() {
-    this.setHeight()
   },
   methods: {
     onReset() {
@@ -120,7 +122,6 @@ export default {
     handleRespone(res) {
       this.tableData = res.rows
       this.showDetail = res.showDetail
-      this.currentPage = res.currentPage
       this.totalCount = res.totalCount
       this.dataLoading = false
     },
@@ -130,6 +131,8 @@ export default {
       this.handleRequest(this.searchForm)
       operationLogSearch(this.searchForm).then((res) => {
         this.handleRespone(res)
+      }).catch(() => {
+        this.dataLoading = false
       })
     },
     onExportBtnClick() {
@@ -138,11 +141,13 @@ export default {
       operationLogExport(this.searchForm).then((res) => {
         this.onDataOut(res.rows)
         this.dataLoading = false
+      }).catch(() => {
+        this.dataLoading = false
       })
     },
     onDataOut(tableData) {
       require.ensure([], () => {
-        const { export_json_to_excel } = require('@/vendor/Export2Excel')
+        const { export_json_to_excel, formatJson } = require('@/vendor/Export2Excel')
         const tHeader = []
         const filterVal = []
         for (const item in tableData[0]) {
@@ -151,46 +156,16 @@ export default {
         }
         tableData.splice(0, 1)
         const list = JSON.parse(JSON.stringify(tableData))
-        const data = this.formatJson(filterVal, list)
+        const data = formatJson(filterVal, list)
         export_json_to_excel({ header: tHeader, data: data, filename: 'OperationLog_' + getFullDateString(new Date()) })
       })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map((v) => filterVal.map(j => v[j]))
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.operationLog {
-  &-container {
-    margin: 5px;
-  }
-  &-pagination {
-    padding: 1em;
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-  }
-}
-
-.filterForm {
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-.el-form-item {
-  margin-bottom: 0px;
-}
-
-.inputTitle {
-  padding: 0px 0px 0px 5px;
-}
-
-.el-input {
-  width: 140px;
+.view-container .el-form .el-form-item .el-input {
+  width: 160px;
 }
 </style>

@@ -1,30 +1,29 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="20%" :before-close="onClose">
-    <el-row>
-      <el-col :span="24">
-        <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
-          <el-form-item label="ID" prop="id">
-            <el-input v-model="editForm.id" :disabled="true" />
-          </el-form-item>
-          <el-form-item :label="$t('__account')" prop="account">
-            <el-input v-model="editForm.account" />
-          </el-form-item>
-          <el-form-item label="IP" prop="ip">
-            <el-input v-model="editForm.ip" />
-          </el-form-item>
-        </el-form>
-      </el-col>
-    </el-row>
-    <span slot="footer">
-      <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
-      <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form ref="editForm" class="row" :model="editForm" :rules="rules" label-width="60px" label-position="left">
+      <el-form-item label="ID" prop="id">
+        <el-input v-model="editForm.id" :disabled="true" />
+      </el-form-item>
+      <el-form-item :label="$t('__account')" prop="account">
+        <el-input v-model="editForm.account" />
+      </el-form-item>
+      <el-form-item label="IP" prop="ip">
+        <el-input v-model="editForm.ip" />
+      </el-form-item>
+    </el-form>
+    <span v-show="!dialogLoading" slot="footer">
+      <el-button class="bg-gray" @click="onReset">{{ $t("__reset") }}</el-button>
+      <el-button class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
+import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
+
 export default {
-  name: 'IpWhitelistDialog',
+  name: 'EditDialog',
+  mixins: [handleDialogWidth],
   props: {
     'title': {
       type: String,
@@ -65,7 +64,8 @@ export default {
         account: [{ required: true, trigger: 'blur', validator: validate }],
         ip: [{ required: true, trigger: 'blur', validator: validate }]
       },
-      editForm: {}
+      editForm: {},
+      dialogLoading: false
     }
   },
   computed: {
@@ -83,7 +83,7 @@ export default {
     onSubmit() {
       this.$refs.editForm.validate((valid) => {
         if (valid) {
-          this.$emit('confirm', this.editForm)
+          this.$emit('confirm', JSON.parse(JSON.stringify(this.editForm)))
         }
       })
     },
@@ -92,10 +92,16 @@ export default {
     },
     onReset() {
       this.editForm = JSON.parse(JSON.stringify(this.form))
+    },
+    setDialogLoading(dialogLoading) {
+      this.dialogLoading = dialogLoading
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.el-form {
+  margin-bottom: 10px;
+}
 </style>

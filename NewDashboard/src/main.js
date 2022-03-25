@@ -15,6 +15,8 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+import vuetify from '@/plugins/vuetify' // path to vuetify export
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -30,11 +32,19 @@ import '@/permission' // permission control
 
 Vue.use(ElementUI)
 Vue.config.productionTip = false
+Vue.prototype.$stringFormat = function stringFormat(formatted, args) {
+  for (let i = 0; i < args.length; i++) {
+    const regexp = new RegExp('\\{' + i + '\\}', 'gi')
+    formatted = formatted.replace(regexp, args[i])
+  }
+  return formatted
+}
 
 new Vue({
   el: '#app',
   router,
   store,
   i18n,
+  vuetify,
   render: h => h(App)
 })

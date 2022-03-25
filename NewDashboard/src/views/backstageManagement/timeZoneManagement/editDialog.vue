@@ -1,21 +1,17 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" :width="formWidth" :before-close="onClose">
-    <el-row>
-      <el-col :span="24">
-        <el-form ref="editForm" class="row" label-width="auto" :model="editForm" :rules="rules">
-          <el-form-item label="ID" prop="id">
-            <el-input v-model="editForm.id" :disabled="true" />
-          </el-form-item>
-          <el-form-item :label="$t('__lowerLimit')" prop="lower_limit">
-            <el-input v-model="editForm.lower_limit" type="number" />
-          </el-form-item>
-          <el-form-item :label="$t('__upperLimit')" prop="upper_limit">
-            <el-input v-model="editForm.upper_limit" type="number" />
-          </el-form-item>
-        </el-form>
-      </el-col>
-    </el-row>
-    <span slot="footer">
+  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" width="20%" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form ref="editForm" class="row" :model="editForm" :rules="rules">
+      <el-form-item label="ID" prop="id">
+        <el-input v-model="editForm.id" :disabled="true" />
+      </el-form-item>
+      <el-form-item :label="$t('__timeZone')" prop="time_zone">
+        <el-input v-model="editForm.time_zone" />
+      </el-form-item>
+      <el-form-item :label="$t('__cityName')" prop="city_name">
+        <el-input v-model="editForm.city_name" />
+      </el-form-item>
+    </el-form>
+    <span v-show="!dialogLoading" slot="footer">
       <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
       <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
     </span>
@@ -23,11 +19,8 @@
 </template>
 
 <script>
-import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
-
 export default {
-  name: 'LimitManagementDialog',
-  mixins: [handleDialogWidth],
+  name: 'EditDialog',
   props: {
     'title': {
       type: String,
@@ -65,10 +58,11 @@ export default {
     }
     return {
       rules: {
-        lower_limit: [{ required: true, trigger: 'blur', validator: validate }],
-        upper_limit: [{ required: true, trigger: 'blur', validator: validate }]
+        time_zone: [{ required: true, trigger: 'blur', validator: validate }],
+        city_name: [{ required: true, trigger: 'blur', validator: validate }]
       },
-      editForm: {}
+      editForm: {},
+      dialogLoading: false
     }
   },
   computed: {
@@ -86,7 +80,7 @@ export default {
     onSubmit() {
       this.$refs.editForm.validate((valid) => {
         if (valid) {
-          this.$emit('confirm', this.editForm)
+          this.$emit('confirm', JSON.parse(JSON.stringify(this.editForm)))
         }
       })
     },
@@ -95,13 +89,13 @@ export default {
     },
     onReset() {
       this.editForm = JSON.parse(JSON.stringify(this.form))
+    },
+    setDialogLoading(dialogLoading) {
+      this.dialogLoading = dialogLoading
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-.el-input {
-  width: auto;
-}
+<style>
 </style>

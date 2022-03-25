@@ -5,7 +5,8 @@ export default {
       tableData: [],
       totalCount: 0,
       pageSize: 10,
-      currentPage: 1
+      currentPage: 1,
+      pageSizes: [10, 20, 30, 40]
     }
   },
   watch: {
@@ -16,6 +17,7 @@ export default {
   methods: {
     handleSizeChange(val) {
       this.pageSize = val
+      this.onSubmit()
     },
     handleCurrentChange(page) {
       this.currentPage = page
