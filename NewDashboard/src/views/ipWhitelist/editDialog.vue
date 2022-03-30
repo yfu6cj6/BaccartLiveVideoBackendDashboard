@@ -11,7 +11,7 @@
         <el-input v-model="editForm.ip" />
       </el-form-item>
     </el-form>
-    <span v-show="!dialogLoading" slot="footer">
+    <span v-if="!dialogLoading" slot="footer">
       <el-button class="bg-gray" @click="onReset">{{ $t("__reset") }}</el-button>
       <el-button class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
     </span>
@@ -92,6 +92,7 @@ export default {
     },
     onReset() {
       this.editForm = JSON.parse(JSON.stringify(this.form))
+      this.$refs.editForm.clearValidate()
     },
     setDialogLoading(dialogLoading) {
       this.dialogLoading = dialogLoading

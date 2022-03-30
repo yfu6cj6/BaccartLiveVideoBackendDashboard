@@ -10,6 +10,7 @@
         tag="span"
         class="tags-view-item"
         @click.middle.native="!isAffix(tag)?closeSelectedTag(tag):''"
+        @dblclick.native="refreshSelectedTag(tag)"
         @contextmenu.prevent.native="openMenu(tag,$event)"
       >
         {{ $t(tag.title) }}
@@ -28,6 +29,7 @@
 <script>
 import ScrollPane from './ScrollPane'
 import path from 'path'
+import { mapGetters } from 'vuex'
 
 export default {
   components: { ScrollPane },
@@ -41,12 +43,10 @@ export default {
     }
   },
   computed: {
-    visitedViews() {
-      return this.$store.state.tagsView.visitedViews
-    },
-    routes() {
-      return this.$store.state.permission.permission_routes
-    }
+    ...mapGetters([
+      'visitedViews',
+      'permission_routes'
+    ])
   },
   watch: {
     $route() {
@@ -94,7 +94,7 @@ export default {
       return tags
     },
     initTags() {
-      const affixTags = this.affixTags = this.filterAffixTags(this.routes)
+      const affixTags = this.affixTags = this.filterAffixTags(this.permission_routes)
       for (const tag of affixTags) {
         // Must have tag name
         if (tag.name) {
@@ -198,67 +198,66 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$yellow:#f9c901;
+
 .tags-view-container {
-  height: 34px;
+  height: 100%;
   width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #d8dce5;
+  background: #000;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
   .tags-view-wrapper {
     .tags-view-item {
       display: inline-block;
       position: relative;
       cursor: pointer;
-      height: 26px;
-      line-height: 26px;
-      border: 1px solid #d8dce5;
-      color: #495060;
-      background: #fff;
-      padding: 0 8px;
-      font-size: 12px;
-      margin-left: 5px;
-      margin-top: 4px;
+      border-right: 1px solid #fff;
+      color: #fff;
+      background: #000;
+      padding: 0px 5px;
+      font-size: 14px;
       &:first-of-type {
-        margin-left: 15px;
+        margin-left: 0px;
       }
       &:last-of-type {
-        margin-right: 15px;
+        margin-right: 0px;
       }
       &.active {
-        background-color: #42b983;
-        color: #fff;
-        border-color: #42b983;
+        background-color: #000;
+        color: $yellow;
+        border-right: 1px solid #fff;
+        font-weight: 700;
         &::before {
           content: '';
-          background: #fff;
+          background: $yellow;
           display: inline-block;
           width: 8px;
           height: 8px;
           border-radius: 50%;
           position: relative;
-          margin-right: 2px;
+          margin-right: 4px;
         }
       }
     }
   }
   .contextmenu {
     margin: 0;
-    background: #fff;
+    background: #000;
     z-index: 3000;
     position: absolute;
     list-style-type: none;
-    padding: 5px 0;
+    padding: 5px;
     border-radius: 4px;
     font-size: 12px;
     font-weight: 400;
-    color: #333;
+    color: $yellow;
     box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
     li {
       margin: 0;
-      padding: 7px 16px;
+      padding: 5px;
+      border-bottom: 1px solid #fff;
       cursor: pointer;
       &:hover {
-        background: #eee;
+        background: #444;
       }
     }
   }
@@ -270,20 +269,20 @@ export default {
 .tags-view-wrapper {
   .tags-view-item {
     .el-icon-close {
-      width: 16px;
-      height: 16px;
-      vertical-align: 2px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       text-align: center;
       transition: all .3s cubic-bezier(.645, .045, .355, 1);
       transform-origin: 100% 50%;
+      font-size: 24px;
       &:before {
         transform: scale(.6);
         display: inline-block;
         vertical-align: -3px;
       }
       &:hover {
-        background-color: #b4bccc;
+        background-color: #333;
         color: #fff;
       }
     }

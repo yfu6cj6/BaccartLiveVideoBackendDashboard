@@ -17,7 +17,7 @@
         <el-input v-model="form.userPassword" show-password />
       </el-form-item>
     </el-form>
-    <span v-show="!dialogLoading" slot="footer">
+    <span v-if="!dialogLoading" slot="footer">
       <el-button class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>
@@ -25,10 +25,11 @@
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
+import common from '@/layout/mixin/common'
 
 export default {
   name: 'SubAgentDistributeDialog',
-  mixins: [handleDialogWidth],
+  mixins: [handleDialogWidth, common],
   props: {
     'title': {
       type: String,

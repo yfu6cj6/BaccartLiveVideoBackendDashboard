@@ -45,8 +45,8 @@
       <el-table-column prop="ip" min-width="80px" label="IP" align="center" sortable />
       <el-table-column prop="description" min-width="60px" :label="$t('__description')" align="center" />
       <el-table-column prop="created_at" min-width="100px" :label="$t('__operationTime')" align="center" sortable />
-      <el-table-column prop="uri" min-width="120px" label="Uri" align="center" />
-      <el-table-column prop="method" min-width="60px" :label="$t('__method')" align="center" />
+      <el-table-column v-if="isAdminister" prop="uri" min-width="120px" label="Uri" align="center" />
+      <el-table-column v-if="isAdminister" prop="method" min-width="60px" :label="$t('__method')" align="center" />
     </el-table>
 
     <el-pagination
@@ -70,9 +70,10 @@ import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import { getFullDate, getFullDateString, getLastDate, getLastDateClearTime } from '@/utils/transDate'
+import { mapGetters } from 'vuex'
 
 const defaultForm = {
-  searchTime: getLastDateClearTime(3)
+  searchTime: getLastDateClearTime(0)
 }
 
 export default {
@@ -103,8 +104,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      'isAdminister'
+    ])
   },
   created() {
+    this.handleCurrentChange(1)
   },
   methods: {
     onReset() {

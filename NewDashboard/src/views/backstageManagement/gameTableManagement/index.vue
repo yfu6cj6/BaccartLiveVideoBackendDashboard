@@ -1,36 +1,38 @@
 <template>
   <div v-loading="dataLoading" class="view-container">
-    <el-form :inline="true" :model="searchForm">
-      <el-form-item>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.table_id" multiple filterable :placeholder="$t('__tableId')">
-          <el-option v-for="item in searchItems.tables" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.live_bet_area_id" multiple filterable :placeholder="$t('__liveBetAreaId')">
-          <el-option v-for="item in searchItems.liveBetArea" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.bet_min" type="number" :placeholder="$t('__betMin')" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.bet_max" type="number" :placeholder="$t('__betMax')" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.total_bet_max" type="number" :placeholder="$t('__totalBetMax')" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="info" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
-      </el-form-item>
-    </el-form>
-    <span class="zeroMeansNoLimit">{{ `${$t('__totalBetMax')}${$t('__zeroMeansNoLimit')}` }}</span>
+    <el-row class="seachForm">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.table_id" multiple filterable :placeholder="$t('__tableId')">
+            <el-option v-for="item in searchItems.tables" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.live_bet_area_id" multiple filterable :placeholder="$t('__liveBetAreaId')">
+            <el-option v-for="item in searchItems.liveBetArea" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.bet_min" type="number" :placeholder="$t('__betMin')" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.bet_max" type="number" :placeholder="$t('__betMax')" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.total_bet_max" type="number" :placeholder="$t('__totalBetMax')" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bg-gray" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        </el-form-item>
+      </el-form>
+      <span class="zeroMeansNoLimit">{{ `${$t('__totalBetMax')}${$t('__zeroMeansNoLimit')}` }}</span>
+    </el-row>
 
     <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column prop="id" label="ID" align="center" :min-width="idWidth" sortable />
@@ -41,8 +43,8 @@
       <el-table-column prop="totalBetMaxLabel" :label="$t('__totalBetMax')" align="center" :min-width="totalBetMaxWidth" sortable />
       <el-table-column :label="$t('__operate')" align="center" min-width="200px">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
-          <el-button type="danger" size="mini" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button class="bg-red" size="mini" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -89,6 +91,7 @@
 
 <script>
 import { gameTableSearch, gameTableCreate, gameTableEdit, gameTableDelete } from '@/api/backstageManagement/gameTableManagement'
+import common from '@/layout/mixin/common'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
@@ -98,7 +101,7 @@ import EditDialog from './editDialog'
 export default {
   name: 'GameTableManagement',
   components: { EditDialog },
-  mixins: [handlePageChange, shared, handleViewResize, handleTableWidth],
+  mixins: [handlePageChange, shared, handleViewResize, handleTableWidth, common],
   data() {
     return {
       dialogEnum: Object.freeze({
@@ -187,7 +190,7 @@ export default {
       this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmChanges')}?`, () => {
         this.$refs.editDialog.setDialogLoading(true)
         data.table_id = undefined
         data.live_bet_area_id = undefined
@@ -196,17 +199,17 @@ export default {
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     onDeleteBtnClick(item) {
-      this.$confirm(`${this.$t('__confirmDeletion')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmDeletion')}?`, () => {
         this.dataLoading = true
         gameTableDelete(item.id).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none

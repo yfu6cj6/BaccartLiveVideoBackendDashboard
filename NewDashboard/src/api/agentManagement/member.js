@@ -86,3 +86,11 @@ export function memberGetLastBetTime(data) {
     data: data
   })
 }
+
+export function memberOneClickRecycling(data) {
+  return request({
+    url: '/member/balance/oneClickRecycling',
+    method: 'post',
+    data: data
+  })
+}

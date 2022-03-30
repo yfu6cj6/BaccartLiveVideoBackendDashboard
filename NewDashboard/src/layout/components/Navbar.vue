@@ -12,13 +12,17 @@
             <el-dropdown-item @click.native="changeLocale('zh_chs')">{{ $t(getLang('zh_chs')) }}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <span class="language-item">Hi, {{ nickname }}</span>
-        <span class="language-item">{{ $t('__agent') }}: {{ agentFullName }}</span>
-        <span class="language-item">
+        <span class="language-header">
+          Hi,
+          <span class="language-item">{{ nickname }}</span>
+        </span>
+        <span class="language-header">
+          {{ $t('__agent') }}:
+          <span class="language-item">{{ agentFullName }}</span>
+        </span>
+        <span class="language-header">
           {{ $t('__balance') }}:
-          <span :class="{'blanceInfo': agent_id === 1}">
-            {{ balanceInfo }}
-          </span>
+          <span class="language-item" :class="{'blanceInfo': agent_id === 1}">{{ balanceInfo }}</span>
         </span>
         <span v-if="marqueeMsg.length > 0" class="marquee">
           <p>{{ marqueeMsg }}</p>
@@ -53,7 +57,7 @@ export default {
       return !this.sidebar.opened
     },
     balanceInfo() {
-      return this.agent_id === 1 ? '∞' : this.balance
+      return this.agent_id === 1 ? 'oo' : this.balance
     }
   },
   created() {
@@ -85,18 +89,32 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$yellow:#f9c901;
+
 .navbar {
   width: 100%;
   height: 50px;
   overflow: hidden;
   position: relative;
-  background: #1a6396;
+  background: #262626;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
 }
 .language {
   &-container {
     height: 50px;
     line-height: 50px;
+
+    .el-dropdown + span,
+    span + span {
+      margin-left: 15px;
+    }
+    span > span {
+      margin-left: 2px;
+    }
+
+    .el-dropdown {
+      font-size: 14px;
+    }
   }
   &-dropdown {
     cursor: pointer;
@@ -104,10 +122,13 @@ export default {
     display: inline-block;
     padding-left: 15px;
   }
+  &-header {
+    color: $yellow;
+    font-size: 14px;
+  }
   &-item {
-    margin: 0 0 0 1.5em;
     color: #fff;
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 .el-icon-arrow-down {
@@ -116,8 +137,8 @@ export default {
 .marquee {
   width: 100%;
   max-width: 45%;
-	background-color: #0d325e;
-	color: white;
+	background-color: #333;
+	color: #fff;
   position: absolute;
   white-space: nowrap;
   overflow: hidden;
@@ -136,8 +157,6 @@ export default {
 }
 
 .blanceInfo {
-  font-size: 24px;
-  display: inline-block;
-  vertical-align: middle;
+  letter-spacing: -2px;
 }
 </style>

@@ -1,32 +1,27 @@
 <template>
-  <div ref="agentLevel" :class="{show:agentLevelSidebar}" class="agentLevel-container">
+  <div ref="agentLevel" :class="{show:agentLevelSidebar}">
     <div class="agentLevel">
-      <div class="agentLevel-items">
-        <div class="handle-button" @click="onHandleBtnClick()">
-          <i class="el-icon-close" />
-        </div>
-        <el-card shadow="never">
-          <el-scrollbar>
-            <el-input
-              v-model="filterText"
-              :placeholder="$t('__enterKeys')"
-            />
-            <el-tree
-              ref="tree"
-              v-loading="agentLevelLoading"
-              :data="agentLevel"
-              :props="defaultProps"
-              node-key="AgentId"
-              :default-expanded-keys="treeDefaultExpandedKeys"
-              :render-content="renderContent"
-              :indent="14"
-              :filter-node-method="filterNode"
-              highlight-current
-              @node-click="handleNodeClick"
-            />
-          </el-scrollbar>
-        </el-card>
+      <div class="agentLevel-item" @click="onHandleBtnClick()">
+        <i class="el-icon-arrow-left" />
+        <span>{{ $t('__agentManagement') }}</span>
       </div>
+      <el-input v-model="filterText" :placeholder="$t('__enterKeys')" />
+      <el-scrollbar wrap-class="scrollbar-wrapper">
+        <el-tree
+          ref="tree"
+          v-loading="agentLevelLoading"
+          :data="agentLevel"
+          :props="defaultProps"
+          node-key="AgentId"
+          :default-expanded-keys="treeDefaultExpandedKeys"
+          :render-content="renderContent"
+          :indent="8"
+          :filter-node-method="filterNode"
+          highlight-current
+          :expand-on-click-node="false"
+          @node-click="handleNodeClick"
+        />
+      </el-scrollbar>
     </div>
   </div>
 </template>
@@ -76,7 +71,8 @@ export default {
         </span>
       )
     },
-    async handleNodeClick(data) {
+    async handleNodeClick(data, node, com) {
+      node.expanded = true
       this.$store.dispatch('agentManagement/setAgentLevelLoading', true)
       await this.$router.push({ path: `/agentManagement/agentManagement/${data.AgentId}` })
       this.$store.dispatch('agentManagement/setAgentLevelLoading', false)
@@ -85,9 +81,37 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+$yellow:#f9c901;
+
 .agentLevel {
-  width: 100%;
+  .el-tree-node__content:hover {
+    background-color: #000;
+  }
+
+  .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+    background-color: #000;
+    color: $yellow;
+  }
+
+  .el-tree-node__expand-icon {
+    color: $yellow;
+  }
+
+  .el-tree-node__expand-icon.is-leaf {
+    color: transparent;
+  }
+
+  .el-tree-node:focus>.el-tree-node__content {
+    background-color: #000;
+  }
+}
+</style>
+<style lang="scss" scoped>
+$yellow:#f9c901;
+
+.agentLevel {
+  width: 170px;
   max-width: 170px;
   height: 100vh;
   position: fixed;
@@ -95,10 +119,17 @@ export default {
   right: 100%;
   transform-origin: right top;
   box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, .05);
-  background: #fff;
+  background: #000;
+  color: #fff;
   transition: all .4s cubic-bezier(.7, .3, .1, 1);
   transform: translate(0%);
   z-index: 1002;
+  &-item {
+    border-bottom: 0.08333rem solid #4e4e4e;
+    margin-bottom: 10px;
+    padding: 10px 0;
+    cursor: pointer;
+  }
 }
 
 .show {
@@ -107,5 +138,13 @@ export default {
   .agentLevel {
     transform: translate(100%);
   }
+}
+
+.el-tree {
+  background-color: #000;
+  color: #fff;
+  min-width: 100%;
+  display: inline-block;
+  overflow: hidden;
 }
 </style>

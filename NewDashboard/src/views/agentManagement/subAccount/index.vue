@@ -15,8 +15,8 @@
         <template slot-scope="scope">
           <span class="scope-content">{{ scope.row.fullName }}</span>
           <br>
-          <el-button class="iconButton" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
-          <el-button class="iconButton" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
+          <el-button v-if="!isAgentSubAccount" class="iconButton" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
+          <el-button v-if="!isAgentSubAccount" class="iconButton" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column :label="$t('__accountStatus')" align="center">
@@ -41,7 +41,7 @@
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
       <el-table-column prop="lastLoginAt" :label="$t('__lastLoginAt')" align="center" />
       <el-table-column prop="lastLoginIp" :label="$t('__lastLoginIP')" align="center" />
-      <el-table-column :label="$t('__operate')" align="center" width="auto">
+      <el-table-column v-if="!isAgentSubAccount" :label="$t('__operate')" align="center" width="auto">
         <template slot-scope="scope">
           <el-checkbox v-model="scope.row.lockLogin" class="red-tick" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row)" />
           <br>
@@ -96,7 +96,7 @@
       :agent-info="agentInfo"
       :form="editForm"
       @close="closeDialogEven"
-      @editSuccess="handleRespone"
+      @editSuccess="createDialogEditSuccess"
     />
 
     <operateDialog
@@ -127,6 +127,14 @@
       @close="closeDialogEven"
       @onSubmit="onSubmitSetHasAgents"
     />
+
+    <passwordTipDialog
+      :title="$t('__tip')"
+      :visible="curDialogIndex === dialogEnum.passwordTip"
+      :confirm="$t('__confirm')"
+      :form="editForm"
+      @close="closeDialogEven"
+    />
   </div>
 </template>
 
@@ -139,6 +147,7 @@ import SubAccountEditDialog from './subAccountEditDialog'
 import SubAgentDistributeDialog from './subAgentDistributeDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
 import OperateDialog from '@/views/agentManagement/operateDialog'
+import PasswordTipDialog from '@/views/agentManagement/passwordTipDialog'
 import { mapGetters } from 'vuex'
 
 const defaultForm = {
@@ -156,7 +165,7 @@ const defaultForm = {
 
 export default {
   name: 'Member',
-  components: { SubAccountEditDialog, ModPasswordDialog, OperateDialog, SubAgentDistributeDialog },
+  components: { SubAccountEditDialog, ModPasswordDialog, OperateDialog, SubAgentDistributeDialog, PasswordTipDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -176,7 +185,8 @@ export default {
         'modPassword': 3,
         'lockLogin': 7,
         'effectAgentLine': 8,
-        'subAgentDistribute': 9
+        'subAgentDistribute': 9,
+        'passwordTip': 10
       }),
       agentInfo: {},
       editForm: {},
@@ -188,7 +198,8 @@ export default {
   computed: {
     ...mapGetters([
       'statusType',
-      'roles'
+      'roles',
+      'isAgentSubAccount'
     ])
   },
   methods: {
@@ -280,11 +291,11 @@ export default {
     },
     handleRespone(res) {
       this.agentInfo = res.agentInfo
-      this.agentInfo.fullName = this.agentInfo.nickname + '(' + this.agentInfo.account + ')'
+      this.agentInfo.fullName = `${this.agentInfo.nickname}(${this.agentInfo.account})`
 
       this.allDataByClient = res.rows
       this.allDataByClient.forEach(element => {
-        element.fullName = element.nickname + '(' + element.account + ')'
+        element.fullName = `${element.nickname}(${element.account})`
         const statusNickname = this.statusType.find(type => type.key === element.status).nickname
         element.statusLabel = this.$t(statusNickname)
         element.rolesNickname = []
@@ -302,6 +313,12 @@ export default {
 
       this.closeDialogEven()
       this.$emit('serverResponse', JSON.parse(JSON.stringify(res)))
+    },
+    createDialogEditSuccess(res) {
+      this.handleRespone(res)
+      const data = JSON.parse(JSON.stringify(this.editForm))
+      this.editForm = { account: data.account, newPassword: data.password }
+      this.curDialogIndex = this.dialogEnum.passwordTip
     },
     setDataLoading(dataLoading) {
       this.$emit('setDataLoading', dataLoading)
@@ -327,6 +344,8 @@ export default {
       subAccountModPassword(data).then((res) => {
         this.handleRespone(res)
         this.$refs.modPasswordDialog.setDialogLoading(false)
+        this.editForm = { account: this.editForm.account, newPassword: data.newPassword }
+        this.curDialogIndex = this.dialogEnum.passwordTip
       }).catch(() => {
         this.$refs.modPasswordDialog.setDialogLoading(false)
       })

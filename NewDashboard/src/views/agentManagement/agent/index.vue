@@ -12,10 +12,14 @@
       </el-table-column>
       <el-table-column :label="$t('__agent')" align="center">
         <template slot-scope="scope">
-          <span class="scope-content">{{ scope.row.fullName }}</span>
+          <router-link :to="`/agentManagement/agentManagement/${scope.row.id}`">
+            <el-button class="agentBtn" size="mini">
+              {{ scope.row.fullName }}
+            </el-button>
+          </router-link>
           <br>
-          <el-button class="iconButton" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
-          <el-button class="iconButton" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
+          <el-button v-if="!isAgentSubAccount" class="iconButton" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
+          <el-button v-if="!isAgentSubAccount" class="iconButton" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column prop="currency" :label="$t('__currency')" align="center" />
@@ -23,8 +27,9 @@
         <template slot-scope="scope">
           <span class="scope-content">{{ scope.row.balance }}</span>
           <br>
-          <el-button class="labelButton bg-yellow" size="mini" @click="onDepositBtnClick(scope.row)">{{ $t("__deposit") }}</el-button>
-          <el-button class="labelButton bg-yellow" size="mini" @click="onWithdrawBtnClick(scope.row)">{{ $t("__withdraw") }}</el-button>
+          <el-button v-if="!isAgentSubAccount" class="labelButton bg-yellow" size="mini" @click="onDepositBtnClick(scope.row)">{{ $t("__deposit") }}</el-button>
+          <el-button v-if="!isAgentSubAccount" class="labelButton bg-yellow" size="mini" @click="onWithdrawBtnClick(scope.row)">{{ $t("__withdraw") }}</el-button>
+          <el-button v-if="!isAgentSubAccount" class="labelButton bg-yellow" size="mini" @click="onOneClickRecyclingBtnClick(scope.row)">{{ $t("__oneClickRecycling") }}</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="timeZone.city_name" :label="$t('__timeZone')" align="center" />
@@ -49,13 +54,30 @@
       </el-table-column>
       <el-table-column prop="created_at" :label="$t('__createdAt')" align="center" />
       <el-table-column prop="lastLoginAt" :label="$t('__lastLoginAt')" align="center" />
-      <el-table-column :label="$t('__operate')" align="center" width="auto">
+      <el-table-column v-if="!isAgentSubAccount" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
-          <el-checkbox v-model="scope.row.totallyDisabled" class="red-tick" :label="$t('__totallyDisabled')" @mousedown.native="onOperateCheckboxClick(dialogEnum.totallyDisabled, scope.row)" />
+          <el-checkbox
+            v-model="scope.row.totallyDisabled"
+            class="red-tick"
+            :label="$t('__totallyDisabled')"
+            :disabled="agentInfoTotallyDisabled"
+            @mousedown.native="onOperateCheckboxClick(dialogEnum.totallyDisabled, scope.row)"
+          />
           <br>
-          <el-checkbox v-model="scope.row.lockLogin" class="red-tick" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row)" />
+          <el-checkbox
+            v-model="scope.row.lockLogin"
+            class="red-tick"
+            :label="$t('__lockLogin')"
+            @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row)"
+          />
           <br>
-          <el-checkbox v-model="scope.row.debarBet" class="red-tick" :label="$t('__debarBet')" @mousedown.native="onOperateCheckboxClick(dialogEnum.debarBet, scope.row)" />
+          <el-checkbox
+            v-model="scope.row.debarBet"
+            class="red-tick"
+            :label="$t('__debarBet')"
+            :disabled="agentInfoBetStatusDisabled"
+            @mousedown.native="onOperateCheckboxClick(dialogEnum.oneClickRecycling, scope.row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -130,6 +152,15 @@
       @withdrawBalance="withdrawBalance"
     />
 
+    <operateDialog
+      ref="oneClickRecyclingDialog"
+      :visible="curDialogIndex === dialogEnum.oneClickRecycling"
+      :content="$stringFormat($t('__agentOneClickRecyclingMsg'), operateDialogMsgParameter)"
+      :form="editForm"
+      @close="closeDialogEven"
+      @onSubmit="operateSubmit"
+    />
+
     <agentEditDialog
       ref="editDialog"
       :title="$t('__editSubAgent')"
@@ -196,7 +227,7 @@
 <script>
 import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword,
   agentGetSetBalanceInfo, agentDepositBalance, agentWithdrawBalance, agentModTotallyDisabled,
-  agentModStatus, agentModBetStatus } from '@/api/agentManagement/agent'
+  agentModStatus, agentModBetStatus, agentOneClickRecycling } from '@/api/agentManagement/agent'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import { currencySearch } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
@@ -208,6 +239,7 @@ import AgentRateLogDialog from './agentRateLogDialog'
 import BalanceDialog from '@/views/agentManagement/balanceDialog'
 import OperateDialog from '@/views/agentManagement/operateDialog'
 import PasswordTipDialog from '@/views/agentManagement/passwordTipDialog'
+import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
 
 const defaultForm = {
@@ -260,7 +292,8 @@ export default {
         'totallyDisabled': 9,
         'lockLogin': 10,
         'debarBet': 11,
-        'passwordTip': 12
+        'passwordTip': 12,
+        'oneClickRecycling': 13
       }),
       handicaps: [],
       agentInfo: {},
@@ -269,6 +302,17 @@ export default {
       rateData: [],
       curDialogIndex: 0,
       operateDialogMsgParameter: []
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'isAgentSubAccount'
+    ]),
+    agentInfoTotallyDisabled() {
+      return this.agentInfo.totally_disabled === '1'
+    },
+    agentInfoBetStatusDisabled() {
+      return this.agentInfo.bet_status === '0'
     }
   },
   methods: {
@@ -304,12 +348,24 @@ export default {
           })
           break
         }
+        case this.dialogEnum.oneClickRecycling: {
+          this.$refs.oneClickRecyclingDialog.setDialogLoading(true)
+          data.agentId = this.editForm.agentId
+          agentOneClickRecycling(data).then((res) => {
+            this.handleRespone(res)
+            this.$refs.oneClickRecyclingDialog.setDialogLoading(false)
+          }).catch(() => {
+            this.$refs.oneClickRecyclingDialog.setDialogLoading(false)
+          })
+          break
+        }
       }
     },
     onOperateCheckboxClick(operateType, rowData) {
       this.editForm = { id: rowData.id }
       switch (operateType) {
         case this.dialogEnum.totallyDisabled: {
+          if (this.agentInfoTotallyDisabled) return
           this.curDialogIndex = this.dialogEnum.totallyDisabled
           this.operateDialogMsgParameter = [rowData.fullName]
           break
@@ -320,6 +376,7 @@ export default {
           break
         }
         case this.dialogEnum.debarBet: {
+          if (this.agentInfoBetStatusDisabled) return
           this.curDialogIndex = this.dialogEnum.debarBet
           this.operateDialogMsgParameter = [rowData.fullName]
           break
@@ -342,11 +399,11 @@ export default {
     },
     handleRespone(res) {
       this.agentInfo = res.agentInfo
-      this.agentInfo.fullName = this.agentInfo.nickname + '(' + this.agentInfo.account + ')'
+      this.agentInfo.fullName = `${this.agentInfo.nickname}(${this.agentInfo.account})`
 
       this.allDataByClient = res.rows
       this.allDataByClient.forEach(element => {
-        element.fullName = element.nickname + '(' + element.account + ')'
+        element.fullName = `${element.nickname}(${element.account})`
         element.currency = element.currency.code
         element.time_zone = element.timeZone.id
         element.totallyDisabled = element.totally_disabled === '1'
@@ -409,7 +466,7 @@ export default {
       })
     },
     onModPasswordBtnClick(rowData) {
-      this.editForm = { id: rowData.id, fullName: rowData.fullName }
+      this.editForm = { id: rowData.id, fullName: rowData.fullName, account: rowData.account }
       this.curDialogIndex = this.dialogEnum.modPassword
     },
     onDepositBtnClick(rowData) {
@@ -434,6 +491,11 @@ export default {
         this.$refs.withdrawBalanceDialog.setDialogLoading(false)
       })
     },
+    onOneClickRecyclingBtnClick(rowData) {
+      this.editForm = { agentId: rowData.id }
+      this.curDialogIndex = this.dialogEnum.oneClickRecycling
+      this.operateDialogMsgParameter = [rowData.fullName]
+    },
     async onEditBtnClick(rowData) {
       this.setDataLoading(true)
       const timezone = await timezoneSearch({})
@@ -449,7 +511,7 @@ export default {
       agentModPassword(data).then((res) => {
         this.handleRespone(res)
         this.$refs.modPasswordDialog.setDialogLoading(false)
-        this.editForm = { account: data.account, newPassword: data.newPassword }
+        this.editForm = { account: this.editForm.account, newPassword: data.newPassword }
         this.curDialogIndex = this.dialogEnum.passwordTip
       }).catch(() => {
         this.$refs.modPasswordDialog.setDialogLoading(false)
@@ -490,6 +552,14 @@ export default {
     -webkit-box-pack: center;
     justify-content: center;
   }
+}
+
+.agentBtn {
+  padding: 0;
+  background: transparent;
+  color: red;
+  border: none;
+  font-size: 14px;
 }
 
 .scope-content {

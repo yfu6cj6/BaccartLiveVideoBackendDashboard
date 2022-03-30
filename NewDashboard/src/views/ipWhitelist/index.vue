@@ -15,7 +15,7 @@
           <el-button class="bg-gray" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
           <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
           <el-button class="bg-yellow" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-          <el-button class="bg-yellow" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+          <el-button v-if="!isAgentSubAccount" class="bg-yellow" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
         </el-form-item>
       </el-form>
     </el-row>
@@ -24,7 +24,7 @@
       <el-table-column prop="id" width="80" label="ID" align="center" />
       <el-table-column prop="account" :label="$t('__account')" align="center" />
       <el-table-column prop="ip" label="IP" align="center" />
-      <el-table-column :label="$t('__operate')" align="center">
+      <el-table-column v-if="!isAgentSubAccount" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
           <el-button class="bg-yellow" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
           <el-button class="bg-red" size="mini" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
@@ -68,15 +68,17 @@
 
 <script>
 import { whitelistSearch, whitelistCreate, whitelistEdit, whitelistDelete } from '@/api/ipWhitelist'
+import common from '@/layout/mixin/common'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
 import EditDialog from './editDialog'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'IpWhitelist',
   components: { EditDialog },
-  mixins: [handlePageChange, shared, handleViewResize],
+  mixins: [handlePageChange, shared, handleViewResize, common],
   data() {
     return {
       dialogEnum: Object.freeze({
@@ -90,6 +92,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      'isAgentSubAccount'
+    ])
   },
   created() {
     this.handleCurrentChange(1)
@@ -140,24 +145,24 @@ export default {
       this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmChanges')}?`, () => {
         this.$refs.editDialog.setDialogLoading(true)
         whitelistEdit(data).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     onDeleteBtnClick(item) {
-      this.$confirm(`${this.$t('__confirmDeletion')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmDeletion')}?`, () => {
         this.dataLoading = true
         whitelistDelete(item.id).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none

@@ -11,10 +11,11 @@
     -webkit-transition: width 0.28s;
     transition: width 0.28s;
     width: 170px !important;
-    background-color: #0a2836;
+    background-color: #000;
     background-size: 100%;
     background-repeat: no-repeat;
     background-position-y: bottom;
+    border-right: 2px solid #f9c901;
     height: 100%;
     position: fixed;
     font-size: 0px;

@@ -3,8 +3,8 @@
     <el-table :data="tableData" border :max-height="viewHeight" :row-class-name="tableRowClassName">
       <el-table-column :label="$t('__agent')" align="center">
         <template slot-scope="scope">
-          <router-link v-if="scope.$index < tableData.length - 2" :to="'/agentBalanceReport/agentBalanceReport/'+scope.row.agentId">
-            <el-button class="agentBtn" type="primary" size="mini">
+          <router-link v-if="scope.$index < tableData.length - 2" :to="`/agentBalanceReport/agentBalanceReport/${scope.row.agentId}`">
+            <el-button class="agentBtn" size="mini">
               {{ scope.row.agent }}
             </el-button>
           </router-link>

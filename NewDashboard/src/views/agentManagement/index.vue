@@ -1,6 +1,7 @@
 <template>
   <div v-loading="dataLoading" class="view-container">
     <el-row class="agentInfoFormData">
+      <el-button class="bg-yellow" size="mini" @click="onTableBtnClick(curTableIndex)">{{ $t("__refresh") }}</el-button>
       <label>{{ `${$t('__agent')}:` }}
         <span>{{ agentInfo.fullName }}</span>
       </label>
@@ -8,7 +9,7 @@
         <span>{{ agentInfo.currency }}</span>
       </label>
       <label>{{ `${$t('__balance')}:` }}
-        <span>{{ agentInfo.balance }}</span>
+        <span :class="{'agentInfoBalance': agentInfo.id === 1}">{{ agentInfoBalance }}</span>
       </label>
       <label>
         <el-button class="bg-yellow" size="mini" @click="onLimitBtnClick(agentInfo.handicaps)">
@@ -58,7 +59,7 @@
         <el-button class="agentInfoFormBtn" :class="{'focus': curTableIndex === tableEnum.subAccount}" size="mini" @click="onTableBtnClick(tableEnum.subAccount)">{{ $t("__subAccount") }}</el-button>
       </el-col>
       <el-col :span="9" class="agentInfoFormOther">
-        <el-button class="bg-yellow" size="mini" @click="onAddSubBtnClick()">{{ addSubLabel }}</el-button>
+        <el-button v-if="!isAgentSubAccount" class="bg-yellow" size="mini" @click="onAddSubBtnClick()">{{ addSubLabel }}</el-button>
       </el-col>
     </el-row>
     <agent
@@ -128,7 +129,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'accountStatusType'
+      'accountStatusType',
+      'isAgentSubAccount'
     ]),
     addSubLabel() {
       switch (this.curTableIndex) {
@@ -143,6 +145,9 @@ export default {
         }
       }
       return ''
+    },
+    agentInfoBalance() {
+      return this.agentInfo.id === 1 ? 'oo' : this.agentInfo.balance
     }
   },
   created() {
@@ -235,6 +240,10 @@ label {
   display: inline-block;
   margin-right: 5px;
   font-weight: normal;
+}
+
+.agentInfoBalance {
+  letter-spacing: -2px;
 }
 
 .agentInfoFormData {

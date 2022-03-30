@@ -1,9 +1,22 @@
 <template>
-  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" width="30%" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
-    <span>{{ `${$t('__account')}: ${form.account}` }}</span>
-    <span>{{ `${$t('__newPassword')}: ${form.newPassword}` }}</span>
-    <span v-show="!dialogLoading" slot="footer">
-      <el-button type="primary" @click="onClose">{{ confirm }}</el-button>
+  <el-dialog
+    v-loading="dialogLoading"
+    :title="title"
+    :visible.sync="visible"
+    :width="formWidth"
+    :before-close="onClose"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
+    <label>{{ `${$t('__account')}: ` }}
+      <span>{{ `${form.account}` }}</span>
+    </label>
+    <br>
+    <label>{{ `${$t('__newPassword')}: ` }}
+      <span>{{ `${form.newPassword}` }}</span>
+    </label>
+    <span v-if="!dialogLoading" slot="footer">
+      <el-button class="bg-yellow" @click="onClose">{{ confirm }}</el-button>
     </span>
   </el-dialog>
 </template>
@@ -58,7 +71,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-span+span {
-  display: block;
+label {
+  color: #f9c901;
+  font-size: 14px;
+  font-weight: 500;
+  span {
+    color: #fff;
+  }
 }
 </style>

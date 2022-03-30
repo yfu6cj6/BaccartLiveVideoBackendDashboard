@@ -110,3 +110,11 @@ export function agentModBetStatus(data) {
     data: data
   })
 }
+
+export function agentOneClickRecycling(data) {
+  return request({
+    url: '/agent/balance/oneClickRecycling',
+    method: 'post',
+    data: data
+  })
+}

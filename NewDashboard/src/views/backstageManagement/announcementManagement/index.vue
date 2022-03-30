@@ -1,57 +1,58 @@
 <template>
   <div v-loading="dataLoading" class="view-container">
-    <el-form :inline="true" :model="searchForm">
-      <el-form-item>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.title" :placeholder="$t('__announcementTitle')" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.content" :placeholder="$t('__announcementContent')" />
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.type" multiple filterable :placeholder="$t('__announcementType')">
-          <el-option v-for="item in methodType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.is_marquee" multiple filterable :placeholder="$t('__marquee')">
-          <el-option v-for="item in announcementMarqueeStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-date-picker
-          v-model="searchForm.announcementedAt"
-          type="datetimerange"
-          align="right"
-          unlink-panels
-          :range-separator="$t('__to')"
-          :start-placeholder="`${$t('__announcementDate')}(${$t('__start')})`"
-          :end-placeholder="`${$t('__announcementDate')}(${$t('__end')})`"
-          :picker-options="pickerOptions"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-date-picker
-          v-model="searchForm.maintainedAt"
-          type="datetimerange"
-          align="right"
-          unlink-panels
-          :range-separator="$t('__to')"
-          :start-placeholder="`${$t('__maintainDate')}(${$t('__start')})`"
-          :end-placeholder="`${$t('__maintainDate')}(${$t('__end')})`"
-          :picker-options="pickerOptions"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="info" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
-      </el-form-item>
-
-    </el-form>
+    <el-row class="seachForm">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.title" :placeholder="$t('__announcementTitle')" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.content" :placeholder="$t('__announcementContent')" />
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.type" multiple filterable :placeholder="$t('__announcementType')">
+            <el-option v-for="item in methodType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.is_marquee" multiple filterable :placeholder="$t('__marquee')">
+            <el-option v-for="item in announcementMarqueeStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker
+            v-model="searchForm.announcementedAt"
+            type="datetimerange"
+            align="right"
+            unlink-panels
+            :range-separator="$t('__to')"
+            :start-placeholder="`${$t('__announcementDate')}(${$t('__start')})`"
+            :end-placeholder="`${$t('__announcementDate')}(${$t('__end')})`"
+            :picker-options="pickerOptions"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker
+            v-model="searchForm.maintainedAt"
+            type="datetimerange"
+            align="right"
+            unlink-panels
+            :range-separator="$t('__to')"
+            :start-placeholder="`${$t('__maintainDate')}(${$t('__start')})`"
+            :end-placeholder="`${$t('__maintainDate')}(${$t('__end')})`"
+            :picker-options="pickerOptions"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bg-gray" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-row>
 
     <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column type="expand">
@@ -73,8 +74,8 @@
       <el-table-column prop="maintain_ended_at" min-width="60px" :label="`${$t('__maintainDate')}(${$t('__end')})`" align="center" sortable />
       <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
-          <el-button type="danger" size="mini" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button class="bg-red" size="mini" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -121,6 +122,7 @@
 
 <script>
 import { announcementSearch, announcementCreate, announcementEdit, announcementDelete } from '@/api/backstageManagement/announcementManagement'
+import common from '@/layout/mixin/common'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
@@ -131,7 +133,7 @@ import { getFullDate, getNextDate } from '@/utils/transDate'
 export default {
   name: 'AnnouncementManagement',
   components: { EditDialog },
-  mixins: [handlePageChange, shared, handleViewResize],
+  mixins: [handlePageChange, shared, handleViewResize, common],
   data() {
     return {
       pickerOptions: {
@@ -246,7 +248,7 @@ export default {
       this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmChanges')}?`, () => {
         this.$refs.editDialog.setDialogLoading(true)
         this.handleRequest(data)
         announcementEdit(data).then((res) => {
@@ -255,18 +257,18 @@ export default {
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     onDeleteBtnClick(item) {
-      this.$confirm(`${this.$t('__confirmDeletion')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmDeletion')}?`, () => {
         this.dataLoading = true
         announcementDelete(item.id).then((res) => {
           this.handleRespone(res)
           this.$store.dispatch('backstageManagement/setAnnouncement', res)
         }).catch(() => {
-
+          this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none

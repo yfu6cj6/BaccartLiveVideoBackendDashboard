@@ -261,7 +261,6 @@ function export_json_to_excelMul({
       ws["!merges"].push(XLSX.utils.decode_range(item))
     })
   }
-  // console.log("width", autoWidth)
   if (autoWidth) {
     /*设置worksheet每列的最大宽度*/
     var colWidth = []

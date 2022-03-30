@@ -16,10 +16,11 @@
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
+import common from '@/layout/mixin/common'
 
 export default {
   name: 'OperateDialog',
-  mixins: [handleDialogWidth],
+  mixins: [handleDialogWidth, common],
   props: {
     'title': {
       type: String,
@@ -95,6 +96,10 @@ export default {
   text-align: center;
   color: #f9c901;
   padding-top: 10px;
+  margin-bottom: 10px;
+}
+
+.el-form {
   margin-bottom: 10px;
 }
 </style>

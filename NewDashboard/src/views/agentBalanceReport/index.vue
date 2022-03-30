@@ -3,7 +3,7 @@
     <el-row class="agentInfoFormData">
       <el-form :inline="true">
         <el-form-item>
-          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onTableBtnClick(curTableIndex)">{{ $t("__refresh") }}</el-button>
         </el-form-item>
         <el-form-item>
           <el-button class="bg-yellow" size="mini" @click="onExportBtnClick()">{{ $t("__export") }}</el-button>
@@ -59,14 +59,14 @@
       </el-col>
     </el-row>
 
-    <Agent
+    <agent
       v-show="curTableIndex === tableEnum.agent"
       ref="agent"
       :view-height="viewHeight"
       @handleRespone="handleAgentRespone"
       @setDataLoading="setDataLoading"
     />
-    <Member
+    <member
       v-show="curTableIndex === tableEnum.member"
       ref="member"
       :view-height="viewHeight"

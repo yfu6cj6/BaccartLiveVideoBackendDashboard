@@ -1,38 +1,39 @@
 <template>
   <div v-loading="dataLoading" class="view-container">
-    <el-form :inline="true" :model="searchForm">
-      <el-form-item>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.account" :placeholder="$t('__account')" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.nickname" :placeholder="$t('__nickname')" />
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.roles" multiple filterable :placeholder="$t('__role')">
-          <el-option v-for="item in roles" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.agent" multiple filterable :placeholder="$t('__agentName')">
-          <el-option v-for="item in agents" :key="item.key" :label="item.nickname" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.status" multiple filterable :placeholder="$t('__accountStatus')">
-          <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="info" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
-      </el-form-item>
-
-    </el-form>
+    <el-row class="seachForm">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.account" :placeholder="$t('__account')" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.nickname" :placeholder="$t('__nickname')" />
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.roles" multiple filterable :placeholder="$t('__role')">
+            <el-option v-for="item in roles" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.agent" multiple filterable :placeholder="$t('__agentName')">
+            <el-option v-for="item in agents" :key="item.key" :label="item.nickname" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.status" multiple filterable :placeholder="$t('__accountStatus')">
+            <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bg-gray" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-row>
 
     <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column type="expand">
@@ -56,8 +57,8 @@
       <el-table-column prop="statusLabel" min-width="80px" :label="$t('__accountStatus')" align="center" sortable />
       <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
-          <el-button type="danger" size="mini" @click="onPasswordResetBtnClick(scope.row)">{{ $t("__resetPassword") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button class="bg-red" size="mini" @click="onPasswordResetBtnClick(scope.row)">{{ $t("__resetPassword") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -117,6 +118,7 @@
 
 <script>
 import { accountSearch, accountCreate, accountEdit, resetPassword } from '@/api/backstageManagement/accountManagement'
+import common from '@/layout/mixin/common'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
@@ -132,7 +134,7 @@ const defaultForm = {
 export default {
   name: 'AccountManagement',
   components: { EditDialog, ResetPasswordDialog },
-  mixins: [handlePageChange, shared, handleViewResize],
+  mixins: [handlePageChange, shared, handleViewResize, common],
   data() {
     return {
       dialogEnum: Object.freeze({
@@ -225,17 +227,17 @@ export default {
       this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmChanges')}?`, () => {
         this.$refs.editDialog.setDialogLoading(true)
         accountEdit(data).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     onPasswordResetBtnClick(item) {
-      this.$confirm(`${this.$t('__confirmReset')}${this.$t('__account')}:${item.account} ${this.$t('__of')}${this.$t('__password')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmReset')}${this.$t('__account')}:${item.account} ${this.$t('__of')}${this.$t('__password')}?`, () => {
         this.selectForm = { account: item.account }
         this.$refs.resetDialog.setDialogLoading(true)
         resetPassword(item).then((res) => {
@@ -245,7 +247,7 @@ export default {
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none

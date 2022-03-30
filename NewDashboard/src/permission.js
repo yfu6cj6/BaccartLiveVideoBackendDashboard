@@ -34,10 +34,9 @@ router.beforeEach(async(to, from, next) => {
         try {
           resetRouter()
           // get user info
-          const { permissions } = await store.dispatch('user/getInfo')
-          const accessRoutes = await store.dispatch('permission/generateRoutes', permissions)
-          router.addRoutes(accessRoutes)
+          await store.dispatch('user/getInfo')
 
+          // get announcement info
           await store.dispatch('backstageManagement/getAnnouncement')
 
           store.dispatch('common/setCommonType')

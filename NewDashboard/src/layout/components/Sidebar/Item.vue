@@ -32,10 +32,17 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$yellow:#f9c901;
+
 .sub-el-icon {
   color: currentColor;
   width: 1em;
   height: 1em;
+  color: $yellow;
+}
+
+.svg-icon {
+  color: $yellow;
 }
 </style>

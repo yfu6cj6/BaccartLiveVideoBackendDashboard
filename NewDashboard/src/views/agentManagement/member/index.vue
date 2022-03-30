@@ -12,10 +12,10 @@
       </el-table-column>
       <el-table-column :label="$t('__member')" align="center">
         <template slot-scope="scope">
-          <span class="scope-content">{{ scope.row.name }}</span>
+          <span class="scope-content">{{ scope.row.fullName }}</span>
           <br>
-          <el-button class="iconButton" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
-          <el-button class="iconButton" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
+          <el-button v-if="!isAgentSubAccount" class="iconButton" size="mini" icon="el-icon-setting" @click="onEditBtnClick(scope.row)" />
+          <el-button v-if="!isAgentSubAccount" class="iconButton" size="mini" icon="el-icon-unlock" @click="onModPasswordBtnClick(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column prop="currency" :label="$t('__currency')" align="center" />
@@ -23,8 +23,9 @@
         <template slot-scope="scope">
           <span class="scope-content">{{ scope.row.balance }}</span>
           <br>
-          <el-button class="labelButton bg-yellow" size="mini" @click="onDepositBtnClick(scope.row)">{{ $t("__deposit") }}</el-button>
-          <el-button class="labelButton bg-yellow" size="mini" @click="onWithdrawBtnClick(scope.row)">{{ $t("__withdraw") }}</el-button>
+          <el-button v-if="!isAgentSubAccount" class="labelButton bg-yellow" size="mini" @click="onDepositBtnClick(scope.row)">{{ $t("__deposit") }}</el-button>
+          <el-button v-if="!isAgentSubAccount" class="labelButton bg-yellow" size="mini" @click="onWithdrawBtnClick(scope.row)">{{ $t("__withdraw") }}</el-button>
+          <el-button v-if="!isAgentSubAccount" class="labelButton bg-yellow" size="mini" @click="onOneClickRecyclingBtnClick(scope.row)">{{ $t("__oneClickRecycling") }}</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="timeZone.city_name" :label="$t('__timeZone')" align="center" />
@@ -49,10 +50,21 @@
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('__operate')" align="center" width="auto">
+      <el-table-column v-if="!isAgentSubAccount" :label="$t('__operate')" align="center" width="auto">
         <template slot-scope="scope">
-          <el-checkbox v-model="scope.row.lockLogin" class="red-tick" :label="$t('__lockLogin')" @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row)" />
-          <el-checkbox v-model="scope.row.debarBet" class="red-tick" :label="$t('__debarBet')" @mousedown.native="onOperateCheckboxClick(dialogEnum.debarBet, scope.row)" />
+          <el-checkbox
+            v-model="scope.row.lockLogin"
+            class="red-tick"
+            :label="$t('__lockLogin')"
+            @mousedown.native="onOperateCheckboxClick(dialogEnum.lockLogin, scope.row)"
+          />
+          <el-checkbox
+            v-model="scope.row.debarBet"
+            class="red-tick"
+            :label="$t('__debarBet')"
+            :disabled="agentInfoBetStatusDisabled"
+            @mousedown.native="onOperateCheckboxClick(dialogEnum.debarBet, scope.row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -111,6 +123,15 @@
       @withdrawBalance="withdrawBalance"
     />
 
+    <operateDialog
+      ref="oneClickRecyclingDialog"
+      :visible="curDialogIndex === dialogEnum.oneClickRecycling"
+      :content="$stringFormat($t('__subOneClickRecyclingMsg'), operateDialogMsgParameter)"
+      :form="editForm"
+      @close="closeDialogEven"
+      @onSubmit="operateSubmit"
+    />
+
     <memberEditDialog
       ref="editDialog"
       :title="$t('__editMember')"
@@ -134,7 +155,7 @@
       :form="editForm"
       :step-enum="editStepEnum"
       @close="closeDialogEven"
-      @editSuccess="handleRespone"
+      @editSuccess="createDialogEditSuccess"
     />
 
     <operateDialog
@@ -154,13 +175,21 @@
       @close="closeDialogEven"
       @onSubmit="operateSubmit"
     />
+
+    <passwordTipDialog
+      :title="$t('__tip')"
+      :visible="curDialogIndex === dialogEnum.passwordTip"
+      :confirm="$t('__confirm')"
+      :form="editForm"
+      @close="closeDialogEven"
+    />
   </div>
 </template>
 
 <script>
 import { memberSearch, memberModPassword, memberGetSetBalanceInfo,
   memberDepositBalance, memberWithdrawBalance, memberModStatus,
-  memberModBetStatus, memberGetLastBetTime } from '@/api/agentManagement/member'
+  memberModBetStatus, memberGetLastBetTime, memberOneClickRecycling } from '@/api/agentManagement/member'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
@@ -169,6 +198,8 @@ import LimitDialog from '@/views/agentManagement/limitDialog'
 import ModPasswordDialog from '@/views/agentManagement/modPasswordDialog'
 import BalanceDialog from '@/views/agentManagement/balanceDialog'
 import OperateDialog from '@/views/agentManagement/operateDialog'
+import PasswordTipDialog from '@/views/agentManagement/passwordTipDialog'
+import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
 
 const defaultForm = {
@@ -194,7 +225,7 @@ const editFormStepEnum = Object.freeze({ 'memberInfo': 0, 'rate': 1, 'limit': 2,
 
 export default {
   name: 'Member',
-  components: { MemberEditDialog, LimitDialog, ModPasswordDialog, BalanceDialog, OperateDialog },
+  components: { MemberEditDialog, LimitDialog, ModPasswordDialog, BalanceDialog, OperateDialog, PasswordTipDialog },
   mixins: [handlePageChange, shared],
   props: {
     'viewHeight': {
@@ -216,7 +247,9 @@ export default {
         'depositBalance': 5,
         'withdrawBalance': 6,
         'lockLogin': 7,
-        'debarBet': 8
+        'debarBet': 8,
+        'passwordTip': 9,
+        'oneClickRecycling': 10
       }),
       agentInfo: {},
       handicaps: [],
@@ -224,6 +257,14 @@ export default {
       editStepEnum: {},
       curDialogIndex: 0,
       operateDialogMsgParameter: []
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'isAgentSubAccount'
+    ]),
+    agentInfoBetStatusDisabled() {
+      return this.agentInfo.bet_status === '0'
     }
   },
   methods: {
@@ -249,6 +290,17 @@ export default {
           })
           break
         }
+        case this.dialogEnum.oneClickRecycling: {
+          this.$refs.oneClickRecyclingDialog.setDialogLoading(true)
+          data.memberId = this.editForm.memberId
+          memberOneClickRecycling(data).then((res) => {
+            this.handleRespone(res)
+            this.$refs.oneClickRecyclingDialog.setDialogLoading(false)
+          }).catch(() => {
+            this.$refs.oneClickRecyclingDialog.setDialogLoading(false)
+          })
+          break
+        }
       }
     },
     onOperateCheckboxClick(operateType, rowData) {
@@ -256,12 +308,13 @@ export default {
       switch (operateType) {
         case this.dialogEnum.lockLogin: {
           this.curDialogIndex = this.dialogEnum.lockLogin
-          this.operateDialogMsgParameter = [rowData.name]
+          this.operateDialogMsgParameter = [rowData.fullName]
           break
         }
         case this.dialogEnum.debarBet: {
+          if (this.agentInfoBetStatusDisabled) return
           this.curDialogIndex = this.dialogEnum.debarBet
-          this.operateDialogMsgParameter = [rowData.name]
+          this.operateDialogMsgParameter = [rowData.fullName]
           break
         }
       }
@@ -291,10 +344,11 @@ export default {
     },
     handleRespone(res) {
       this.agentInfo = res.agentInfo
-      this.agentInfo.fullName = this.agentInfo.nickname + '(' + this.agentInfo.account + ')'
+      this.agentInfo.fullName = `${this.agentInfo.nickname}(${this.agentInfo.account})`
 
       this.allDataByClient = res.rows
       this.allDataByClient.forEach(element => {
+        element.fullName = `${element.nick_name}(${element.name})`
         element.currency = element.currency.code
         element.time_zone = element.timeZone.id
         element.lockLogin = element.status === '0'
@@ -305,6 +359,12 @@ export default {
 
       this.closeDialogEven()
       this.$emit('serverResponse', JSON.parse(JSON.stringify(res)))
+    },
+    createDialogEditSuccess(res) {
+      this.handleRespone(res)
+      const data = JSON.parse(JSON.stringify(this.editForm))
+      this.editForm = { account: data.name, newPassword: data.password }
+      this.curDialogIndex = this.dialogEnum.passwordTip
     },
     numberFormatStr(number) {
       return numberFormat(number)
@@ -337,7 +397,7 @@ export default {
       })
     },
     onModPasswordBtnClick(rowData) {
-      this.editForm = { id: rowData.id, fullName: rowData.name }
+      this.editForm = { id: rowData.id, fullName: rowData.fullName, account: rowData.name }
       this.curDialogIndex = this.dialogEnum.modPassword
     },
     onDepositBtnClick(rowData) {
@@ -362,11 +422,18 @@ export default {
         this.$refs.withdrawBalanceDialog.setDialogLoading(false)
       })
     },
+    onOneClickRecyclingBtnClick(rowData) {
+      this.editForm = { memberId: rowData.id }
+      this.curDialogIndex = this.dialogEnum.oneClickRecycling
+      this.operateDialogMsgParameter = [rowData.fullName]
+    },
     modPassword(data) {
       this.$refs.modPasswordDialog.setDialogLoading(true)
       memberModPassword(data).then((res) => {
         this.handleRespone(res)
         this.$refs.modPasswordDialog.setDialogLoading(false)
+        this.editForm = { account: this.editForm.account, newPassword: data.newPassword }
+        this.curDialogIndex = this.dialogEnum.passwordTip
       }).catch(() => {
         this.$refs.modPasswordDialog.setDialogLoading(false)
       })

@@ -1,26 +1,27 @@
 <template>
   <div v-loading="dataLoading" class="view-container">
-    <el-form :inline="true" :model="searchForm">
-      <el-form-item>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.id" type="number" placeholder="ID" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.time_zone" :placeholder="$t('__timeZone')" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.city_name" :placeholder="$t('__cityName')" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="info" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
-      </el-form-item>
-
-    </el-form>
+    <el-row class="seachForm">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.id" type="number" placeholder="ID" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.time_zone" :placeholder="$t('__timeZone')" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.city_name" :placeholder="$t('__cityName')" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bg-gray" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-row>
 
     <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column prop="id" min-width="25px" label="ID" align="center" sortable />
@@ -28,8 +29,8 @@
       <el-table-column prop="city_name" min-width="80px" :label="$t('__cityName')" align="center" sortable />
       <el-table-column min-width="100px" :label="$t('__operate')" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
-          <el-button type="danger" size="mini" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button class="bg-red" size="mini" @click="onDeleteBtnClick(scope.row)">{{ $t("__delete") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -70,6 +71,7 @@
 
 <script>
 import { timezoneSearch, timezoneCreate, timezoneEdit, timezoneDelete } from '@/api/backstageManagement/timeZoneManagement'
+import common from '@/layout/mixin/common'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
@@ -78,7 +80,7 @@ import EditDialog from './editDialog'
 export default {
   name: 'TimeZoneManagement',
   components: { EditDialog },
-  mixins: [handlePageChange, shared, handleViewResize],
+  mixins: [handlePageChange, shared, handleViewResize, common],
   data() {
     return {
       dialogEnum: Object.freeze({
@@ -142,24 +144,24 @@ export default {
       this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmChanges')}?`, () => {
         this.$refs.editDialog.setDialogLoading(true)
         timezoneEdit(data).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     onDeleteBtnClick(item) {
-      this.$confirm(`${this.$t('__confirmDeletion')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmDeletion')}?`, () => {
         this.dataLoading = true
         timezoneDelete(item.id).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none

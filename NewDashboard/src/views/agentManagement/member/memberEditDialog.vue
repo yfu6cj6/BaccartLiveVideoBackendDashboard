@@ -37,11 +37,6 @@
           <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('__betStatus')" prop="bet_status">
-        <el-select v-model="form.bet_status">
-          <el-option v-for="item in accountStatusType" :key="item.key" :label="$t(item.nickname)" :value="item.key" />
-        </el-select>
-      </el-form-item>
       <el-form-item :label="$t('__timeZone')" prop="time_zone">
         <el-select v-model="form.time_zone">
           <el-option v-for="item in time_zone" :key="item.id" :label="item.city_name" :value="item.id" />
@@ -85,7 +80,7 @@
     <el-form v-show="curIndex === stepEnum.balanceConfig" ref="step4" :model="form" :rules="step4Rules" label-width="70px" :label-position="formLabelPosition">
       <div class="step4Info">
         <label>{{ $t('__superiorAgent') + ': ' }}
-          <span>{{ agentInfo.fullName }}</span>
+          <span>{{ agentBalanceInfo.parent }}</span>
         </label>
         <br>
         <label>{{ $t('__agentBalance') + ': ' }}
@@ -93,11 +88,11 @@
         </label>
         <br>
         <label>{{ $t('__member') + ': ' }}
-          <span>{{ form.nick_name }}</span>
+          <span>{{ agentBalanceInfo.agent }}</span>
         </label>
         <br>
         <label>{{ $t('__memberBalance') + ': ' }}
-          <span>{{ numberFormatStr(0) }}</span>
+          <span>{{ agentBalanceInfo.agentBalance }}</span>
         </label>
       </div>
       <el-form-item :label="$t('__depositBalance')" prop="balance">
@@ -172,23 +167,25 @@
         </el-form-item>
       </el-row>
     </el-form>
-    <span v-show="!dialogLoading" slot="footer">
-      <el-button v-show="previousBtnVisible" class="bg-gray" @click="onPreviousBtnClick">{{ $t("__previous") }}</el-button>
-      <el-button v-show="nextBtnVisible" class="bg-yellow" @click="onNextBtnClick">{{ $t("__nextStep") }}</el-button>
-      <el-button v-show="confirmBtnVisible" class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
+    <span v-if="!dialogLoading" slot="footer">
+      <el-button v-if="previousBtnVisible" class="bg-gray" @click="onPreviousBtnClick">{{ $t("__previous") }}</el-button>
+      <el-button v-if="nextBtnVisible" class="bg-yellow" @click="onNextBtnClick">{{ $t("__nextStep") }}</el-button>
+      <el-button v-if="confirmBtnVisible" class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
+import common from '@/layout/mixin/common'
 import { memberCreateAccount, memberCreate, memberEdit } from '@/api/agentManagement/member'
+import { agentGetSetBalanceInfo } from '@/api/agentManagement/agent'
 import { mapGetters } from 'vuex'
 import { numberFormat } from '@/utils/numberFormat'
 
 export default {
   name: 'MemberEditDialog',
-  mixins: [handleDialogWidth],
+  mixins: [handleDialogWidth, common],
   props: {
     'title': {
       type: String,
@@ -318,7 +315,8 @@ export default {
       time_zone: [],
       currency: [],
       dialogLoading: false,
-      selectHandicaps: []
+      selectHandicaps: [],
+      agentBalanceInfo: {}
     }
   },
   computed: {
@@ -358,7 +356,7 @@ export default {
       return currencyData ? currencyData.name : ''
     },
     parentBalance() {
-      return this.agentInfo.id === 1 ? '∞' : this.agentInfo.balance
+      return this.agentBalanceInfo.parentId === 1 ? '∞' : this.agentBalanceInfo.parentBalance
     }
   },
   watch: {
@@ -389,6 +387,16 @@ export default {
           if (this.form.handicaps.some(formHandicaps => formHandicaps.id === agentInfoHandicap.id)) {
             this.$refs.handicapsTable.toggleRowSelection(agentInfoHandicap, true)
           }
+        })
+      } else if (this.curIndex === this.stepEnum.balanceConfig) {
+        this.dialogLoading = true
+        const data = { agentId: this.agentInfo.id, actType: 'create' }
+        agentGetSetBalanceInfo(data).then((res) => {
+          this.agentBalanceInfo = res.rows
+          this.agentBalanceInfo.agent = `${this.form.nick_name}(${this.form.name})`
+          this.dialogLoading = false
+        }).catch(() => {
+          this.dialogLoading = false
         })
       }
     }
@@ -478,6 +486,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$yellow:#f9c901;
+
 label {
   font-weight: 300;
 }
@@ -488,7 +498,7 @@ label {
 }
 
 .agentNameSpan {
-  color: #f9c901;
+  color: $yellow;
 }
 
 span {
@@ -510,7 +520,7 @@ span {
 .step4Info {
   margin: 10px 0 0 0;
   label {
-    color: #f9c901;
+    color: $yellow;
     font-size: 10px;
     font-weight: 500;
   }
@@ -518,13 +528,13 @@ span {
 
 .step5Header {
   font-size: 16px;
-  color: #f9c901;
+  color: $yellow;
   font-weight: 600;
 }
 
 .step5Info {
   label {
-    color: #f9c901;
+    color: $yellow;
     font-size: 10px;
     font-weight: 500;
   }
@@ -539,13 +549,13 @@ span {
 }
 
 .v-line100 {
-  border-bottom: 0.08333rem solid #f9c901;
+  border-bottom: 0.08333rem solid $yellow;
   width: 100%;
   height: 1px;
 }
 
 .v-line96 {
-  border-bottom: 0.08333rem solid #f9c901;
+  border-bottom: 0.08333rem solid $yellow;
   width: 96%;
   height: 1px;
 }

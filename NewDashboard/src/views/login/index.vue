@@ -1,68 +1,50 @@
 <template>
-  <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
-      <div class="title-container">
-        <h3 class="title">Login Form</h3>
-      </div>
-
-      <el-form-item prop="account">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="account"
-          v-model="loginForm.account"
-          placeholder="Enter Account"
-          name="account"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
-      </el-form-item>
-
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Enter Password"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd()">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-        </span>
-      </el-form-item>
-
-      <el-form-item v-if="showCaptcha" prop="captcha">
-        <el-input
-          ref="captcha"
-          v-model="loginForm.captcha"
-          placeholder="Enter Captcha"
-          name="captcha"
-          type="text"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="captcha-container">
-          <img class="captcha-content" :src="captchaImg">
-        </span>
-
-        <span class="refresh" @click="refreshCaptcha()">
-          <i class="el-icon-refresh-right" />
-        </span>
-      </el-form-item>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
-    </el-form>
+  <div>
+    <el-row class="form-container">
+      <div class="title">{{ $t('__projectName') }}</div>
+      <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
+        <el-form-item prop="account" :class="{'validateSuccess': accountValidateSuccess, 'validateError': accountValidateError}">
+          <div>
+            <svg-icon class="icon" icon-class="user" />
+            <el-input
+              ref="account"
+              v-model="loginForm.account"
+              class="input"
+              name="account"
+              type="text"
+              tabindex="1"
+            />
+          </div>
+        </el-form-item>
+        <el-form-item prop="password" :class="{'validateSuccess': passwordValidateSuccess, 'validateError': passwordValidateError}">
+          <svg-icon class="icon" icon-class="key" />
+          <el-input
+            :key="passwordType"
+            ref="password"
+            v-model="loginForm.password"
+            class="input"
+            :type="passwordType"
+            name="password"
+            tabindex="2"
+            @keyup.enter.native="handleLogin"
+          />
+          <svg-icon class="show-password" :class="{'isActive': passwordType !== 'password'}" :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" @click="showPwd()" />
+        </el-form-item>
+        <el-form-item v-if="showCaptcha" prop="captcha" :class="{'validateSuccess': captchaValidateSuccess, 'validateError': captchaValidateError}">
+          <el-input
+            ref="captcha"
+            v-model="loginForm.captcha"
+            class="captchaInput"
+            name="captcha"
+            type="text"
+            @keyup.enter.native="handleLogin"
+          />
+          <img class="captcha" :src="captchaImg" @click="refreshCaptcha()">
+          <i class="el-icon-refresh-right refresh" @click="refreshCaptcha()" />
+        </el-form-item>
+        <el-button :loading="loading" class="bg-yellow" @click.native.prevent="handleLogin">{{ $t('__login') }}</el-button>
+      </el-form>
+    </el-row>
   </div>
 </template>
 
@@ -74,15 +56,28 @@ export default {
   data() {
     const validateAccount = (rule, value, callback) => {
       if (!value) {
-        callback(new Error('This field is requiredRequired'))
+        this.validateAccount = 2
+        callback(new Error(' '))
       } else {
+        this.validateAccount = 1
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 5) {
-        callback(new Error('The password can not be less than 5 digits'))
+      if (!value) {
+        this.validatePassword = 2
+        callback(new Error(' '))
       } else {
+        this.validatePassword = 1
+        callback()
+      }
+    }
+    const validateCaptcha = (rule, value, callback) => {
+      if (!value) {
+        this.validateCaptcha = 2
+        callback(new Error(' '))
+      } else {
+        this.validateCaptcha = 1
         callback()
       }
     }
@@ -96,17 +91,38 @@ export default {
       loginRules: {
         account: [{ required: true, trigger: 'blur', validator: validateAccount }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        captcha: [{ required: true, trigger: 'blur', validator: validateAccount }]
+        captcha: [{ required: true, trigger: 'blur', validator: validateCaptcha }]
       },
       loading: false,
       passwordType: 'password',
       captchaData: {},
+      validateAccount: 0,
+      validatePassword: 0,
+      validateCaptcha: 0,
       showCaptcha: process.env.NODE_ENV !== 'development'
     }
   },
   computed: {
     captchaImg() {
       return this.captchaData.img
+    },
+    accountValidateSuccess() {
+      return this.validateAccount === 1
+    },
+    accountValidateError() {
+      return this.validateAccount === 2
+    },
+    passwordValidateSuccess() {
+      return this.validatePassword === 1
+    },
+    passwordValidateError() {
+      return this.validatePassword === 2
+    },
+    captchaValidateSuccess() {
+      return this.validateCaptcha === 1
+    },
+    captchaValidateError() {
+      return this.validateCaptcha === 2
     }
   },
   created() {
@@ -135,11 +151,10 @@ export default {
       })
     },
     handleLogin() {
-      this.loading = true
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+          this.loading = true
           login(this.loginForm).then((res) => {
-            this.$store.dispatch('user/login', res)
             // status = '0' 已被停權
             if (res.user.status === '0') {
               this.$message({
@@ -151,9 +166,9 @@ export default {
                 message: 'Login successfully',
                 type: 'success'
               })
+              this.$store.dispatch('user/login', res)
               this.$router.push({ path: '/home' })
             }
-            this.loading = false
           }).catch((err) => {
             if (this.showCaptcha) {
               this.captchaData = err.data.captcha
@@ -161,11 +176,9 @@ export default {
               this.loginForm.captcha = ''
               this.$refs.captcha.focus()
             }
+          }).finally(() => {
             this.loading = false
           })
-        } else {
-          this.loading = false
-          return false
         }
       })
     }
@@ -174,129 +187,106 @@ export default {
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
-$bg:#283443;
-$light_gray:#fff;
-$cursor: #fff;
-
-@supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
-    color: $cursor;
+.form-container {
+  .el-input__inner {
+    border: none;
+    font-size: 16px;
+    color: #fff;
+    background-color: rgba(255,255,255,0);
   }
-}
-
-/* reset element-ui css */
-.login-container {
-  .el-input {
-    display: inline-block;
-    height: 47px;
-    width: calc(100% - 100px - 50px);
-
-    input {
-      background: transparent;
-      border: 0px;
-      -webkit-appearance: none;
-      border-radius: 0px;
-      padding: 12px 5px 12px 15px;
-      color: $light_gray;
-      height: 47px;
-      caret-color: $cursor;
-
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
-      }
-    }
-  }
-
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
+  .el-form-item__content {
+    background-color: rgba(255,255,255,0.08);
   }
 }
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$yellow:#f9c901;
 
-.login-container {
-  min-height: 100%;
+.form-container {
+  max-width: 100%;
+  height: 100vh;
+  margin: 0 auto;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  -webkit-box-align: center;
+  align-items: center;
+  background-color: black;
+  padding-top: 150px;
+}
+
+.title {
+  font-size: 1.66667rem;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 1.41667rem;
+  color: #b99e71;
+}
+
+.icon {
+  width: 2rem !important;
+  height: 2rem !important;
+  display: inline;
+  vertical-align: middle;
+  color: $yellow;
+  padding: 5px;
+}
+
+.icon+.input {
+  display: inline-block;
+  width: calc(100% - 2rem - 1.5em);
+}
+
+.input {
+  padding-left: 5px;
+}
+
+.show-password {
+  float: right;
+  height: 40px;
+  cursor: pointer;
+  color: #6e6e6e;
+}
+
+.captchaInput {
+  width: calc(100% - 100px - 14px);
+}
+
+.captcha {
+  vertical-align: middle;
+  width: 100px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.show-password.isActive,
+.refresh {
+  cursor: pointer;
+  color: #fff;
+}
+
+.el-form-item {
+  display: block;
+  padding: 0px;
+  margin: 20px 0;
+  border-bottom: 2px solid $yellow;
+  width: 360px;
+}
+
+.el-form-item.validateSuccess {
+  border-bottom: 2px solid #67c23a;
+}
+
+.el-form-item.validateError {
+  border-bottom: 2px solid #f56c6c;
+}
+
+.el-button {
+  margin-top: 10px;
   width: 100%;
-  background-color: $bg;
-  overflow: hidden;
-
-  .login-form {
-    position: relative;
-    width: 520px;
-    max-width: 100%;
-    padding: 160px 35px 0;
-    margin: 0 auto;
-    overflow: hidden;
-  }
-
-  .el-image {
-    margin: 22px 0 0;
-  }
-
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $dark_gray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
-  }
-
-  .captcha {
-    &-container {
-      color: $dark_gray;
-      vertical-align: middle;
-      width: 100px;
-      height: auto;
-      display: inline-block;
-    }
-
-    &-content {
-      width: 100%;
-      vertical-align: middle;
-    }
-  }
-
-  .title-container {
-    position: relative;
-
-    .title {
-      font-size: 26px;
-      color: $light_gray;
-      margin: 0px auto 40px auto;
-      text-align: center;
-      font-weight: bold;
-    }
-  }
-
-  .show-pwd {
-    position: absolute;
-    right: 10px;
-    top: 7px;
-    font-size: 16px;
-    color: $dark_gray;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .refresh {
-    position: absolute;
-    right: 14px;
-    top: 7px;
-    font-size: 16px;
-    color: $dark_gray;
-    cursor: pointer;
-    user-select: none;
-  }
+  font-size: 20px;
 }
 </style>

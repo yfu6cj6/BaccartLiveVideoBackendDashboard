@@ -1,6 +1,14 @@
 <template>
-  <el-dialog v-loading="dialogLoading" :title="title" :visible.sync="visible" width="20%" :before-close="onClose" :close-on-click-modal="false" :close-on-press-escape="false">
-    <el-form ref="editForm" class="row" :model="editForm" :rules="rules">
+  <el-dialog
+    v-loading="dialogLoading"
+    :title="title"
+    :visible.sync="visible"
+    :width="formWidth"
+    :before-close="onClose"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
+    <el-form ref="editForm" class="row" :model="editForm" :rules="rules" label-width="60px" label-position="left">
       <el-form-item label="ID" prop="id">
         <el-input v-model="editForm.id" :disabled="true" />
       </el-form-item>
@@ -14,16 +22,19 @@
         <el-input v-model="editForm.symbol" />
       </el-form-item>
     </el-form>
-    <span v-show="!dialogLoading" slot="footer">
-      <el-button icon="el-icon-minus" @click="onReset">{{ $t("__reset") }}</el-button>
-      <el-button type="primary" icon="el-icon-check" @click="onSubmit">{{ confirm }}</el-button>
+    <span v-if="!dialogLoading" slot="footer">
+      <el-button class="bg-gray" @click="onReset">{{ $t("__reset") }}</el-button>
+      <el-button class="bg-yellow" @click="onSubmit">{{ confirm }}</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
+import handleDialogWidth from '@/layout/mixin/handleDialogWidth'
+
 export default {
   name: 'EditDialog',
+  mixins: [handleDialogWidth],
   props: {
     'title': {
       type: String,
@@ -93,6 +104,7 @@ export default {
     },
     onReset() {
       this.editForm = JSON.parse(JSON.stringify(this.form))
+      this.$refs.editForm.clearValidate()
     },
     setDialogLoading(dialogLoading) {
       this.dialogLoading = dialogLoading
@@ -101,5 +113,8 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.el-input {
+  width: 90%;
+}
 </style>

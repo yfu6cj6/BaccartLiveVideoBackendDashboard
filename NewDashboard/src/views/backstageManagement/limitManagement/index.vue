@@ -1,26 +1,27 @@
 <template>
   <div v-loading="dataLoading" class="view-container">
-    <el-form :inline="true" :model="searchForm">
-      <el-form-item>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.id" type="number" placeholder="ID" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.lower_limit" type="number" :placeholder="$t('__lowerLimit')" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="searchForm.upper_limit" type="number" :placeholder="$t('__upperLimit')" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="info" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
-        <el-button type="primary" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
-        <el-button type="primary" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
-        <el-button type="primary" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
-      </el-form-item>
-
-    </el-form>
+    <el-row class="seachForm">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__refresh") }}</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.id" type="number" placeholder="ID" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.lower_limit" type="number" :placeholder="$t('__lowerLimit')" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="searchForm.upper_limit" type="number" :placeholder="$t('__upperLimit')" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bg-gray" size="mini" @click="onReset()">{{ $t("__reset") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="handleCurrentChange(1)">{{ $t("__search") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onShowAllBtnClick({})">{{ $t("__showAll") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onCreateBtnClick()">{{ $t("__create") }}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-row>
 
     <el-table :data="tableData" border :max-height="viewHeight">
       <el-table-column prop="id" label="ID" align="center" />
@@ -28,7 +29,7 @@
       <el-table-column prop="upper_limit" :label="$t('__upperLimit')" align="center" />
       <el-table-column :label="$t('__operate')" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
+          <el-button class="bg-yellow" size="mini" @click="onEditBtnClick(scope.row)">{{ $t("__edit") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -69,6 +70,7 @@
 
 <script>
 import { tableLimitSearch, tableLimitCreate, tableLimitEdit } from '@/api/backstageManagement/limitManagement'
+import common from '@/layout/mixin/common'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
 import handleViewResize from '@/layout/mixin/handleViewResize'
@@ -77,7 +79,7 @@ import EditDialog from './editDialog'
 export default {
   name: 'LimitManagement',
   components: { EditDialog },
-  mixins: [handlePageChange, shared, handleViewResize],
+  mixins: [handlePageChange, shared, handleViewResize, common],
   data() {
     return {
       dialogEnum: Object.freeze({
@@ -141,14 +143,14 @@ export default {
       this.curDialogIndex = this.dialogEnum.edit
     },
     editDialogConfirmEven(data) {
-      this.$confirm(`${this.$t('__confirmChanges')}?`).then(_ => {
+      this.confirmMsg(`${this.$t('__confirmChanges')}?`, () => {
         this.$refs.editDialog.setDialogLoading(true)
         tableLimitEdit(data).then((res) => {
           this.handleRespone(res)
         }).catch(() => {
           this.closeLoading()
         })
-      }).catch(_ => {})
+      })
     },
     closeDialogEven() {
       this.curDialogIndex = this.dialogEnum.none

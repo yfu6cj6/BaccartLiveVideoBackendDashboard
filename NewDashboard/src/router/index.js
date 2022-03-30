@@ -80,6 +80,13 @@ export const asyncRoutes = [
     displayChildren: true,
     children: [
       {
+        // 真人玩法管理
+        path: 'liveBetAreaManagement',
+        name: 'LiveBetAreaManagement',
+        component: () => import('@/views/backstageManagement/liveBetAreaManagement/index'),
+        meta: { title: '__liveBetAreaManagement', icon: 'el-icon-user', permission: 'BackStageManage.LiveBetAreaManage' }
+      },
+      {
         // 限紅管理
         path: 'limitManagement',
         name: 'LimitManagement',
@@ -91,7 +98,7 @@ export const asyncRoutes = [
         path: 'gameTableManagement',
         name: 'GameTableManagement',
         component: () => import('@/views/backstageManagement/gameTableManagement/index'),
-        meta: { title: '__gameTableManagement', icon: 'user', permission: 'BackStageManage.GameTableManage' }
+        meta: { title: '__gameTableManagement', icon: 'el-icon-s-flag', permission: 'BackStageManage.GameTableManage' }
       },
       {
         // 帳號管理
@@ -178,7 +185,7 @@ export const asyncRoutes = [
     path: '/agentBalanceRecord',
     component: Layout,
     redirect: '/agentBalanceRecord',
-    meta: { title: '__agentBalanceRecord', icon: 'el-icon-star-off', permission: 'AgentManage.Balance.Record' },
+    meta: { title: '__agentBalanceRecord', icon: 'el-icon-data-line', permission: 'AgentManage.Balance.Record' },
     children: [{
       path: 'agentBalanceRecord',
       name: 'AgentBalanceRecord',
@@ -192,7 +199,7 @@ export const asyncRoutes = [
     path: '/memberBalanceRecord',
     component: Layout,
     redirect: '/memberBalanceRecord',
-    meta: { title: '__memberBalanceRecord', icon: 'el-icon-postcard', permission: 'MemberManage.Balance.Record' },
+    meta: { title: '__memberBalanceRecord', icon: 'el-icon-data-analysis', permission: 'MemberManage.Balance.Record' },
     children: [{
       path: 'memberBalanceRecord',
       name: 'MemberBalanceRecord',
