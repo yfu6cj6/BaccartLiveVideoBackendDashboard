@@ -2,13 +2,19 @@ export default {
   data() {
     return {
       viewHeight: 0,
-      otherHeight: 100,
+      otherHeight: 0,
       formClassName: []
     }
   },
+  computed: {
+    commonClassName() {
+      return ['navbar', 'tags-view-container', 'seachForm', 'el-pagination']
+    },
+    commonOtherHeight() {
+      return 5
+    }
+  },
   mounted() {
-    this.formClassName.push('el-pagination')
-    this.formClassName.push('seachForm')
     window.onresize = () => {
       this.setHeight()
     }
@@ -18,15 +24,16 @@ export default {
   },
   methods: {
     setHeight() {
-      const windowsHeight = document.body.clientHeight
+      const windowsHeight = document.body.offsetHeight
       let formHeight = 0
-      this.formClassName.forEach(element => {
+      const className = this.commonClassName.concat(this.formClassName)
+      className.forEach(element => {
         const el = document.getElementsByClassName(element)[0]
         if (el) {
-          formHeight += el.clientHeight
+          formHeight += el.offsetHeight
         }
       })
-      this.viewHeight = windowsHeight - this.otherHeight - formHeight
+      this.viewHeight = windowsHeight - this.otherHeight - this.commonOtherHeight - formHeight
     }
   }
 }

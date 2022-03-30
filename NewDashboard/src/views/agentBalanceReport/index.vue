@@ -105,7 +105,7 @@ export default {
   created() {
     this.tempRoute = Object.assign({}, this.$route)
     this.formClassName = ['agentInfoFormData', 'agentInfoForm']
-    this.otherHeight += 50
+    this.otherHeight = 50
     this.$nextTick(() => {
       this.agentId = this.$route.params && this.$route.params.id
       this.onTableBtnClick(this.tableEnum.agent)
@@ -185,7 +185,6 @@ span {
 .agentInfoFormData,
 .agentInfoForm {
   background: #333;
-  margin: 5px 5px 0 5px;
 }
 
 .agentInfoFormBtn {

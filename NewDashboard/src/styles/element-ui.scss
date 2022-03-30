@@ -147,13 +147,18 @@ div::-webkit-scrollbar-track {
 }
 
 div::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
+  height: 8px;
   background-color: black;
 }
 
 div::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color: $yellow;
+}
+
+div::-webkit-scrollbar-corner {
+  background-color: #000;
 }
 
 .bg-yellow,

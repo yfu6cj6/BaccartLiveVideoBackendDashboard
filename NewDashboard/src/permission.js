@@ -39,8 +39,6 @@ router.beforeEach(async(to, from, next) => {
           // get announcement info
           await store.dispatch('backstageManagement/getAnnouncement')
 
-          store.dispatch('common/setCommonType')
-
           next({ ...to, replace: true })
         } catch (error) {
           // remove token and go to login page to re-login

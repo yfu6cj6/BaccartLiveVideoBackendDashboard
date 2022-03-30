@@ -3,6 +3,7 @@ import { removeToken, removeTokenType } from '@/utils/auth'
 import { asyncRoutes, constantRoutes } from '@/router'
 import router from '@/router'
 import { resetRouter } from '@/router'
+import store from '@/store'
 
 const getDefaultState = () => {
   return {
@@ -55,6 +56,7 @@ const actions = {
   login({ commit }, res) {
     commit('SET_USER', res)
     commit('SET_ROUTES', res.permissions)
+    store.dispatch('common/setCommonType')
   },
 
   // get user info
@@ -63,6 +65,7 @@ const actions = {
       getInfo().then(res => {
         commit('SET_USER', res)
         commit('SET_ROUTES', res.permissions)
+        store.dispatch('common/setCommonType')
         resolve()
       }).catch(error => {
         reject(error)

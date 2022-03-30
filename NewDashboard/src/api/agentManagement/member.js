@@ -94,3 +94,11 @@ export function memberOneClickRecycling(data) {
     data: data
   })
 }
+
+export function memberWeeklyLossSettlement(data) {
+  return request({
+    url: '/member/modWeeklyLossSettlement',
+    method: 'post',
+    data: data
+  })
+}

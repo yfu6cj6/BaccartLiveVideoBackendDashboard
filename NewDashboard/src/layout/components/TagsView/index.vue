@@ -14,7 +14,7 @@
         @contextmenu.prevent.native="openMenu(tag,$event)"
       >
         {{ $t(tag.title) }}
-        <span v-if="!isAffix(tag)" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
+        <svg-icon v-if="!isAffix(tag)" icon-class="close" @click.prevent.stop="closeSelectedTag(tag)" />
       </router-link>
     </scroll-pane>
     <ul v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
@@ -213,8 +213,13 @@ $yellow:#f9c901;
       border-right: 1px solid #fff;
       color: #fff;
       background: #000;
-      padding: 0px 5px;
+      padding: 10px 5px;
       font-size: 14px;
+      .svg-icon {
+        font-size: 8px;
+        margin-left: 10px;
+        vertical-align: middle;
+      }
       &:first-of-type {
         margin-left: 0px;
       }
@@ -258,32 +263,6 @@ $yellow:#f9c901;
       cursor: pointer;
       &:hover {
         background: #444;
-      }
-    }
-  }
-}
-</style>
-
-<style lang="scss">
-//reset element css of el-icon-close
-.tags-view-wrapper {
-  .tags-view-item {
-    .el-icon-close {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      text-align: center;
-      transition: all .3s cubic-bezier(.645, .045, .355, 1);
-      transform-origin: 100% 50%;
-      font-size: 24px;
-      &:before {
-        transform: scale(.6);
-        display: inline-block;
-        vertical-align: -3px;
-      }
-      &:hover {
-        background-color: #333;
-        color: #fff;
       }
     }
   }

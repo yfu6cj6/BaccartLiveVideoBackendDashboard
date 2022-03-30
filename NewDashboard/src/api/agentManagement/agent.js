@@ -118,3 +118,11 @@ export function agentOneClickRecycling(data) {
     data: data
   })
 }
+
+export function agentWeeklyLossSettlement(data) {
+  return request({
+    url: '/agent/modWeeklyLossSettlement',
+    method: 'post',
+    data: data
+  })
+}

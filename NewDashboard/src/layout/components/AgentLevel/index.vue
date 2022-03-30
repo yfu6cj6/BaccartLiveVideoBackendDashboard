@@ -6,7 +6,7 @@
         <span>{{ $t('__agentManagement') }}</span>
       </div>
       <el-input v-model="filterText" :placeholder="$t('__enterKeys')" />
-      <el-scrollbar wrap-class="scrollbar-wrapper">
+      <div class="scroll-view">
         <el-tree
           ref="tree"
           v-loading="agentLevelLoading"
@@ -21,7 +21,7 @@
           :expand-on-click-node="false"
           @node-click="handleNodeClick"
         />
-      </el-scrollbar>
+      </div>
     </div>
   </div>
 </template>
@@ -113,7 +113,7 @@ $yellow:#f9c901;
 .agentLevel {
   width: 170px;
   max-width: 170px;
-  height: 100vh;
+  height: 100%;
   position: fixed;
   top: 0%;
   right: 100%;
@@ -130,6 +130,15 @@ $yellow:#f9c901;
     padding: 10px 0;
     cursor: pointer;
   }
+
+  .scroll-view {
+    max-height: calc(100vh - 90px);
+    overflow: auto;
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 100%;
+    padding-right: 10px;
+  }
 }
 
 .show {
@@ -143,8 +152,6 @@ $yellow:#f9c901;
 .el-tree {
   background-color: #000;
   color: #fff;
-  min-width: 100%;
   display: inline-block;
-  overflow: hidden;
 }
 </style>

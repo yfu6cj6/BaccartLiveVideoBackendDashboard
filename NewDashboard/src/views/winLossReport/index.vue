@@ -178,7 +178,7 @@ export default {
   created() {
     this.tempRoute = Object.assign({}, this.$route)
     this.formClassName = ['agentInfoFormData', 'agentInfoForm']
-    this.otherHeight += 50
+    this.otherHeight = 50
     this.$nextTick(() => {
       this.agentId = this.$route.params && this.$route.params.id
       this.onTableBtnClick(this.tableEnum.agent)

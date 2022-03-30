@@ -1,7 +1,7 @@
 <template>
   <div :class="{'has-logo':showLogo}">
     <logo v-if="showLogo" :collapse="isCollapse" />
-    <el-scrollbar wrap-class="scrollbar-wrapper">
+    <div class="scroll-container">
       <el-menu
         :default-active="activeMenu"
         :collapse="isCollapse"
@@ -14,7 +14,7 @@
       >
         <sidebar-item v-for="route in permission_routes" :key="route.path" :item="route" :base-path="route.path" />
       </el-menu>
-    </el-scrollbar>
+    </div>
   </div>
 </template>
 
@@ -52,3 +52,13 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.scroll-container {
+  max-height: 100vh;
+  overflow: auto;
+  overflow-x: auto;
+  white-space: nowrap;
+  width: 100%;
+}
+</style>

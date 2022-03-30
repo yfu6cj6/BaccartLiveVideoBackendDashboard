@@ -76,7 +76,14 @@
             class="red-tick"
             :label="$t('__debarBet')"
             :disabled="agentInfoBetStatusDisabled"
-            @mousedown.native="onOperateCheckboxClick(dialogEnum.oneClickRecycling, scope.row)"
+            @mousedown.native="onOperateCheckboxClick(dialogEnum.debarBet, scope.row)"
+          />
+          <br>
+          <el-checkbox
+            v-model="scope.row.weeklyLossSettlement"
+            class="red-tick"
+            :label="$t('__weeklyLossSettlement')"
+            @mousedown.native="onOperateCheckboxClick(dialogEnum.weeklyLossSettlement, scope.row)"
           />
         </template>
       </el-table-column>
@@ -214,6 +221,15 @@
       @onSubmit="operateSubmit"
     />
 
+    <operateDialog
+      ref="weeklyLossSettlementDialog"
+      :visible="curDialogIndex === dialogEnum.weeklyLossSettlement"
+      :content="$stringFormat($t('__agentWeeklyLossSettlement'), operateDialogMsgParameter)"
+      :form="editForm"
+      @close="closeDialogEven"
+      @onSubmit="operateSubmit"
+    />
+
     <passwordTipDialog
       :title="$t('__tip')"
       :visible="curDialogIndex === dialogEnum.passwordTip"
@@ -227,7 +243,7 @@
 <script>
 import { agentSearch, agentCommissionRateLog, agentRollingRateLog, agentModPassword,
   agentGetSetBalanceInfo, agentDepositBalance, agentWithdrawBalance, agentModTotallyDisabled,
-  agentModStatus, agentModBetStatus, agentOneClickRecycling } from '@/api/agentManagement/agent'
+  agentModStatus, agentModBetStatus, agentOneClickRecycling, agentWeeklyLossSettlement } from '@/api/agentManagement/agent'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import { currencySearch } from '@/api/backstageManagement/currencyManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
@@ -293,7 +309,8 @@ export default {
         'lockLogin': 10,
         'debarBet': 11,
         'passwordTip': 12,
-        'oneClickRecycling': 13
+        'oneClickRecycling': 13,
+        'weeklyLossSettlement': 14
       }),
       handicaps: [],
       agentInfo: {},
@@ -359,6 +376,16 @@ export default {
           })
           break
         }
+        case this.dialogEnum.weeklyLossSettlement: {
+          this.$refs.weeklyLossSettlementDialog.setDialogLoading(true)
+          agentWeeklyLossSettlement(data).then((res) => {
+            this.handleRespone(res)
+            this.$refs.weeklyLossSettlementDialog.setDialogLoading(false)
+          }).catch(() => {
+            this.$refs.weeklyLossSettlementDialog.setDialogLoading(false)
+          })
+          break
+        }
       }
     },
     onOperateCheckboxClick(operateType, rowData) {
@@ -378,6 +405,11 @@ export default {
         case this.dialogEnum.debarBet: {
           if (this.agentInfoBetStatusDisabled) return
           this.curDialogIndex = this.dialogEnum.debarBet
+          this.operateDialogMsgParameter = [rowData.fullName]
+          break
+        }
+        case this.dialogEnum.weeklyLossSettlement: {
+          this.curDialogIndex = this.dialogEnum.weeklyLossSettlement
           this.operateDialogMsgParameter = [rowData.fullName]
           break
         }
@@ -409,6 +441,7 @@ export default {
         element.totallyDisabled = element.totally_disabled === '1'
         element.lockLogin = element.status === '0'
         element.debarBet = element.bet_status === '0'
+        element.weeklyLossSettlement = element.weekly_loss_settlement === '1'
       })
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)

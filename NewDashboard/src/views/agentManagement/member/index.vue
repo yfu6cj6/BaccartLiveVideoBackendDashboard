@@ -65,6 +65,12 @@
             :disabled="agentInfoBetStatusDisabled"
             @mousedown.native="onOperateCheckboxClick(dialogEnum.debarBet, scope.row)"
           />
+          <el-checkbox
+            v-model="scope.row.weeklyLossSettlement"
+            class="red-tick"
+            :label="$t('__weeklyLossSettlement')"
+            @mousedown.native="onOperateCheckboxClick(dialogEnum.weeklyLossSettlement, scope.row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -126,7 +132,7 @@
     <operateDialog
       ref="oneClickRecyclingDialog"
       :visible="curDialogIndex === dialogEnum.oneClickRecycling"
-      :content="$stringFormat($t('__subOneClickRecyclingMsg'), operateDialogMsgParameter)"
+      :content="$stringFormat($t('__memberOneClickRecyclingMsg'), operateDialogMsgParameter)"
       :form="editForm"
       @close="closeDialogEven"
       @onSubmit="operateSubmit"
@@ -176,6 +182,15 @@
       @onSubmit="operateSubmit"
     />
 
+    <operateDialog
+      ref="weeklyLossSettlementDialog"
+      :visible="curDialogIndex === dialogEnum.weeklyLossSettlement"
+      :content="$stringFormat($t('__memberWeeklyLossSettlement'), operateDialogMsgParameter)"
+      :form="editForm"
+      @close="closeDialogEven"
+      @onSubmit="operateSubmit"
+    />
+
     <passwordTipDialog
       :title="$t('__tip')"
       :visible="curDialogIndex === dialogEnum.passwordTip"
@@ -189,7 +204,8 @@
 <script>
 import { memberSearch, memberModPassword, memberGetSetBalanceInfo,
   memberDepositBalance, memberWithdrawBalance, memberModStatus,
-  memberModBetStatus, memberGetLastBetTime, memberOneClickRecycling } from '@/api/agentManagement/member'
+  memberModBetStatus, memberGetLastBetTime, memberOneClickRecycling,
+  memberWeeklyLossSettlement } from '@/api/agentManagement/member'
 import { timezoneSearch } from '@/api/backstageManagement/timeZoneManagement'
 import handlePageChange from '@/layout/mixin/handlePageChange'
 import shared from '@/layout/mixin/shared'
@@ -249,7 +265,8 @@ export default {
         'lockLogin': 7,
         'debarBet': 8,
         'passwordTip': 9,
-        'oneClickRecycling': 10
+        'oneClickRecycling': 10,
+        'weeklyLossSettlement': 11
       }),
       agentInfo: {},
       handicaps: [],
@@ -301,6 +318,16 @@ export default {
           })
           break
         }
+        case this.dialogEnum.weeklyLossSettlement: {
+          this.$refs.weeklyLossSettlementDialog.setDialogLoading(true)
+          memberWeeklyLossSettlement(data).then((res) => {
+            this.handleRespone(res)
+            this.$refs.weeklyLossSettlementDialog.setDialogLoading(false)
+          }).catch(() => {
+            this.$refs.weeklyLossSettlementDialog.setDialogLoading(false)
+          })
+          break
+        }
       }
     },
     onOperateCheckboxClick(operateType, rowData) {
@@ -314,6 +341,11 @@ export default {
         case this.dialogEnum.debarBet: {
           if (this.agentInfoBetStatusDisabled) return
           this.curDialogIndex = this.dialogEnum.debarBet
+          this.operateDialogMsgParameter = [rowData.fullName]
+          break
+        }
+        case this.dialogEnum.weeklyLossSettlement: {
+          this.curDialogIndex = this.dialogEnum.weeklyLossSettlement
           this.operateDialogMsgParameter = [rowData.fullName]
           break
         }
@@ -353,6 +385,7 @@ export default {
         element.time_zone = element.timeZone.id
         element.lockLogin = element.status === '0'
         element.debarBet = element.bet_status === '0'
+        element.weeklyLossSettlement = element.weekly_loss_settlement === '1'
       })
       this.totalCount = res.rows.length
       this.handlePageChangeByClient(this.currentPage)

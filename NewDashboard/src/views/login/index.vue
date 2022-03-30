@@ -154,7 +154,7 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          login(this.loginForm).then((res) => {
+          login(this.loginForm).then(async(res) => {
             // status = '0' 已被停權
             if (res.user.status === '0') {
               this.$message({
@@ -167,6 +167,7 @@ export default {
                 type: 'success'
               })
               this.$store.dispatch('user/login', res)
+              await this.$store.dispatch('backstageManagement/getAnnouncement')
               this.$router.push({ path: '/home' })
             }
           }).catch((err) => {

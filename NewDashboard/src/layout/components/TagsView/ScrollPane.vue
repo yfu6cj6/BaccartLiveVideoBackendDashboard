@@ -1,7 +1,7 @@
 <template>
-  <el-scrollbar ref="scrollContainer" :vertical="false" class="scroll-container" @wheel.native.prevent="handleScroll">
+  <div ref="scrollContainer" class="scroll-container" @mousewheel.prevent="handleScroll">
     <slot />
-  </el-scrollbar>
+  </div>
 </template>
 
 <script>
@@ -16,7 +16,7 @@ export default {
   },
   computed: {
     scrollWrapper() {
-      return this.$refs.scrollContainer.$refs.wrap
+      return this.$refs.scrollContainer
     }
   },
   mounted() {
@@ -29,13 +29,13 @@ export default {
     handleScroll(e) {
       const eventDelta = e.wheelDelta || -e.deltaY * 40
       const $scrollWrapper = this.scrollWrapper
-      $scrollWrapper.scrollLeft = $scrollWrapper.scrollLeft + eventDelta / 4
+      $scrollWrapper.scrollLeft = $scrollWrapper.scrollLeft - eventDelta / 4
     },
     emitScroll() {
       this.$emit('scroll')
     },
     moveToTarget(currentTag) {
-      const $container = this.$refs.scrollContainer.$el
+      const $container = document.getElementsByClassName('scroll-view')[0]
       const $containerWidth = $container.offsetWidth
       const $scrollWrapper = this.scrollWrapper
       const tagList = this.$parent.$refs.tag
@@ -78,17 +78,10 @@ export default {
 
 <style lang="scss" scoped>
 .scroll-container {
+  max-height: calc(100vh - 90px);
+  overflow: auto;
+  overflow-x: auto;
   white-space: nowrap;
-  position: relative;
-  overflow: hidden;
   width: 100%;
-  ::v-deep {
-    .el-scrollbar__bar {
-      bottom: 0px;
-    }
-    .el-scrollbar__wrap {
-      height: 49px;
-    }
-  }
 }
 </style>
